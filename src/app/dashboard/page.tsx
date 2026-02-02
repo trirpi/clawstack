@@ -3,8 +3,14 @@ import Link from 'next/link'
 import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
+import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { Button } from '@/components/ui/Button'
 import { formatDate } from '@/lib/utils'
+
+export const metadata = {
+  title: 'Dashboard - Clawstack',
+  description: 'Manage your posts and publication',
+}
 
 export default async function DashboardPage() {
   const session = await getSession()
@@ -45,6 +51,7 @@ export default async function DashboardPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
+      <DashboardNav />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-8">
@@ -118,7 +125,7 @@ export default async function DashboardPage() {
                         Edit
                       </Button>
                     </Link>
-                    <Link href={`/@${publication.slug}/${post.slug}`}>
+                    <Link href={`/${publication.slug}/${post.slug}`}>
                       <Button variant="outline" size="sm">
                         View
                       </Button>
