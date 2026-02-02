@@ -1,10 +1,32 @@
 'use client'
 
 import { signIn } from 'next-auth/react'
+import { useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 
-export default function LoginPage() {
+const errorMessages: Record<string, string> = {
+  Configuration: 'Server configuration error. Please contact support.',
+  AccessDenied: 'Access denied. You may not have permission to sign in.',
+  Verification: 'The verification link has expired or has already been used.',
+  OAuthSignin: 'Error starting the sign in process. Please try again.',
+  OAuthCallback: 'Error during authentication callback. Please try again.',
+  OAuthCreateAccount: 'Could not create your account. Please try again.',
+  EmailCreateAccount: 'Could not create your account. Please try again.',
+  Callback: 'Authentication callback error. Please try again.',
+  OAuthAccountNotLinked: 'This email is already associated with another account.',
+  EmailSignin: 'Error sending the verification email. Please try again.',
+  CredentialsSignin: 'Sign in failed. Please check your credentials.',
+  SessionRequired: 'Please sign in to access this page.',
+  Default: 'An error occurred during sign in. Please try again.',
+}
+
+function LoginContent() {
+  const searchParams = useSearchParams()
+  const error = searchParams.get('error')
+  const errorMessage = error ? (errorMessages[error] || errorMessages.Default) : null
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
@@ -20,6 +42,25 @@ export default function LoginPage() {
             Sign in to your account to continue
           </p>
         </div>
+
+        {errorMessage && (
+          <div className="rounded-lg bg-red-50 border border-red-200 p-4">
+            <div className="flex items-start gap-3">
+              <svg className="w-5 h-5 text-red-600 mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+              <div>
+                <h3 className="text-sm font-medium text-red-800">Sign in failed</h3>
+                <p className="mt-1 text-sm text-red-700">{errorMessage}</p>
+                {error === 'Configuration' && (
+                  <p className="mt-2 text-xs text-red-600">
+                    Error code: {error}. The administrator needs to configure OAuth credentials.
+                  </p>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="mt-8 space-y-4">
           <Button
@@ -61,5 +102,17 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="animate-pulse text-gray-400">Loading...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
   )
 }
