@@ -156,6 +156,80 @@ test.describe('Visual Regression Tests', () => {
     })
   })
 
+  test.describe('Explore Page', () => {
+    test('full page screenshot', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      await page.goto('/explore')
+      await page.waitForLoadState('networkidle')
+      
+      await expect(page).toHaveScreenshot('explore-desktop.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.05,
+      })
+    })
+  })
+
+  test.describe('Pricing Page', () => {
+    test('full page screenshot', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      await page.goto('/pricing')
+      await page.waitForLoadState('networkidle')
+      
+      await expect(page).toHaveScreenshot('pricing-desktop.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.05,
+      })
+    })
+
+    test('pricing cards screenshot', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      await page.goto('/pricing')
+      await page.waitForLoadState('networkidle')
+      
+      const cards = page.locator('.grid').first()
+      await expect(cards).toHaveScreenshot('pricing-cards.png', {
+        maxDiffPixelRatio: 0.05,
+      })
+    })
+  })
+
+  test.describe('About Page', () => {
+    test('full page screenshot', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      await page.goto('/about')
+      await page.waitForLoadState('networkidle')
+      
+      await expect(page).toHaveScreenshot('about-desktop.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.05,
+      })
+    })
+  })
+
+  test.describe('Legal Pages', () => {
+    test('privacy page screenshot', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      await page.goto('/privacy')
+      await page.waitForLoadState('networkidle')
+      
+      await expect(page).toHaveScreenshot('privacy-desktop.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.05,
+      })
+    })
+
+    test('terms page screenshot', async ({ page }) => {
+      await page.setViewportSize({ width: 1280, height: 720 })
+      await page.goto('/terms')
+      await page.waitForLoadState('networkidle')
+      
+      await expect(page).toHaveScreenshot('terms-desktop.png', {
+        fullPage: true,
+        maxDiffPixelRatio: 0.05,
+      })
+    })
+  })
+
   test.describe('Component States', () => {
     test('button hover state', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })

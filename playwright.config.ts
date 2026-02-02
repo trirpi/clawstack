@@ -8,13 +8,18 @@ export default defineConfig({
   workers: process.env.CI ? 1 : undefined,
   reporter: 'html',
   
-  // Screenshot comparison settings
+  // Screenshot comparison settings - strict for catching visual regressions
   expect: {
     toHaveScreenshot: {
-      maxDiffPixelRatio: 0.05,
-      threshold: 0.2,
+      // Allow only 1% pixel difference (was 5%)
+      maxDiffPixelRatio: 0.01,
+      // Per-pixel color threshold - lower = stricter (was 0.2)
+      threshold: 0.1,
     },
   },
+  
+  // Don't auto-update snapshots in CI - fail instead
+  updateSnapshots: process.env.CI ? 'none' : 'missing',
   
   // Snapshot settings
   snapshotDir: './__tests__/e2e/snapshots',
