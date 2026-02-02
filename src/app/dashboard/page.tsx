@@ -1,0 +1,135 @@
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
+import { getSession, getCurrentUser } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { Header } from '@/components/layout/Header'
+import { Button } from '@/components/ui/Button'
+import { formatDate } from '@/lib/utils'
+
+export default async function DashboardPage() {
+  const session = await getSession()
+  
+  if (!session?.user) {
+    redirect('/login')
+  }
+
+  const user = await getCurrentUser()
+  
+  // Get or create publication
+  let publication = user?.publication
+  
+  if (!publication) {
+    // Create a default publication for new users
+    const slug = session.user.email?.split('@')[0] || session.user.id
+    publication = await prisma.publication.create({
+      data: {
+        name: `${session.user.name || 'My'}'s Publication`,
+        slug,
+        userId: session.user.id,
+      },
+    })
+  }
+
+  // Get posts
+  const posts = await prisma.post.findMany({
+    where: { publicationId: publication.id },
+    orderBy: { createdAt: 'desc' },
+    take: 10,
+  })
+
+  // Get subscriber count
+  const subscriberCount = await prisma.subscription.count({
+    where: { publicationId: publication.id },
+  })
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
+        {/* Stats */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-8">
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="text-sm text-gray-500">Total Posts</div>
+            <div className="text-3xl font-bold text-gray-900 mt-1">{posts.length}</div>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="text-sm text-gray-500">Subscribers</div>
+            <div className="text-3xl font-bold text-gray-900 mt-1">{subscriberCount}</div>
+          </div>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+            <div className="text-sm text-gray-500">Publication</div>
+            <div className="text-xl font-semibold text-gray-900 mt-1 truncate">
+              {publication.name}
+            </div>
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold text-gray-900">Your Posts</h1>
+          <Link href="/dashboard/new">
+            <Button>New Post</Button>
+          </Link>
+        </div>
+
+        {/* Posts List */}
+        {posts.length === 0 ? (
+          <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-200">
+            <div className="text-4xl mb-4">📝</div>
+            <h2 className="text-xl font-semibold text-gray-900 mb-2">
+              No posts yet
+            </h2>
+            <p className="text-gray-600 mb-6">
+              Start sharing your OpenClaw scripts, plugins, and tutorials
+            </p>
+            <Link href="/dashboard/new">
+              <Button>Create Your First Post</Button>
+            </Link>
+          </div>
+        ) : (
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-200">
+            {posts.map((post) => (
+              <div key={post.id} className="p-6 hover:bg-gray-50 transition-colors">
+                <div className="flex items-start justify-between">
+                  <div className="flex-1 min-w-0">
+                    <Link
+                      href={`/dashboard/edit/${post.id}`}
+                      className="text-lg font-semibold text-gray-900 hover:text-orange-600"
+                    >
+                      {post.title}
+                    </Link>
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
+                        post.published
+                          ? 'bg-green-100 text-green-800'
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {post.published ? 'Published' : 'Draft'}
+                      </span>
+                      <span className="px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                        {post.category}
+                      </span>
+                      <span>{formatDate(post.createdAt)}</span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 ml-4">
+                    <Link href={`/dashboard/edit/${post.id}`}>
+                      <Button variant="ghost" size="sm">
+                        Edit
+                      </Button>
+                    </Link>
+                    <Link href={`/@${publication.slug}/${post.slug}`}>
+                      <Button variant="outline" size="sm">
+                        View
+                      </Button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </main>
+    </div>
+  )
+}

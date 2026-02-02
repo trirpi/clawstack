@@ -1,36 +1,161 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# OpenClaw
+
+A publishing platform for AI automation creators. Share scripts, plugins, prompts, and tutorials with the OpenClaw community.
+
+## Features
+
+- **Rich Publishing** - Write articles with syntax-highlighted code blocks
+- **One-Click Install** - Readers can install scripts directly to OpenClaw
+- **Paid Subscriptions** - Monetize your content with Stripe
+- **AI-Native Format** - .claw file downloads and deep linking support
+- **Community** - Comments and subscriber engagement
+
+## Tech Stack
+
+- **Framework**: Next.js 16 with App Router
+- **Styling**: Tailwind CSS
+- **Database**: Prisma ORM with SQLite (development) / PostgreSQL (production)
+- **Auth**: NextAuth.js with GitHub OAuth
+- **Payments**: Stripe Checkout & Connect
+- **Editor**: Tiptap rich text editor
+- **Testing**: Vitest (unit) + Playwright (E2E)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+- Node.js 20+
+- npm or yarn
+- GitHub OAuth App (for authentication)
+- Stripe account (for payments)
+
+### Installation
+
+1. Clone the repository:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/yourusername/clawstack.git
+cd clawstack
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Install dependencies:
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. Set up environment variables:
+```bash
+cp .env.example .env
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Edit `.env` with your credentials:
+- Create a GitHub OAuth app at https://github.com/settings/developers
+- Get Stripe keys from https://dashboard.stripe.com/apikeys
 
-## Learn More
+4. Set up the database:
+```bash
+npx prisma generate
+npx prisma db push
+```
 
-To learn more about Next.js, take a look at the following resources:
+5. Start the development server:
+```bash
+npm run dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+Visit http://localhost:3000
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Scripts
 
-## Deploy on Vercel
+```bash
+npm run dev        # Start development server
+npm run build      # Build for production
+npm run start      # Start production server
+npm run lint       # Run ESLint
+npm run test       # Run unit tests
+npm run test:watch # Run tests in watch mode
+npm run test:e2e   # Run E2E tests
+npm run db:push    # Push schema to database
+npm run db:studio  # Open Prisma Studio
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Project Structure
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```
+clawstack/
+├── src/
+│   ├── app/                    # Next.js App Router pages
+│   │   ├── api/               # API routes
+│   │   ├── dashboard/         # Creator dashboard
+│   │   ├── [username]/        # Publication pages
+│   │   └── login/             # Auth pages
+│   ├── components/            # React components
+│   │   ├── content/          # Content display components
+│   │   ├── editor/           # Post editor
+│   │   ├── landing/          # Landing page sections
+│   │   ├── layout/           # Header, Footer
+│   │   ├── providers/        # Context providers
+│   │   └── ui/               # Reusable UI components
+│   ├── lib/                   # Utilities and configs
+│   └── types/                 # TypeScript definitions
+├── prisma/                    # Database schema
+├── __tests__/                 # Test files
+│   ├── unit/                 # Unit tests
+│   └── e2e/                  # End-to-end tests
+└── public/                    # Static assets
+```
+
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push to GitHub
+2. Import project on [Vercel](https://vercel.com)
+3. Add environment variables
+4. Deploy
+
+### Environment Variables for Production
+
+```
+DATABASE_URL=postgresql://...
+NEXTAUTH_SECRET=<generated-secret>
+NEXTAUTH_URL=https://your-domain.com
+GITHUB_ID=<oauth-app-id>
+GITHUB_SECRET=<oauth-app-secret>
+STRIPE_SECRET_KEY=sk_live_xxx
+STRIPE_PUBLISHABLE_KEY=pk_live_xxx
+STRIPE_WEBHOOK_SECRET=whsec_xxx
+```
+
+## OpenClaw Integration
+
+### Deep Linking
+
+Scripts can be installed via deep link:
+```
+openclaw://install?url=https://your-site.com/user/script-name
+```
+
+### .claw File Format
+
+```json
+{
+  "version": "1.0",
+  "title": "Script Name",
+  "description": "What it does",
+  "author": "Author Name",
+  "category": "SCRIPT",
+  "scripts": ["script content here"]
+}
+```
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests: `npm run test && npm run test:e2e`
+5. Submit a pull request
+
+## License
+
+MIT
