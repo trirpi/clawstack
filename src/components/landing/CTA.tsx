@@ -15,10 +15,7 @@ export function CTA() {
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
             <Link href="/login">
-              <Button
-                size="lg"
-                className="bg-white text-orange-600 hover:bg-orange-50"
-              >
+              <Button size="lg" variant="white">
                 Create Your Publication
               </Button>
             </Link>

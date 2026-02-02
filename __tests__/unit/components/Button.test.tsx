@@ -26,6 +26,13 @@ describe('Button', () => {
     expect(button.className).toContain('border-2')
   })
 
+  it('applies white variant', () => {
+    render(<Button variant="white">White</Button>)
+    const button = screen.getByRole('button')
+    expect(button.className).toContain('bg-white')
+    expect(button.className).toContain('text-orange-600')
+  })
+
   it('applies size classes', () => {
     render(<Button size="lg">Large</Button>)
     const button = screen.getByRole('button')
