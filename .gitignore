@@ -14,6 +14,9 @@
 /coverage
 /playwright-report/
 /test-results/
+# Keep snapshots but ignore diff outputs
+__tests__/e2e/snapshots/**/*-diff.png
+__tests__/e2e/snapshots/**/*-actual.png
 
 # next.js
 /.next/

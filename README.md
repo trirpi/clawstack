@@ -14,7 +14,7 @@ A publishing platform for AI automation creators. Share scripts, plugins, prompt
 
 - **Framework**: Next.js 16 with App Router
 - **Styling**: Tailwind CSS
-- **Database**: Prisma ORM with SQLite (development) / PostgreSQL (production)
+- **Database**: Prisma ORM with PostgreSQL (Vercel Postgres, Neon, Supabase)
 - **Auth**: NextAuth.js with GitHub OAuth
 - **Payments**: Stripe Checkout & Connect
 - **Editor**: Tiptap rich text editor
@@ -115,14 +115,19 @@ clawstack/
 
 ### Environment Variables for Production
 
+**Required for Vercel:**
+
+1. **Database** - Add Vercel Postgres from Storage tab, it auto-populates:
+   - `DATABASE_URL` - Pooled connection string
+   - `DIRECT_URL` - Direct connection for migrations
+
+2. **Auth & API Keys:**
 ```
-DATABASE_URL=postgresql://...
-NEXTAUTH_SECRET=<generated-secret>
-NEXTAUTH_URL=https://your-domain.com
-GITHUB_ID=<oauth-app-id>
-GITHUB_SECRET=<oauth-app-secret>
+NEXTAUTH_SECRET=<run: openssl rand -base64 32>
+NEXTAUTH_URL=https://your-app.vercel.app
+GITHUB_ID=<from github.com/settings/developers>
+GITHUB_SECRET=<from GitHub OAuth app>
 STRIPE_SECRET_KEY=sk_live_xxx
-STRIPE_PUBLISHABLE_KEY=pk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```
 
