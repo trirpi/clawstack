@@ -11,7 +11,7 @@ export default function LoginPage() {
         <div className="text-center">
           <Link href="/" className="inline-flex items-center gap-2">
             <span className="text-4xl">🦞</span>
-            <span className="text-2xl font-bold text-gray-900">OpenClaw</span>
+            <span className="text-2xl font-bold text-gray-900">Clawstack</span>
           </Link>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
             Welcome back

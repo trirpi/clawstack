@@ -80,7 +80,7 @@ export default async function DashboardPage() {
               No posts yet
             </h2>
             <p className="text-gray-600 mb-6">
-              Start sharing your OpenClaw scripts, plugins, and tutorials
+              Start sharing your Clawstack scripts, plugins, and tutorials
             </p>
             <Link href="/dashboard/new">
               <Button>Create Your First Post</Button>

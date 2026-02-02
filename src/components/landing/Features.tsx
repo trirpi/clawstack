@@ -9,7 +9,7 @@ const features = [
     icon: '🔌',
     title: 'One-Click Install',
     description:
-      'Readers can install your scripts and plugins directly to OpenClaw with a single click.',
+      'Readers can install your scripts and plugins directly to Clawstack with a single click.',
   },
   {
     icon: '💰',
@@ -33,7 +33,7 @@ const features = [
     icon: '🌐',
     title: 'Community',
     description:
-      'Comments, discussions, and recommendations. Connect with the OpenClaw community.',
+      'Comments, discussions, and recommendations. Connect with the Clawstack community.',
   },
 ]
 
@@ -46,7 +46,7 @@ export function Features() {
             Everything you need to share AI automations
           </h2>
           <p className="mt-4 text-lg text-gray-600">
-            Built specifically for the OpenClaw community
+            Built specifically for the Clawstack community
           </p>
         </div>
 

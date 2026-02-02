@@ -129,16 +129,16 @@ export default async function PostPage({ params }: Props) {
             />
           )}
 
-          {/* OpenClaw Install Button for scripts */}
+          {/* Clawstack Install Button for scripts */}
           {post.category === 'SCRIPT' && !showPaywall && (
             <div className="mt-8 p-4 bg-orange-50 rounded-xl border border-orange-200">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="font-semibold text-gray-900">
-                    Install to OpenClaw
+                    Install to Clawstack
                   </h4>
                   <p className="text-sm text-gray-600">
-                    One-click install this script to your OpenClaw
+                    One-click install this script to your Clawstack
                   </p>
                 </div>
                 <Button>Install Script</Button>

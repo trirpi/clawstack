@@ -5,7 +5,7 @@ test.describe('SEO', () => {
     await page.goto('/')
     
     const title = await page.title()
-    expect(title).toContain('OpenClaw')
+    expect(title).toContain('Clawstack')
   })
 
   test('home page should have meta description', async ({ page }) => {

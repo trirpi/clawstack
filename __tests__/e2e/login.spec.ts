@@ -7,11 +7,11 @@ test.describe('Login Page', () => {
     await expect(page.getByRole('heading', { name: /welcome back/i })).toBeVisible()
   })
 
-  test('should show OpenClaw branding', async ({ page }) => {
+  test('should show Clawstack branding', async ({ page }) => {
     await page.goto('/login')
     
     await expect(page.getByText('🦞')).toBeVisible()
-    await expect(page.getByText('OpenClaw')).toBeVisible()
+    await expect(page.getByText('Clawstack')).toBeVisible()
   })
 
   test('should have GitHub sign in button', async ({ page }) => {

@@ -9,10 +9,10 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: 'OpenClaw - Share AI Automations',
+  title: 'Clawstack - Share AI Automations',
   description:
-    'The publishing platform for AI automation creators. Share scripts, plugins, prompts, and tutorials with the OpenClaw community.',
-  keywords: ['OpenClaw', 'AI', 'automation', 'scripts', 'plugins', 'newsletter'],
+    'The publishing platform for AI automation creators. Share scripts, plugins, prompts, and tutorials with the Clawstack community.',
+  keywords: ['Clawstack', 'AI', 'automation', 'scripts', 'plugins', 'newsletter'],
 }
 
 export default function RootLayout({

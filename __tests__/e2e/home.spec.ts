@@ -4,7 +4,7 @@ test.describe('Home Page', () => {
   test('should display the landing page with correct title', async ({ page }) => {
     await page.goto('/')
     
-    await expect(page).toHaveTitle(/OpenClaw/)
+    await expect(page).toHaveTitle(/Clawstack/)
   })
 
   test('should display hero section with main heading', async ({ page }) => {
@@ -12,7 +12,7 @@ test.describe('Home Page', () => {
     
     const heading = page.getByRole('heading', { level: 1 })
     await expect(heading).toBeVisible()
-    await expect(heading).toContainText('OpenClaw')
+    await expect(heading).toContainText('Clawstack')
   })
 
   test('should have Get Started CTA button', async ({ page }) => {
@@ -39,7 +39,7 @@ test.describe('Home Page', () => {
     await expect(page.getByText('Creator Earnings')).toBeVisible()
   })
 
-  test('should have OpenClaw logo', async ({ page }) => {
+  test('should have Clawstack logo', async ({ page }) => {
     await page.goto('/')
     
     // Check logo is visible

@@ -1,11 +1,11 @@
-# OpenClaw
+# Clawstack
 
-A publishing platform for AI automation creators. Share scripts, plugins, prompts, and tutorials with the OpenClaw community.
+A publishing platform for AI automation creators. Share scripts, plugins, prompts, and tutorials with the Clawstack community.
 
 ## Features
 
 - **Rich Publishing** - Write articles with syntax-highlighted code blocks
-- **One-Click Install** - Readers can install scripts directly to OpenClaw
+- **One-Click Install** - Readers can install scripts directly to Clawstack
 - **Paid Subscriptions** - Monetize your content with Stripe
 - **AI-Native Format** - .claw file downloads and deep linking support
 - **Community** - Comments and subscriber engagement
@@ -131,13 +131,13 @@ STRIPE_SECRET_KEY=sk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```
 
-## OpenClaw Integration
+## Clawstack Integration
 
 ### Deep Linking
 
 Scripts can be installed via deep link:
 ```
-openclaw://install?url=https://your-site.com/user/script-name
+clawstack://install?url=https://your-site.com/user/script-name
 ```
 
 ### .claw File Format

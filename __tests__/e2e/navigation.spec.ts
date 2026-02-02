@@ -23,7 +23,7 @@ test.describe('Navigation', () => {
     await page.goto('/login')
     
     // Click the logo
-    await page.getByRole('link').filter({ has: page.getByText('OpenClaw') }).first().click()
+    await page.getByRole('link').filter({ has: page.getByText('Clawstack') }).first().click()
     
     await expect(page).toHaveURL('/')
   })

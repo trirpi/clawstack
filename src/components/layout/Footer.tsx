@@ -7,7 +7,7 @@ export function Footer() {
         <div className="flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
             <span className="text-2xl">🦞</span>
-            <span className="text-lg font-bold text-gray-900">OpenClaw</span>
+            <span className="text-lg font-bold text-gray-900">Clawstack</span>
           </div>
           <div className="flex items-center gap-6 text-sm text-gray-600">
             <Link href="/about" className="hover:text-gray-900">
@@ -24,7 +24,7 @@ export function Footer() {
             </Link>
           </div>
           <div className="text-sm text-gray-500">
-            &copy; {new Date().getFullYear()} OpenClaw. All rights reserved.
+            &copy; {new Date().getFullYear()} Clawstack. All rights reserved.
           </div>
         </div>
       </div>

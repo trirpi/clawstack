@@ -8,7 +8,7 @@ export function Hero() {
         <div className="mx-auto max-w-3xl text-center">
           <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
             Share your{' '}
-            <span className="text-orange-600">OpenClaw</span>{' '}
+            <span className="text-orange-600">Clawstack</span>{' '}
             creations with the world
           </h1>
           <p className="mt-6 text-lg leading-8 text-gray-600">

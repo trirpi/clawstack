@@ -13,7 +13,7 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
 
   const handleInstall = () => {
     // Try deep link first
-    window.location.href = `openclaw://install?url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(title)}`
+    window.location.href = `clawstack://install?url=${encodeURIComponent(postUrl)}&title=${encodeURIComponent(title)}`
     
     // Fallback: show options after a delay
     setTimeout(() => setShowOptions(true), 1000)
@@ -21,7 +21,7 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
 
   const handleCopyUrl = async () => {
     await navigator.clipboard.writeText(postUrl)
-    alert('URL copied! Paste in OpenClaw to install.')
+    alert('URL copied! Paste in Clawstack to install.')
   }
 
   const handleDownloadClaw = () => {
@@ -48,9 +48,9 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
     <div className="mt-8 p-4 bg-orange-50 rounded-xl border border-orange-200">
       <div className="flex items-center justify-between flex-wrap gap-4">
         <div>
-          <h4 className="font-semibold text-gray-900">Install to OpenClaw</h4>
+          <h4 className="font-semibold text-gray-900">Install to Clawstack</h4>
           <p className="text-sm text-gray-600">
-            One-click install this script to your OpenClaw
+            One-click install this script to your Clawstack
           </p>
         </div>
         <div className="flex items-center gap-2">
@@ -61,7 +61,7 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
       {showOptions && (
         <div className="mt-4 pt-4 border-t border-orange-200">
           <p className="text-sm text-gray-600 mb-3">
-            OpenClaw app not detected. Try these options:
+            Clawstack app not detected. Try these options:
           </p>
           <div className="flex flex-wrap gap-2">
             <Button variant="outline" size="sm" onClick={handleCopyUrl}>
@@ -71,12 +71,12 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
               Download .claw file
             </Button>
             <a
-              href="https://github.com/openclaw/openclaw"
+              href="https://github.com/clawstack/clawstack"
               target="_blank"
               rel="noopener noreferrer"
             >
               <Button variant="ghost" size="sm">
-                Get OpenClaw
+                Get Clawstack
               </Button>
             </a>
           </div>
