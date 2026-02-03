@@ -52,8 +52,15 @@ export async function POST() {
     })
 
     return NextResponse.json({ url: accountLink.url })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Stripe connect error:', error)
-    return NextResponse.json({ error: 'Failed to connect Stripe' }, { status: 500 })
+    
+    // Get detailed error message
+    let errorMessage = 'Failed to connect Stripe'
+    if (error && typeof error === 'object' && 'message' in error) {
+      errorMessage = (error as { message: string }).message
+    }
+    
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }

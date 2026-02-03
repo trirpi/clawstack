@@ -5,6 +5,13 @@ import { stripe } from '@/lib/stripe'
 
 export async function POST() {
   try {
+    if (!stripe) {
+      return NextResponse.json(
+        { error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY.' },
+        { status: 503 }
+      )
+    }
+
     const session = await getSession()
     
     if (!session?.user?.id) {
@@ -23,8 +30,14 @@ export async function POST() {
     const loginLink = await stripe.accounts.createLoginLink(user.stripeAccountId)
 
     return NextResponse.json({ url: loginLink.url })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Stripe dashboard error:', error)
-    return NextResponse.json({ error: 'Failed to create dashboard link' }, { status: 500 })
+    
+    let errorMessage = 'Failed to create dashboard link'
+    if (error && typeof error === 'object' && 'message' in error) {
+      errorMessage = (error as { message: string }).message
+    }
+    
+    return NextResponse.json({ error: errorMessage }, { status: 500 })
   }
 }
