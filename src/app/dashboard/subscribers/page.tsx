@@ -49,15 +49,9 @@ export default async function SubscribersPage() {
       <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Subscribers</h1>
-          <button
-            className="text-sm text-orange-600 hover:text-orange-700 font-medium"
-            onClick={() => {
-              // Export functionality would go here
-              alert('Export feature coming soon!')
-            }}
-          >
-            Export CSV
-          </button>
+          <span className="text-sm text-gray-400 font-medium">
+            Export CSV (coming soon)
+          </span>
         </div>
 
         {/* Stats */}

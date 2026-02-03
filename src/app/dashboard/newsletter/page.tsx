@@ -90,7 +90,7 @@ export default async function NewsletterPage() {
             <p className="text-sm text-gray-600 mb-4">
               Send one of your recent posts directly to all subscribers.
             </p>
-            <div className="space-y-3">
+                <div className="space-y-3">
               {recentPosts.map((post) => (
                 <div
                   key={post.id}
@@ -102,12 +102,9 @@ export default async function NewsletterPage() {
                       Published {post.publishedAt?.toLocaleDateString()}
                     </div>
                   </div>
-                  <button
-                    className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-colors"
-                    onClick={() => alert('Send post as newsletter feature coming soon!')}
-                  >
-                    Send to Subscribers
-                  </button>
+                  <span className="px-4 py-2 text-sm font-medium text-gray-400">
+                    Send (coming soon)
+                  </span>
                 </div>
               ))}
             </div>

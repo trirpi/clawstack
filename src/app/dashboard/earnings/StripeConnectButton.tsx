@@ -17,13 +17,17 @@ export function StripeConnectButton({ isConnected = false }: StripeConnectButton
         method: 'POST',
       })
       
-      if (!res.ok) throw new Error('Failed to create connect account')
+      const data = await res.json()
       
-      const { url } = await res.json()
-      window.location.href = url
+      if (!res.ok) {
+        throw new Error(data.error || 'Failed to create connect account')
+      }
+      
+      window.location.href = data.url
     } catch (error) {
       console.error('Stripe connect error:', error)
-      alert('Failed to connect Stripe. Please try again.')
+      const message = error instanceof Error ? error.message : 'Failed to connect Stripe. Please try again.'
+      alert(message)
     } finally {
       setLoading(false)
     }
