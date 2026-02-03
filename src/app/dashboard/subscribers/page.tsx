@@ -3,6 +3,7 @@ import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
+import { ExportSubscribersButton } from '@/components/dashboard/ExportSubscribersButton'
 import { formatDate } from '@/lib/utils'
 
 export const metadata = {
@@ -49,9 +50,7 @@ export default async function SubscribersPage() {
       <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-8">
           <h1 className="text-2xl font-bold text-gray-900">Subscribers</h1>
-          <span className="text-sm text-gray-400 font-medium">
-            Export CSV (coming soon)
-          </span>
+          {subscribers.length > 0 && <ExportSubscribersButton />}
         </div>
 
         {/* Stats */}

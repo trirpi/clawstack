@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { NewsletterComposer } from './NewsletterComposer'
+import { SendPostButton } from '@/components/dashboard/SendPostButton'
 
 export const metadata = {
   title: 'Newsletter - Clawstack',
@@ -102,9 +103,7 @@ export default async function NewsletterPage() {
                       Published {post.publishedAt?.toLocaleDateString()}
                     </div>
                   </div>
-                  <span className="px-4 py-2 text-sm font-medium text-gray-400">
-                    Send (coming soon)
-                  </span>
+                  <SendPostButton postId={post.id} postTitle={post.title} />
                 </div>
               ))}
             </div>
