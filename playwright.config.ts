@@ -36,8 +36,6 @@ export default defineConfig({
     screenshot: 'on',
     // Always record videos
     video: 'on',
-    // Video settings
-    videoSize: { width: 1280, height: 720 },
   },
   
   projects: [
