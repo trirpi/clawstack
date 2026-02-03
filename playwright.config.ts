@@ -25,11 +25,19 @@ export default defineConfig({
   snapshotDir: './__tests__/e2e/snapshots',
   snapshotPathTemplate: '{snapshotDir}/{testFileDir}/{testFileName}-snapshots/{arg}{ext}',
   
+  // Output folder for test artifacts
+  outputDir: './test-results',
+  
   use: {
     baseURL: 'http://localhost:3000',
-    trace: 'on-first-retry',
-    screenshot: 'only-on-failure',
-    video: 'retain-on-failure',
+    // Always record traces - can be viewed with `npx playwright show-trace`
+    trace: 'on',
+    // Always take screenshots
+    screenshot: 'on',
+    // Always record videos
+    video: 'on',
+    // Video settings
+    videoSize: { width: 1280, height: 720 },
   },
   
   projects: [
