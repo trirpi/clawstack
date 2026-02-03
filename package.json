@@ -19,7 +19,10 @@
     "test:e2e:trace": "playwright show-trace",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
-    "db:generate": "prisma generate"
+    "db:generate": "prisma generate",
+    "db:local": "cp prisma/schema.sqlite.prisma prisma/schema.prisma && prisma generate && prisma db push",
+    "db:postgres": "git checkout prisma/schema.prisma && prisma generate",
+    "db:reset": "rm -f prisma/dev.db prisma/dev.db-journal && npm run db:local"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
