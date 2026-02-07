@@ -29,7 +29,7 @@ export default defineConfig({
   outputDir: './test-results',
   
   use: {
-    baseURL: 'http://localhost:3000',
+    baseURL: 'http://127.0.0.1:3001',
     // Always record traces - can be viewed with `npx playwright show-trace`
     trace: 'on',
     // Always take screenshots
@@ -46,8 +46,8 @@ export default defineConfig({
   ],
   
   webServer: {
-    command: 'npm run dev',
-    url: 'http://localhost:3000',
+    command: 'env -u NO_COLOR FORCE_COLOR=0 NEXT_DISABLE_TURBOPACK=1 npm run dev -- --hostname 127.0.0.1 --port 3001',
+    url: 'http://127.0.0.1:3001',
     reuseExistingServer: true,
     timeout: 120000,
   },

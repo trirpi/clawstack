@@ -5,7 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { Button } from '@/components/ui/Button'
-import { formatDate } from '@/lib/utils'
+import { formatDate, slugify } from '@/lib/utils'
 
 export const metadata = {
   title: 'Dashboard - Clawstack',
@@ -26,7 +26,16 @@ export default async function DashboardPage() {
   
   if (!publication) {
     // Create a default publication for new users
-    const slug = session.user.email?.split('@')[0] || session.user.id
+    const baseSlugSource = session.user.email?.split('@')[0] || session.user.name || session.user.id
+    const baseSlug = slugify(baseSlugSource) || session.user.id
+    let slug = baseSlug
+    let suffix = 1
+
+    while (await prisma.publication.findUnique({ where: { slug } })) {
+      suffix += 1
+      slug = `${baseSlug}-${suffix}`
+    }
+
     publication = await prisma.publication.create({
       data: {
         name: `${session.user.name || 'My'}'s Publication`,

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
+import { getSession } from '@/lib/auth'
 
 interface Props {
   params: Promise<{ postId: string }>
@@ -19,12 +20,31 @@ export async function GET(request: NextRequest, { params }: Props) {
     return NextResponse.json({ error: 'Post not found' }, { status: 404 })
   }
 
-  // Only allow downloads for free posts or check subscription
-  if (post.visibility === 'PAID') {
-    return NextResponse.json(
-      { error: 'This content requires a subscription' },
-      { status: 403 }
-    )
+  // Only allow downloads for free posts or active paid subscribers
+  if (post.visibility !== 'FREE') {
+    const session = await getSession()
+
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const subscription = await prisma.subscription.findUnique({
+      where: {
+        userId_publicationId: {
+          userId: session.user.id,
+          publicationId: post.publicationId,
+        },
+      },
+    })
+
+    const hasAccess = subscription?.tier === 'PAID' && subscription?.status === 'ACTIVE'
+
+    if (!hasAccess) {
+      return NextResponse.json(
+        { error: 'This content requires a subscription' },
+        { status: 403 }
+      )
+    }
   }
 
   // Extract code blocks from content for .claw file

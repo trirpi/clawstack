@@ -5,18 +5,18 @@ import { stripe, createConnectAccount, createAccountLink } from '@/lib/stripe'
 
 export async function POST() {
   try {
+    const session = await getSession()
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     // Check if Stripe is configured
     if (!stripe) {
       return NextResponse.json(
         { error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY in environment variables.' },
         { status: 503 }
       )
-    }
-
-    const session = await getSession()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({

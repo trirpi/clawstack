@@ -101,17 +101,35 @@ export async function PUT(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
+    let finalSlug = slug
+    if (slug) {
+      const slugConflict = await prisma.post.findUnique({
+        where: {
+          publicationId_slug: {
+            publicationId: existingPost.publicationId,
+            slug,
+          },
+        },
+      })
+
+      if (slugConflict && slugConflict.id !== existingPost.id) {
+        finalSlug = `${slug}-${Date.now()}`
+      }
+    }
+
     const post = await prisma.post.update({
       where: { id },
       data: {
         title,
-        slug,
+        slug: finalSlug,
         content,
         excerpt: excerpt || null,
         category,
         visibility,
         published,
-        publishedAt: published && !existingPost.publishedAt ? new Date() : existingPost.publishedAt,
+        publishedAt: published
+          ? existingPost.publishedAt || new Date()
+          : null,
       },
     })
 

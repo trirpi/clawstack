@@ -5,6 +5,14 @@ import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 
 export async function POST(request: NextRequest) {
+  if (!stripe) {
+    return NextResponse.json(
+      { error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY.' },
+      { status: 503 }
+    )
+  }
+
+  const stripeClient = stripe
   const body = await request.text()
   const headersList = await headers()
   const signature = headersList.get('stripe-signature')
@@ -16,7 +24,7 @@ export async function POST(request: NextRequest) {
   let event: Stripe.Event
 
   try {
-    event = stripe.webhooks.constructEvent(
+    event = stripeClient.webhooks.constructEvent(
       body,
       signature,
       process.env.STRIPE_WEBHOOK_SECRET || ''
@@ -30,7 +38,7 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
-        await handleCheckoutComplete(session)
+        await handleCheckoutComplete(stripeClient, session)
         break
       }
 
@@ -60,7 +68,10 @@ export async function POST(request: NextRequest) {
   }
 }
 
-async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
+async function handleCheckoutComplete(
+  stripeClient: Stripe,
+  session: Stripe.Checkout.Session
+) {
   const publicationId = session.metadata?.publicationId
   const customerId = session.customer as string
   const subscriptionId = session.subscription as string
@@ -71,7 +82,7 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
   }
 
   // Get customer email to find user
-  const customer = await stripe.customers.retrieve(customerId)
+  const customer = await stripeClient.customers.retrieve(customerId)
   if (customer.deleted) return
 
   const user = await prisma.user.findUnique({

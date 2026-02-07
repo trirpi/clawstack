@@ -6,6 +6,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
 import { formatDate } from '@/lib/utils'
+import { sanitizeHtmlBasic } from '@/lib/sanitize'
 
 interface Props {
   params: Promise<{ username: string; slug: string }>
@@ -54,6 +55,8 @@ export default async function PostPage({ params }: Props) {
 
   // For preview posts, show teaser
   const showPaywall = post.visibility !== 'FREE' && !hasAccess
+  const sanitizedExcerpt = post.excerpt ? sanitizeHtmlBasic(post.excerpt) : ''
+  const sanitizedContent = sanitizeHtmlBasic(post.content)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -104,10 +107,10 @@ export default async function PostPage({ params }: Props) {
           {/* Post Content */}
           {showPaywall ? (
             <div>
-              {post.excerpt && (
+              {sanitizedExcerpt && (
                 <div
                   className="prose prose-lg max-w-none mb-8"
-                  dangerouslySetInnerHTML={{ __html: post.excerpt }}
+                  dangerouslySetInnerHTML={{ __html: sanitizedExcerpt }}
                 />
               )}
               <div className="bg-gradient-to-b from-transparent to-gray-100 h-32 -mt-32 relative z-10" />
@@ -125,7 +128,7 @@ export default async function PostPage({ params }: Props) {
           ) : (
             <div
               className="prose prose-lg max-w-none prose-pre:bg-gray-900 prose-pre:text-gray-100"
-              dangerouslySetInnerHTML={{ __html: post.content }}
+              dangerouslySetInnerHTML={{ __html: sanitizedContent }}
             />
           )}
 

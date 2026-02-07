@@ -5,17 +5,17 @@ import { stripe } from '@/lib/stripe'
 
 export async function POST() {
   try {
+    const session = await getSession()
+    
+    if (!session?.user?.id) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
     if (!stripe) {
       return NextResponse.json(
         { error: 'Stripe is not configured. Please set STRIPE_SECRET_KEY.' },
         { status: 503 }
       )
-    }
-
-    const session = await getSession()
-    
-    if (!session?.user?.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
     const user = await prisma.user.findUnique({

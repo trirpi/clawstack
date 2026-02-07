@@ -2,9 +2,15 @@ import Stripe from 'stripe'
 
 // Only initialize Stripe if we have a secret key
 const stripeKey = process.env.STRIPE_SECRET_KEY
-export const stripe = stripeKey
+export const stripe: Stripe | null = stripeKey
   ? new Stripe(stripeKey, { apiVersion: '2026-01-28.clover' })
-  : (null as unknown as Stripe)
+  : null
+
+function assertStripeConfigured(candidate: Stripe | null): asserts candidate is Stripe {
+  if (!candidate) {
+    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY.')
+  }
+}
 
 /**
  * Create a Stripe Checkout session for subscription
@@ -22,7 +28,9 @@ export async function createCheckoutSession({
   successUrl: string
   cancelUrl: string
 }) {
-  const session = await stripe.checkout.sessions.create({
+  const stripeClient = stripe
+  assertStripeConfigured(stripeClient)
+  const session = await stripeClient.checkout.sessions.create({
     mode: 'subscription',
     payment_method_types: ['card'],
     line_items: [
@@ -52,7 +60,9 @@ export async function createBillingPortalSession({
   customerId: string
   returnUrl: string
 }) {
-  const session = await stripe.billingPortal.sessions.create({
+  const stripeClient = stripe
+  assertStripeConfigured(stripeClient)
+  const session = await stripeClient.billingPortal.sessions.create({
     customer: customerId,
     return_url: returnUrl,
   })
@@ -70,7 +80,9 @@ export async function createConnectAccount({
   email: string
   userId: string
 }) {
-  const account = await stripe.accounts.create({
+  const stripeClient = stripe
+  assertStripeConfigured(stripeClient)
+  const account = await stripeClient.accounts.create({
     type: 'express',
     email,
     metadata: {
@@ -97,7 +109,9 @@ export async function createAccountLink({
   refreshUrl: string
   returnUrl: string
 }) {
-  const accountLink = await stripe.accountLinks.create({
+  const stripeClient = stripe
+  assertStripeConfigured(stripeClient)
+  const accountLink = await stripeClient.accountLinks.create({
     account: accountId,
     refresh_url: refreshUrl,
     return_url: returnUrl,
