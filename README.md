@@ -47,6 +47,14 @@ npm install
 cp .env.example .env
 ```
 
+#### Local DB vs Production DB
+- Production uses PostgreSQL (see `prisma/schema.prisma`).
+- Local dev uses SQLite for quick setup. Run:
+```bash
+npm run db:local
+```
+This copies `prisma/schema.sqlite.prisma` into `prisma/schema.prisma` and pushes the schema to a local `dev.db`.
+
 Edit `.env` with your credentials:
 - Create a GitHub OAuth app at https://github.com/settings/developers
 - Get Stripe keys from https://dashboard.stripe.com/apikeys
