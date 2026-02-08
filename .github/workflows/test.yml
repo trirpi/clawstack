@@ -94,7 +94,7 @@ jobs:
       - name: Run E2E tests
         run: npm run test:e2e
         env:
-          DATABASE_URL: postgresql://fake:fake@localhost:5432/fake
+          DATABASE_URL: file:./dev.db
           NEXTAUTH_SECRET: test-secret
           NEXTAUTH_URL: http://localhost:3000
 

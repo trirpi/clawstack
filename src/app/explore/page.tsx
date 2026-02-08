@@ -38,6 +38,8 @@ export default async function ExplorePage() {
       subscribers: { _count: 'desc' },
     },
   })
+  type ExplorePublication = (typeof publications)[number]
+  type ExplorePost = (typeof posts)[number]
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -61,7 +63,7 @@ export default async function ExplorePage() {
                 Featured Creators
               </h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                {publications.map((pub) => (
+                {publications.map((pub: ExplorePublication) => (
                   <Link
                     key={pub.id}
                     href={`/${pub.slug}`}
@@ -114,7 +116,7 @@ export default async function ExplorePage() {
               </div>
             ) : (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {posts.map((post) => (
+                {posts.map((post: ExplorePost) => (
                   <article key={post.id} className="group">
                     <Link href={`/${post.publication.slug}/${post.slug}`}>
                       <div className="flex items-start gap-2 mb-2">

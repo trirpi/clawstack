@@ -32,7 +32,8 @@ export async function GET() {
 
     // Generate CSV content
     const csvHeader = 'Name,Email,Tier,Status,Subscribed Date\n'
-    const csvRows = subscribers.map(sub => {
+    type Subscriber = (typeof subscribers)[number]
+    const csvRows = subscribers.map((sub: Subscriber) => {
       const name = (sub.user.name || 'Anonymous').replace(/,/g, ' ')
       const email = sub.user.email
       const tier = sub.tier

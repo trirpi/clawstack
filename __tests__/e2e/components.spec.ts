@@ -178,8 +178,9 @@ test.describe('Pricing Page Components', () => {
     await page.goto('/pricing')
     
     // Should have Get Started and Start Earning buttons
-    await expect(page.getByRole('button', { name: 'Get Started' })).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Start Earning' })).toBeVisible()
+    const main = page.getByRole('main')
+    await expect(main.getByRole('button', { name: 'Get Started' })).toBeVisible()
+    await expect(main.getByRole('button', { name: 'Start Earning' })).toBeVisible()
   })
 
   test('pricing page should display prices', async ({ page }) => {

@@ -30,6 +30,7 @@ export default async function PublicationPage({ params }: Props) {
   if (!publication) {
     notFound()
   }
+  type PublicationPost = (typeof publication.posts)[number]
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -76,7 +77,7 @@ export default async function PublicationPage({ params }: Props) {
             </p>
           ) : (
             <div className="space-y-8">
-              {publication.posts.map((post) => (
+              {publication.posts.map((post: PublicationPost) => (
                 <article key={post.id} className="group">
                   <Link href={`/${username}/${post.slug}`}>
                     <div className="flex items-start gap-2">

@@ -35,6 +35,7 @@ export default async function PostPage({ params }: Props) {
   if (!post) {
     notFound()
   }
+  type PostComment = (typeof post.comments)[number]
 
   const session = await getSession()
 
@@ -161,7 +162,7 @@ export default async function PostPage({ params }: Props) {
                 </p>
               ) : (
                 <div className="space-y-6">
-                  {post.comments.map((comment) => (
+                  {post.comments.map((comment: PostComment) => (
                     <div key={comment.id} className="flex gap-4">
                       {comment.user.image ? (
                         <img

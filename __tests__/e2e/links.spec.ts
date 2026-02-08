@@ -118,7 +118,7 @@ test.describe('Link Validation', () => {
   test.describe('Pricing Page Links', () => {
     test('get started button should work', async ({ page }) => {
       await page.goto('/pricing')
-      await page.getByRole('link', { name: /get started/i }).click()
+      await page.getByRole('main').getByRole('link', { name: /get started/i }).click()
       await expect(page).toHaveURL('/login')
     })
 

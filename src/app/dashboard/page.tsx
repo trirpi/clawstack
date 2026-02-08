@@ -56,6 +56,7 @@ export default async function DashboardPage() {
   const subscriberCount = await prisma.subscription.count({
     where: { publicationId: publication.id },
   })
+  type DashboardPost = (typeof posts)[number]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -104,7 +105,7 @@ export default async function DashboardPage() {
           </div>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-200">
-            {posts.map((post) => (
+            {posts.map((post: DashboardPost) => (
               <div key={post.id} className="p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">

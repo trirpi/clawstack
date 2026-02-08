@@ -39,9 +39,10 @@ export default async function SubscribersPage() {
     },
     orderBy: { createdAt: 'desc' },
   })
+  type Subscriber = (typeof subscribers)[number]
 
-  const freeSubscribers = subscribers.filter(s => s.tier === 'FREE')
-  const paidSubscribers = subscribers.filter(s => s.tier === 'PAID')
+  const freeSubscribers = subscribers.filter((s: Subscriber) => s.tier === 'FREE')
+  const paidSubscribers = subscribers.filter((s: Subscriber) => s.tier === 'PAID')
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -91,7 +92,7 @@ export default async function SubscribersPage() {
               </div>
             </div>
             <div className="divide-y divide-gray-200">
-              {subscribers.map((subscription) => (
+              {subscribers.map((subscription: Subscriber) => (
                 <div key={subscription.id} className="px-6 py-4 hover:bg-gray-50">
                   <div className="grid grid-cols-12 gap-4 items-center">
                     <div className="col-span-5 flex items-center gap-3">

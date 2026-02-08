@@ -46,7 +46,7 @@ export default defineConfig({
   ],
   
   webServer: {
-    command: 'env -u NO_COLOR FORCE_COLOR=0 NEXT_DISABLE_TURBOPACK=1 bash scripts/playwright-webserver.sh',
+    command: 'bash scripts/playwright-webserver.sh',
     url: 'http://127.0.0.1:3001',
     reuseExistingServer: true,
     timeout: 120000,

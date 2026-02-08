@@ -48,7 +48,8 @@ export async function POST(request: Request) {
     }
 
     // Send emails to all subscribers
-    const emails = subscribers.map((sub) => sub.user.email)
+    type Subscriber = (typeof subscribers)[number]
+    const emails = subscribers.map((sub: Subscriber) => sub.user.email)
     
     // Resend supports batch sending
     const { error } = await resend.emails.send({

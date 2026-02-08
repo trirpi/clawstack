@@ -43,6 +43,7 @@ export default async function NewsletterPage() {
       publishedAt: true,
     },
   })
+  type RecentPost = (typeof recentPosts)[number]
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -92,7 +93,7 @@ export default async function NewsletterPage() {
               Send one of your recent posts directly to all subscribers.
             </p>
                 <div className="space-y-3">
-              {recentPosts.map((post) => (
+              {recentPosts.map((post: RecentPost) => (
                 <div
                   key={post.id}
                   className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"

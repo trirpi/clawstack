@@ -66,8 +66,9 @@ export async function POST(request: NextRequest) {
     // Send emails to all subscribers
     const baseUrl = process.env.NEXTAUTH_URL || 'https://clawstack.vercel.app'
     const postUrl = `${baseUrl}/${user.publication.slug}/${post.slug}`
+    type Subscriber = (typeof subscribers)[number]
     
-    const emails = subscribers.map(sub => sub.user.email)
+    const emails = subscribers.map((sub: Subscriber) => sub.user.email)
     
     // Strip HTML tags for plain text version
     const plainContent = post.content.replace(/<[^>]*>/g, '').substring(0, 500)

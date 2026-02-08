@@ -118,7 +118,7 @@ test.describe('Form Validations', () => {
   test('pricing buttons link to login', async ({ page }) => {
     await page.goto('/pricing')
     
-    const getStartedButton = page.getByRole('link', { name: /get started/i })
+    const getStartedButton = page.getByRole('main').getByRole('link', { name: /get started/i })
     await getStartedButton.click()
     await expect(page).toHaveURL('/login')
   })
