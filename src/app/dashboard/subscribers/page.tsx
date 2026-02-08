@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { redirect } from 'next/navigation'
 import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
@@ -97,9 +98,12 @@ export default async function SubscribersPage() {
                   <div className="grid grid-cols-12 gap-4 items-center">
                     <div className="col-span-5 flex items-center gap-3">
                       {subscription.user.image ? (
-                        <img
+                        <Image
                           src={subscription.user.image}
                           alt=""
+                          width={32}
+                          height={32}
+                          unoptimized
                           className="w-8 h-8 rounded-full"
                         />
                       ) : (

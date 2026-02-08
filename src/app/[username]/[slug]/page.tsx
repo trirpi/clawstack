@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { getSession } from '@/lib/auth'
@@ -83,9 +84,12 @@ export default async function PostPage({ params }: Props) {
                 className="flex items-center gap-2 hover:text-orange-600"
               >
                 {post.publication.user.image ? (
-                  <img
+                  <Image
                     src={post.publication.user.image}
                     alt={post.publication.name}
+                    width={40}
+                    height={40}
+                    unoptimized
                     className="w-10 h-10 rounded-full"
                   />
                 ) : (
@@ -165,9 +169,12 @@ export default async function PostPage({ params }: Props) {
                   {post.comments.map((comment: PostComment) => (
                     <div key={comment.id} className="flex gap-4">
                       {comment.user.image ? (
-                        <img
+                        <Image
                           src={comment.user.image}
                           alt={comment.user.name || 'User'}
+                          width={40}
+                          height={40}
+                          unoptimized
                           className="w-10 h-10 rounded-full"
                         />
                       ) : (

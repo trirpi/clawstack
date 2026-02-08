@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
@@ -71,9 +72,12 @@ export default async function ExplorePage() {
                   >
                     <div className="flex items-center gap-4">
                       {pub.user.image ? (
-                        <img
+                        <Image
                           src={pub.user.image}
                           alt={pub.name}
+                          width={48}
+                          height={48}
+                          unoptimized
                           className="w-12 h-12 rounded-full"
                         />
                       ) : (

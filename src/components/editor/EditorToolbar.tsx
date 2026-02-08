@@ -3,12 +3,12 @@
 import {
   useCallback,
   useEffect,
-  useRef,
   useState,
   type ChangeEvent,
   type DragEvent,
 } from 'react'
 import type { Editor } from '@tiptap/react'
+import { CODE_LANGUAGES, normalizeImageUrl, normalizeLinkUrl } from './editorUtils'
 
 interface EditorToolbarProps {
   editor: Editor | null
@@ -25,44 +25,6 @@ interface ToolbarButtonProps {
 interface SelectionRange {
   from: number
   to: number
-}
-
-const CODE_LANGUAGES = [
-  { value: 'plaintext', label: 'Plain text' },
-  { value: 'javascript', label: 'JavaScript' },
-  { value: 'typescript', label: 'TypeScript' },
-  { value: 'python', label: 'Python' },
-  { value: 'bash', label: 'Bash' },
-  { value: 'json', label: 'JSON' },
-  { value: 'html', label: 'HTML' },
-  { value: 'css', label: 'CSS' },
-  { value: 'sql', label: 'SQL' },
-  { value: 'yaml', label: 'YAML' },
-  { value: 'markdown', label: 'Markdown' },
-]
-
-function normalizeLinkUrl(url: string) {
-  if (!url) return ''
-
-  if (/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(url)) {
-    return url
-  }
-
-  if (url.startsWith('/') || url.startsWith('#') || url.startsWith('?')) {
-    return url
-  }
-
-  return `https://${url}`
-}
-
-function normalizeImageUrl(url: string) {
-  if (!url) return ''
-
-  if (/^(https?:\/\/|\/|data:image\/)/i.test(url)) {
-    return url
-  }
-
-  return `https://${url}`
 }
 
 function ToolbarButton({ onClick, isActive, disabled, title, children }: ToolbarButtonProps) {
@@ -101,7 +63,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
   const [imagePreviewUrl, setImagePreviewUrl] = useState('')
   const [imageError, setImageError] = useState('')
   const [isUploadingImage, setIsUploadingImage] = useState(false)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (!imageFile) {
@@ -598,6 +559,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                 className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center hover:border-orange-400 hover:bg-orange-50"
               >
                 {imagePreviewUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img src={imagePreviewUrl} alt="Preview" className="max-h-28 rounded-lg" />
                 ) : (
                   <>
@@ -607,7 +569,6 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                   </>
                 )}
                 <input
-                  ref={fileInputRef}
                   type="file"
                   accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
                   className="hidden"

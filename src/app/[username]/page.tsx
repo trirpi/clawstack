@@ -1,3 +1,4 @@
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
@@ -40,9 +41,12 @@ export default async function PublicationPage({ params }: Props) {
         <div className="bg-gradient-to-b from-orange-50 to-white py-12">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
             {publication.avatar ? (
-              <img
+              <Image
                 src={publication.avatar}
                 alt={publication.name}
+                width={96}
+                height={96}
+                unoptimized
                 className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
               />
             ) : (

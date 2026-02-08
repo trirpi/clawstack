@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get or create Stripe customer
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: { id: session.user.id },
     })
 

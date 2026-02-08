@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
@@ -54,9 +55,12 @@ export function CommentForm({ postId }: CommentFormProps) {
     <form onSubmit={handleSubmit} className="mb-6">
       <div className="flex gap-4">
         {session.user?.image ? (
-          <img
+          <Image
             src={session.user.image}
             alt={session.user.name || 'You'}
+            width={40}
+            height={40}
+            unoptimized
             className="w-10 h-10 rounded-full"
           />
         ) : (
