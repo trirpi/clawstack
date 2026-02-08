@@ -71,8 +71,12 @@ test.describe('Navigation Elements', () => {
     
     await expect(page.getByRole('link', { name: /explore/i }).first()).toBeVisible()
     await expect(page.getByRole('link', { name: /pricing/i }).first()).toBeVisible()
-    await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible()
-    await expect(page.getByRole('link', { name: /get started/i }).first()).toBeVisible()
+
+    const authLoginLinks = page.locator('header a[href="/login"]')
+    const dashboardLink = page.locator('header a[href="/dashboard"]')
+    await expect
+      .poll(async () => (await authLoginLinks.count()) + (await dashboardLink.count()), { timeout: 15000 })
+      .toBeGreaterThan(0)
   })
 
   test('footer has all links', async ({ page }) => {

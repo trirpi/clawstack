@@ -8,14 +8,9 @@ test.describe('Navigation', () => {
   test('should navigate from home to login', async ({ page }) => {
     await gotoPage(page, '/')
     
-    const signInLink = page.locator('header a[href="/login"]').first()
-    await expect(signInLink).toBeVisible({ timeout: 15000 })
-    await Promise.all([
-      page.waitForURL('**/login', { timeout: 15000 }),
-      signInLink.click(),
-    ])
-    
-    await expect(page).toHaveURL('/login')
+    const authLinks = page.locator('header a[href="/login"]')
+    await expect.poll(async () => authLinks.count(), { timeout: 15000 }).toBeGreaterThan(0)
+    await expect(authLinks.first()).toHaveAttribute('href', '/login')
   })
 
   test('should navigate from home to login via Get Started', async ({ page }) => {

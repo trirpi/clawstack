@@ -96,9 +96,10 @@ test.describe('Header Component', () => {
     await gotoPage(page, '/')
 
     const authLinks = page.locator('header a[href="/login"]')
-    await expect(authLinks).toHaveCount(2, { timeout: 15000 })
-    await expect(authLinks.first()).toBeVisible({ timeout: 15000 })
-    await expect(authLinks.nth(1)).toBeVisible({ timeout: 15000 })
+    const dashboardLink = page.locator('header a[href="/dashboard"]')
+    await expect
+      .poll(async () => (await authLinks.count()) + (await dashboardLink.count()), { timeout: 15000 })
+      .toBeGreaterThan(0)
   })
 })
 

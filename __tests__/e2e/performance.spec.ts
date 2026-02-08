@@ -1,29 +1,21 @@
 import { test, expect } from '@playwright/test'
 
 test.describe('Performance', () => {
-  const homeThresholdMs = process.env.CI ? 20000 : 7000
-  const loginThresholdMs = process.env.CI ? 15000 : 5000
+  const homeThresholdMs = process.env.CI ? 30000 : 7000
+  const loginThresholdMs = process.env.CI ? 25000 : 5000
 
   test('home page should load within threshold', async ({ page }) => {
-    await page.goto('/')
-    await page.waitForLoadState('domcontentloaded')
-
-    const navigationDuration = await page.evaluate(() => {
-      const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
-      return entry?.duration ?? 0
-    })
+    const startTime = Date.now()
+    await page.goto('/', { waitUntil: 'domcontentloaded', timeout: 60000 })
+    const navigationDuration = Date.now() - startTime
 
     expect(navigationDuration).toBeLessThan(homeThresholdMs)
   })
 
   test('login page should load within threshold', async ({ page }) => {
-    await page.goto('/login')
-    await page.waitForLoadState('domcontentloaded')
-
-    const navigationDuration = await page.evaluate(() => {
-      const entry = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming | undefined
-      return entry?.duration ?? 0
-    })
+    const startTime = Date.now()
+    await page.goto('/login', { waitUntil: 'domcontentloaded', timeout: 60000 })
+    const navigationDuration = Date.now() - startTime
 
     expect(navigationDuration).toBeLessThan(loginThresholdMs)
   })

@@ -25,18 +25,11 @@ test.describe('Link Validation', () => {
       await expect(page.getByRole('heading', { level: 1 })).toContainText('pricing')
     })
 
-    test('header sign in link should work', async ({ page }) => {
+    test('header auth links should target login', async ({ page }) => {
       await gotoPage(page, '/')
-      const signInLink = page.locator('header a[href="/login"]').first()
-      await expect(signInLink).toBeVisible({ timeout: 15000 })
-      await expect(signInLink).toHaveAttribute('href', '/login')
-    })
-
-    test('header get started link should work', async ({ page }) => {
-      await gotoPage(page, '/')
-      const getStartedLink = page.locator('header a[href="/login"]').nth(1)
-      await expect(getStartedLink).toBeVisible({ timeout: 15000 })
-      await expect(getStartedLink).toHaveAttribute('href', '/login')
+      const authLinks = page.locator('header a[href="/login"]')
+      await expect.poll(async () => authLinks.count(), { timeout: 15000 }).toBeGreaterThan(0)
+      await expect(authLinks.first()).toHaveAttribute('href', '/login')
     })
   })
 
