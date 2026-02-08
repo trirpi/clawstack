@@ -1,11 +1,22 @@
 import { defineConfig, devices } from '@playwright/test'
 
+const configuredWorkers = process.env.PLAYWRIGHT_WORKERS
+  ? Number.parseInt(process.env.PLAYWRIGHT_WORKERS, 10)
+  : NaN
+
+const workerCount =
+  Number.isFinite(configuredWorkers) && configuredWorkers > 0
+    ? configuredWorkers
+    : process.env.CI
+      ? 8
+      : undefined
+
 export default defineConfig({
   testDir: './__tests__/e2e',
   fullyParallel: true,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : undefined,
+  workers: workerCount,
   reporter: 'html',
   
   // Screenshot comparison settings - strict for catching visual regressions

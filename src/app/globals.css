@@ -54,7 +54,7 @@ body {
 
 /* Code block styling */
 pre {
-  background: #1e1e1e;
+  background: #111827;
   border-radius: 8px;
   padding: 1rem;
   overflow-x: auto;
@@ -62,6 +62,88 @@ pre {
 
 code {
   font-family: 'Fira Code', 'Consolas', monospace;
+}
+
+.ProseMirror pre,
+.prose pre {
+  background: #111827;
+  color: #e5e7eb;
+  border-radius: 10px;
+  border: 1px solid #1f2937;
+}
+
+.ProseMirror pre code,
+.prose pre code {
+  background: transparent;
+  color: inherit;
+}
+
+/* Lowlight/Highlight.js token colors */
+.ProseMirror .hljs-comment,
+.ProseMirror .hljs-quote,
+.prose .hljs-comment,
+.prose .hljs-quote {
+  color: #94a3b8;
+}
+
+.ProseMirror .hljs-keyword,
+.ProseMirror .hljs-selector-tag,
+.ProseMirror .hljs-literal,
+.ProseMirror .hljs-name,
+.ProseMirror .hljs-section,
+.ProseMirror .hljs-link,
+.prose .hljs-keyword,
+.prose .hljs-selector-tag,
+.prose .hljs-literal,
+.prose .hljs-name,
+.prose .hljs-section,
+.prose .hljs-link {
+  color: #f472b6;
+}
+
+.ProseMirror .hljs-string,
+.ProseMirror .hljs-title,
+.ProseMirror .hljs-type,
+.ProseMirror .hljs-attribute,
+.ProseMirror .hljs-symbol,
+.ProseMirror .hljs-bullet,
+.ProseMirror .hljs-addition,
+.ProseMirror .hljs-template-tag,
+.ProseMirror .hljs-template-variable,
+.prose .hljs-string,
+.prose .hljs-title,
+.prose .hljs-type,
+.prose .hljs-attribute,
+.prose .hljs-symbol,
+.prose .hljs-bullet,
+.prose .hljs-addition,
+.prose .hljs-template-tag,
+.prose .hljs-template-variable {
+  color: #86efac;
+}
+
+.ProseMirror .hljs-number,
+.ProseMirror .hljs-meta,
+.ProseMirror .hljs-built_in,
+.ProseMirror .hljs-builtin-name,
+.ProseMirror .hljs-params,
+.ProseMirror .hljs-regexp,
+.prose .hljs-number,
+.prose .hljs-meta,
+.prose .hljs-built_in,
+.prose .hljs-builtin-name,
+.prose .hljs-params,
+.prose .hljs-regexp {
+  color: #fbbf24;
+}
+
+.ProseMirror .hljs-variable,
+.ProseMirror .hljs-subst,
+.ProseMirror .hljs-class .hljs-title,
+.prose .hljs-variable,
+.prose .hljs-subst,
+.prose .hljs-class .hljs-title {
+  color: #93c5fd;
 }
 
 /* Focus styles */

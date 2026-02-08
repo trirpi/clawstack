@@ -69,6 +69,9 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
       }),
       Link.configure({
         openOnClick: false,
+        autolink: true,
+        linkOnPaste: true,
+        defaultProtocol: 'https',
         HTMLAttributes: {
           class: 'text-orange-600 underline',
         },

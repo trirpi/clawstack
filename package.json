@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "prisma generate && ( [ -d prisma/migrations ] && [ \"$(ls -A prisma/migrations)\" ] && prisma migrate deploy || echo \"No migrations; skipping prisma migrate deploy\" ) && next build --webpack",
-    "build:local": "next build --webpack",
+    "build:local": "prisma generate && next build --webpack",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",

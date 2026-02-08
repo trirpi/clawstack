@@ -1,6 +1,13 @@
 'use client'
 
-import { useCallback, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ChangeEvent,
+  type DragEvent,
+} from 'react'
 import type { Editor } from '@tiptap/react'
 
 interface EditorToolbarProps {
@@ -15,6 +22,49 @@ interface ToolbarButtonProps {
   children: React.ReactNode
 }
 
+interface SelectionRange {
+  from: number
+  to: number
+}
+
+const CODE_LANGUAGES = [
+  { value: 'plaintext', label: 'Plain text' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'python', label: 'Python' },
+  { value: 'bash', label: 'Bash' },
+  { value: 'json', label: 'JSON' },
+  { value: 'html', label: 'HTML' },
+  { value: 'css', label: 'CSS' },
+  { value: 'sql', label: 'SQL' },
+  { value: 'yaml', label: 'YAML' },
+  { value: 'markdown', label: 'Markdown' },
+]
+
+function normalizeLinkUrl(url: string) {
+  if (!url) return ''
+
+  if (/^[a-zA-Z][a-zA-Z\d+.-]*:/.test(url)) {
+    return url
+  }
+
+  if (url.startsWith('/') || url.startsWith('#') || url.startsWith('?')) {
+    return url
+  }
+
+  return `https://${url}`
+}
+
+function normalizeImageUrl(url: string) {
+  if (!url) return ''
+
+  if (/^(https?:\/\/|\/|data:image\/)/i.test(url)) {
+    return url
+  }
+
+  return `https://${url}`
+}
+
 function ToolbarButton({ onClick, isActive, disabled, title, children }: ToolbarButtonProps) {
   return (
     <button
@@ -23,8 +73,8 @@ function ToolbarButton({ onClick, isActive, disabled, title, children }: Toolbar
       disabled={disabled}
       title={title}
       className={`p-2 rounded-lg transition-colors ${
-        isActive 
-          ? 'bg-orange-100 text-orange-700' 
+        isActive
+          ? 'bg-orange-100 text-orange-700'
           : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
       } ${disabled ? 'opacity-50 cursor-not-allowed' : ''}`}
     >
@@ -40,45 +90,195 @@ function ToolbarDivider() {
 export function EditorToolbar({ editor }: EditorToolbarProps) {
   const [isLinkOpen, setIsLinkOpen] = useState(false)
   const [linkUrl, setLinkUrl] = useState('')
+  const [linkText, setLinkText] = useState('')
+  const [linkSelection, setLinkSelection] = useState<SelectionRange | null>(null)
 
-  const openLinkDialog = useCallback(() => {
-    if (!editor) return
-    const previousUrl = editor.getAttributes('link').href || ''
-    setLinkUrl(previousUrl)
-    setIsLinkOpen(true)
-  }, [editor])
+  const [selectedCodeLanguage, setSelectedCodeLanguage] = useState('javascript')
 
-  const applyLink = useCallback(() => {
-    if (!editor) return
-    const url = linkUrl.trim()
-    if (!url) {
-      editor.chain().focus().extendMarkRange('link').unsetLink().run()
-      setIsLinkOpen(false)
+  const [isImageOpen, setIsImageOpen] = useState(false)
+  const [imageUrl, setImageUrl] = useState('')
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreviewUrl, setImagePreviewUrl] = useState('')
+  const [imageError, setImageError] = useState('')
+  const [isUploadingImage, setIsUploadingImage] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (!imageFile) {
+      setImagePreviewUrl('')
       return
     }
 
-    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+    const objectUrl = URL.createObjectURL(imageFile)
+    setImagePreviewUrl(objectUrl)
+
+    return () => {
+      URL.revokeObjectURL(objectUrl)
+    }
+  }, [imageFile])
+
+  const closeLinkDialog = useCallback(() => {
     setIsLinkOpen(false)
-  }, [editor, linkUrl])
+    setLinkSelection(null)
+  }, [])
+
+  const openLinkDialog = useCallback(() => {
+    if (!editor) return
+
+    editor.chain().focus().extendMarkRange('link').run()
+
+    const previousUrl = editor.getAttributes('link').href || ''
+    const { from, to } = editor.state.selection
+    const selectedText = editor.state.doc.textBetween(from, to, ' ')
+
+    setLinkSelection({ from, to })
+    setLinkUrl(previousUrl)
+    setLinkText(selectedText || previousUrl || '')
+    setIsLinkOpen(true)
+  }, [editor])
 
   const removeLink = useCallback(() => {
     if (!editor) return
-    editor.chain().focus().extendMarkRange('link').unsetLink().run()
-    setIsLinkOpen(false)
-  }, [editor])
 
-  const addImage = useCallback(() => {
-    if (!editor) return
-    
-    const url = window.prompt('Enter image URL:')
-    if (url) {
-      editor.chain().focus().setImage({ src: url }).run()
+    const range = linkSelection ?? {
+      from: editor.state.selection.from,
+      to: editor.state.selection.to,
     }
-  }, [editor])
+
+    if (range.from === range.to) {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run()
+    } else {
+      editor.chain().focus().setTextSelection(range).unsetLink().run()
+    }
+
+    closeLinkDialog()
+  }, [editor, linkSelection, closeLinkDialog])
+
+  const applyLink = useCallback(() => {
+    if (!editor) return
+
+    const rawUrl = linkUrl.trim()
+
+    if (!rawUrl) {
+      removeLink()
+      return
+    }
+
+    const normalizedUrl = normalizeLinkUrl(rawUrl)
+    const range = linkSelection ?? {
+      from: editor.state.selection.from,
+      to: editor.state.selection.to,
+    }
+
+    const content = linkText.length > 0 ? linkText : normalizedUrl
+    const linkEnd = range.from + content.length
+
+    editor
+      .chain()
+      .focus()
+      .insertContentAt(range, content)
+      .setTextSelection({ from: range.from, to: linkEnd })
+      .setLink({ href: normalizedUrl })
+      .run()
+
+    closeLinkDialog()
+  }, [editor, linkSelection, linkText, linkUrl, removeLink, closeLinkDialog])
+
+  const handleCodeLanguageChange = useCallback(
+    (event: ChangeEvent<HTMLSelectElement>) => {
+      if (!editor) return
+
+      const language = event.target.value
+      setSelectedCodeLanguage(language)
+
+      if (editor.isActive('codeBlock')) {
+        editor.chain().focus().updateAttributes('codeBlock', { language }).run()
+      }
+    },
+    [editor],
+  )
+
+  const openImageDialog = useCallback(() => {
+    setImageUrl('')
+    setImageFile(null)
+    setImageError('')
+    setIsImageOpen(true)
+  }, [])
+
+  const closeImageDialog = useCallback(() => {
+    setIsImageOpen(false)
+    setImageUrl('')
+    setImageFile(null)
+    setImageError('')
+  }, [])
+
+  const onImageFileChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
+    const nextFile = event.target.files?.[0] ?? null
+    setImageFile(nextFile)
+    setImageError('')
+  }, [])
+
+  const onImageDrop = useCallback((event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault()
+    const nextFile = event.dataTransfer.files?.[0] ?? null
+    setImageFile(nextFile)
+    setImageError('')
+  }, [])
+
+  const onImageDropOver = useCallback((event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault()
+  }, [])
+
+  const insertImageFromUrl = useCallback(() => {
+    if (!editor) return
+
+    const normalized = normalizeImageUrl(imageUrl.trim())
+
+    if (!normalized) {
+      setImageError('Add an image URL or upload a file.')
+      return
+    }
+
+    editor.chain().focus().setImage({ src: normalized }).run()
+    closeImageDialog()
+  }, [editor, imageUrl, closeImageDialog])
+
+  const uploadAndInsertImage = useCallback(async () => {
+    if (!editor || !imageFile) return
+
+    setImageError('')
+    setIsUploadingImage(true)
+
+    try {
+      const formData = new FormData()
+      formData.append('file', imageFile)
+
+      const response = await fetch('/api/uploads/image', {
+        method: 'POST',
+        body: formData,
+      })
+
+      const payload = (await response.json().catch(() => null)) as { url?: string; error?: string } | null
+
+      if (!response.ok || !payload?.url) {
+        throw new Error(payload?.error || 'Failed to upload image')
+      }
+
+      editor.chain().focus().setImage({ src: payload.url, alt: imageFile.name }).run()
+      closeImageDialog()
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Failed to upload image'
+      setImageError(message)
+    } finally {
+      setIsUploadingImage(false)
+    }
+  }, [editor, imageFile, closeImageDialog])
 
   if (!editor) {
     return null
   }
+
+  const codeBlockLanguage = editor.getAttributes('codeBlock').language || selectedCodeLanguage
 
   return (
     <div className="flex flex-wrap items-center gap-1 px-4 py-2 bg-gray-50 border-b border-gray-100">
@@ -204,7 +404,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       </ToolbarButton>
 
       <ToolbarButton
-        onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+        onClick={() => editor.chain().focus().toggleCodeBlock({ language: codeBlockLanguage }).run()}
         isActive={editor.isActive('codeBlock')}
         title="Code Block"
       >
@@ -212,6 +412,21 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
         </svg>
       </ToolbarButton>
+
+      {editor.isActive('codeBlock') && (
+        <select
+          value={codeBlockLanguage}
+          onChange={handleCodeLanguageChange}
+          className="h-9 rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700 focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
+          title="Code language"
+        >
+          {CODE_LANGUAGES.map((language) => (
+            <option key={language.value} value={language.value}>
+              {language.label}
+            </option>
+          ))}
+        </select>
+      )}
 
       <ToolbarButton
         onClick={() => editor.chain().focus().setHorizontalRule().run()}
@@ -236,7 +451,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
       </ToolbarButton>
 
       <ToolbarButton
-        onClick={addImage}
+        onClick={openImageDialog}
         title="Add Image"
       >
         <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -304,23 +519,41 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
           <div className="w-full max-w-md rounded-xl bg-white shadow-xl border border-gray-200">
             <div className="px-5 py-4 border-b border-gray-200">
-              <h4 className="text-sm font-semibold text-gray-900">Insert link</h4>
+              <h4 className="text-sm font-semibold text-gray-900">Edit link</h4>
             </div>
-            <div className="px-5 py-4 space-y-2">
-              <label className="text-xs font-medium text-gray-600">URL</label>
-              <input
-                autoFocus
-                type="url"
-                value={linkUrl}
-                onChange={(e) => setLinkUrl(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') applyLink()
-                  if (e.key === 'Escape') setIsLinkOpen(false)
-                }}
-                placeholder="https://example.com"
-                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
-              />
-              <p className="text-xs text-gray-500">Paste a full URL. Empty will remove the link.</p>
+            <div className="px-5 py-4 space-y-3">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-600">Text</label>
+                <input
+                  autoFocus
+                  type="text"
+                  value={linkText}
+                  onChange={(event) => setLinkText(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') applyLink()
+                    if (event.key === 'Escape') closeLinkDialog()
+                  }}
+                  placeholder="Link text"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-600">URL</label>
+                <input
+                  type="url"
+                  value={linkUrl}
+                  onChange={(event) => setLinkUrl(event.target.value)}
+                  onKeyDown={(event) => {
+                    if (event.key === 'Enter') applyLink()
+                    if (event.key === 'Escape') closeLinkDialog()
+                  }}
+                  placeholder="https://example.com"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+              <p className="text-xs text-gray-500">
+                URLs auto-link while typing and on paste. You can change display text without changing the URL.
+              </p>
             </div>
             <div className="px-5 py-4 border-t border-gray-200 flex items-center justify-between">
               <button
@@ -333,7 +566,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
               <div className="flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => setIsLinkOpen(false)}
+                  onClick={closeLinkDialog}
                   className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
                 >
                   Cancel
@@ -346,6 +579,85 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                   Apply
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {isImageOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-xl rounded-xl bg-white shadow-xl border border-gray-200">
+            <div className="px-5 py-4 border-b border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-900">Insert image</h4>
+            </div>
+
+            <div className="px-5 py-4 space-y-4">
+              <label
+                onDrop={onImageDrop}
+                onDragOver={onImageDropOver}
+                className="flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 text-center hover:border-orange-400 hover:bg-orange-50"
+              >
+                {imagePreviewUrl ? (
+                  <img src={imagePreviewUrl} alt="Preview" className="max-h-28 rounded-lg" />
+                ) : (
+                  <>
+                    <span className="text-sm font-medium text-gray-700">Drag and drop an image</span>
+                    <span className="text-xs text-gray-500 mt-1">or click to browse</span>
+                    <span className="text-xs text-gray-400 mt-2">PNG, JPG, WEBP, GIF, AVIF up to 10MB</span>
+                  </>
+                )}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif,image/avif"
+                  className="hidden"
+                  onChange={onImageFileChange}
+                />
+              </label>
+
+              {imageFile && (
+                <div className="text-xs text-gray-600">Selected file: {imageFile.name}</div>
+              )}
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-gray-600">or paste image URL</label>
+                <input
+                  type="url"
+                  value={imageUrl}
+                  onChange={(event) => setImageUrl(event.target.value)}
+                  placeholder="https://example.com/image.png"
+                  className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+
+              {imageError && <p className="text-sm text-red-600">{imageError}</p>}
+            </div>
+
+            <div className="px-5 py-4 border-t border-gray-200 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={closeImageDialog}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                disabled={isUploadingImage}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={insertImageFromUrl}
+                className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                disabled={isUploadingImage}
+              >
+                Use URL
+              </button>
+              <button
+                type="button"
+                onClick={uploadAndInsertImage}
+                className="px-3 py-1.5 text-sm rounded-lg bg-orange-600 text-white hover:bg-orange-700 disabled:opacity-50"
+                disabled={isUploadingImage || !imageFile}
+              >
+                {isUploadingImage ? 'Uploading...' : 'Upload image'}
+              </button>
             </div>
           </div>
         </div>
