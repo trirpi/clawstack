@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback } from 'react'
+import { useCallback, useState } from 'react'
 import type { Editor } from '@tiptap/react'
 
 interface EditorToolbarProps {
@@ -38,20 +38,33 @@ function ToolbarDivider() {
 }
 
 export function EditorToolbar({ editor }: EditorToolbarProps) {
-  const setLink = useCallback(() => {
+  const [isLinkOpen, setIsLinkOpen] = useState(false)
+  const [linkUrl, setLinkUrl] = useState('')
+
+  const openLinkDialog = useCallback(() => {
     if (!editor) return
-    
-    const previousUrl = editor.getAttributes('link').href
-    const url = window.prompt('Enter URL:', previousUrl)
+    const previousUrl = editor.getAttributes('link').href || ''
+    setLinkUrl(previousUrl)
+    setIsLinkOpen(true)
+  }, [editor])
 
-    if (url === null) return
-
-    if (url === '') {
+  const applyLink = useCallback(() => {
+    if (!editor) return
+    const url = linkUrl.trim()
+    if (!url) {
       editor.chain().focus().extendMarkRange('link').unsetLink().run()
+      setIsLinkOpen(false)
       return
     }
 
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run()
+    setIsLinkOpen(false)
+  }, [editor, linkUrl])
+
+  const removeLink = useCallback(() => {
+    if (!editor) return
+    editor.chain().focus().extendMarkRange('link').unsetLink().run()
+    setIsLinkOpen(false)
   }, [editor])
 
   const addImage = useCallback(() => {
@@ -213,7 +226,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
 
       {/* Links & Media */}
       <ToolbarButton
-        onClick={setLink}
+        onClick={openLinkDialog}
         isActive={editor.isActive('link')}
         title="Add Link"
       >
@@ -286,6 +299,57 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6" />
         </svg>
       </ToolbarButton>
+
+      {isLinkOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4">
+          <div className="w-full max-w-md rounded-xl bg-white shadow-xl border border-gray-200">
+            <div className="px-5 py-4 border-b border-gray-200">
+              <h4 className="text-sm font-semibold text-gray-900">Insert link</h4>
+            </div>
+            <div className="px-5 py-4 space-y-2">
+              <label className="text-xs font-medium text-gray-600">URL</label>
+              <input
+                autoFocus
+                type="url"
+                value={linkUrl}
+                onChange={(e) => setLinkUrl(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') applyLink()
+                  if (e.key === 'Escape') setIsLinkOpen(false)
+                }}
+                placeholder="https://example.com"
+                className="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
+              />
+              <p className="text-xs text-gray-500">Paste a full URL. Empty will remove the link.</p>
+            </div>
+            <div className="px-5 py-4 border-t border-gray-200 flex items-center justify-between">
+              <button
+                type="button"
+                onClick={removeLink}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Remove link
+              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => setIsLinkOpen(false)}
+                  className="px-3 py-1.5 text-sm rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={applyLink}
+                  className="px-3 py-1.5 text-sm rounded-lg bg-orange-600 text-white hover:bg-orange-700"
+                >
+                  Apply
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
