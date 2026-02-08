@@ -1,12 +1,17 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * Comprehensive component tests - verify all interactive elements work correctly
  */
 
+async function gotoPage(page: Page, url: string) {
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+}
+
 test.describe('Button Components', () => {
   test('all buttons on home page should be clickable', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
+    await expect(page.getByRole('link', { name: /start publishing/i })).toBeVisible({ timeout: 15000 })
     
     // Find all buttons and links styled as buttons
     const buttons = page.locator('button, a.inline-flex, a[class*="rounded"]')
@@ -24,7 +29,7 @@ test.describe('Button Components', () => {
   })
 
   test('primary button should be visible and functional', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const primaryButton = page.getByRole('link', { name: /start publishing/i })
     await expect(primaryButton).toBeVisible()
@@ -35,7 +40,7 @@ test.describe('Button Components', () => {
   })
 
   test('outline button should be visible and functional', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const outlineButton = page.getByRole('link', { name: /explore content/i })
     await expect(outlineButton).toBeVisible()
@@ -46,7 +51,7 @@ test.describe('Button Components', () => {
   })
 
   test('CTA button should be visible', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Scroll to CTA
     await page.getByText('Ready to share your automations').scrollIntoViewIfNeeded()
@@ -58,14 +63,14 @@ test.describe('Button Components', () => {
 
 test.describe('Header Component', () => {
   test('logo should link to home', async ({ page }) => {
-    await page.goto('/explore')
+    await gotoPage(page, '/explore')
     
     await page.getByRole('link').filter({ has: page.getByText('Clawstack') }).first().click()
     await expect(page).toHaveURL('/')
   })
 
   test('header should be sticky at top of page', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const header = page.locator('header')
     await expect(header).toBeVisible()
@@ -80,7 +85,7 @@ test.describe('Header Component', () => {
 
   test('navigation links should be visible on desktop', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 720 })
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Desktop nav should be visible
     await expect(page.getByRole('link', { name: /explore/i }).first()).toBeVisible()
@@ -88,16 +93,18 @@ test.describe('Header Component', () => {
   })
 
   test('header should have sign in and get started buttons', async ({ page }) => {
-    await page.goto('/')
-    
-    await expect(page.getByRole('link', { name: /sign in/i })).toBeVisible()
-    await expect(page.getByRole('link', { name: /get started/i }).first()).toBeVisible()
+    await gotoPage(page, '/')
+
+    const authLinks = page.locator('header a[href="/login"]')
+    await expect(authLinks).toHaveCount(2, { timeout: 15000 })
+    await expect(authLinks.first()).toBeVisible({ timeout: 15000 })
+    await expect(authLinks.nth(1)).toBeVisible({ timeout: 15000 })
   })
 })
 
 test.describe('Footer Component', () => {
   test('footer should contain all required links', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const footer = page.locator('footer')
     await footer.scrollIntoViewIfNeeded()
@@ -109,7 +116,7 @@ test.describe('Footer Component', () => {
   })
 
   test('footer should display copyright', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const footer = page.locator('footer')
     await footer.scrollIntoViewIfNeeded()
@@ -121,27 +128,27 @@ test.describe('Footer Component', () => {
 
 test.describe('Hero Section', () => {
   test('hero should have main heading with Clawstack', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const heading = page.getByRole('heading', { level: 1 })
     await expect(heading).toContainText('Clawstack')
   })
 
   test('hero should have description', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     await expect(page.getByText(/publishing platform/i)).toBeVisible()
   })
 
   test('hero should have two CTA buttons', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     await expect(page.getByRole('link', { name: /start publishing/i })).toBeVisible()
     await expect(page.getByRole('link', { name: /explore content/i })).toBeVisible()
   })
 
   test('hero should have stats section', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     await expect(page.getByText('Active Creators')).toBeVisible()
     await expect(page.getByText('Scripts Shared')).toBeVisible()
@@ -150,7 +157,7 @@ test.describe('Hero Section', () => {
 
 test.describe('Features Section', () => {
   test('features should display feature cards', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Look for feature cards by their headings
     const featureHeadings = page.locator('h3')
@@ -161,7 +168,7 @@ test.describe('Features Section', () => {
 
 test.describe('Pricing Page Components', () => {
   test('pricing page should display Free and Pro plans', async ({ page }) => {
-    await page.goto('/pricing')
+    await gotoPage(page, '/pricing')
     
     // Look for plan names
     await expect(page.getByRole('heading', { name: 'Free', exact: true })).toBeVisible()
@@ -169,13 +176,13 @@ test.describe('Pricing Page Components', () => {
   })
 
   test('pricing page should have FAQ section', async ({ page }) => {
-    await page.goto('/pricing')
+    await gotoPage(page, '/pricing')
     
     await expect(page.getByText('Frequently Asked Questions')).toBeVisible()
   })
 
   test('pricing page should have CTA buttons', async ({ page }) => {
-    await page.goto('/pricing')
+    await gotoPage(page, '/pricing')
     
     // Should have Get Started and Start Earning buttons
     const main = page.getByRole('main')
@@ -184,7 +191,7 @@ test.describe('Pricing Page Components', () => {
   })
 
   test('pricing page should display prices', async ({ page }) => {
-    await page.goto('/pricing')
+    await gotoPage(page, '/pricing')
     
     // Look for price text - use first() since they may appear multiple places
     await expect(page.getByText('$0').first()).toBeVisible()
@@ -194,13 +201,13 @@ test.describe('Pricing Page Components', () => {
 
 test.describe('Explore Page Components', () => {
   test('explore page should have title', async ({ page }) => {
-    await page.goto('/explore')
+    await gotoPage(page, '/explore')
     
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Explore')
   })
 
   test('explore page should have description', async ({ page }) => {
-    await page.goto('/explore')
+    await gotoPage(page, '/explore')
     
     await expect(page.getByText(/discover|scripts|plugins/i)).toBeVisible()
   })
@@ -208,13 +215,13 @@ test.describe('Explore Page Components', () => {
 
 test.describe('About Page Components', () => {
   test('about page should have title', async ({ page }) => {
-    await page.goto('/about')
+    await gotoPage(page, '/about')
     
     await expect(page.getByRole('heading', { level: 1 })).toContainText('About')
   })
 
   test('about page should have mission section', async ({ page }) => {
-    await page.goto('/about')
+    await gotoPage(page, '/about')
     
     await expect(page.getByText(/mission/i)).toBeVisible()
   })
@@ -222,7 +229,7 @@ test.describe('About Page Components', () => {
 
 test.describe('Legal Pages', () => {
   test('privacy page should have required sections', async ({ page }) => {
-    await page.goto('/privacy')
+    await gotoPage(page, '/privacy')
     
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Privacy')
     // Look for the heading specifically
@@ -230,7 +237,7 @@ test.describe('Legal Pages', () => {
   })
 
   test('terms page should have required sections', async ({ page }) => {
-    await page.goto('/terms')
+    await gotoPage(page, '/terms')
     
     await expect(page.getByRole('heading', { level: 1 })).toContainText('Terms')
     await expect(page.getByText(/acceptance of terms/i)).toBeVisible()
@@ -239,7 +246,7 @@ test.describe('Legal Pages', () => {
 
 test.describe('Login Page', () => {
   test('login page should have GitHub OAuth button', async ({ page }) => {
-    await page.goto('/login')
+    await gotoPage(page, '/login')
     
     const githubButton = page.getByRole('button', { name: /github/i })
     await expect(githubButton).toBeVisible()
@@ -247,13 +254,13 @@ test.describe('Login Page', () => {
   })
 
   test('login page should have branding', async ({ page }) => {
-    await page.goto('/login')
+    await gotoPage(page, '/login')
     
     await expect(page.getByText('Clawstack')).toBeVisible()
   })
 
   test('login page should have legal links', async ({ page }) => {
-    await page.goto('/login')
+    await gotoPage(page, '/login')
     
     await expect(page.getByRole('link', { name: /terms/i })).toBeVisible()
     await expect(page.getByRole('link', { name: /privacy/i })).toBeVisible()

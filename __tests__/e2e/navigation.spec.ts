@@ -1,29 +1,45 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function gotoPage(page: Page, url: string) {
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+}
 
 test.describe('Navigation', () => {
   test('should navigate from home to login', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
-    await page.getByRole('link', { name: /sign in/i }).click()
+    const signInLink = page.locator('header a[href="/login"]').first()
+    await expect(signInLink).toBeVisible({ timeout: 15000 })
+    await Promise.all([
+      page.waitForURL('**/login', { timeout: 15000 }),
+      signInLink.click(),
+    ])
     
     await expect(page).toHaveURL('/login')
   })
 
   test('should navigate from home to login via Get Started', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
-    // Click the first "Get Started" or "Start Publishing" button
-    const ctaButton = page.getByRole('link', { name: /start publishing|get started/i }).first()
-    await ctaButton.click()
+    const getStartedLink = page.getByRole('link', { name: /start publishing/i }).first()
+    await expect(getStartedLink).toBeVisible({ timeout: 15000 })
+    await Promise.all([
+      page.waitForURL('**/login', { timeout: 15000 }),
+      getStartedLink.click(),
+    ])
     
     await expect(page).toHaveURL('/login')
   })
 
   test('should navigate back to home from login', async ({ page }) => {
-    await page.goto('/login')
+    await gotoPage(page, '/login')
     
-    // Click the logo
-    await page.getByRole('link').filter({ has: page.getByText('Clawstack') }).first().click()
+    const homeLink = page.locator('a[href="/"]').filter({ hasText: /clawstack/i }).first()
+    await expect(homeLink).toBeVisible({ timeout: 15000 })
+    await Promise.all([
+      page.waitForURL('**/', { timeout: 15000 }),
+      homeLink.click(),
+    ])
     
     await expect(page).toHaveURL('/')
   })
@@ -43,11 +59,11 @@ test.describe('Navigation', () => {
 
   test('header should be present on all pages', async ({ page }) => {
     // Check home
-    await page.goto('/')
+    await gotoPage(page, '/')
     await expect(page.getByRole('banner')).toBeVisible()
     
     // Check login
-    await page.goto('/login')
+    await gotoPage(page, '/login')
     // Login page has a different layout, just check the page loads
     await expect(page.locator('body')).toBeVisible()
   })

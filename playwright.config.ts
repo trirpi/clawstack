@@ -13,7 +13,7 @@ const workerCount =
 
 export default defineConfig({
   testDir: './__tests__/e2e',
-  fullyParallel: true,
+  fullyParallel: false,
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: workerCount,
@@ -41,12 +41,10 @@ export default defineConfig({
   
   use: {
     baseURL: 'http://127.0.0.1:3001',
-    // Always record traces - can be viewed with `npx playwright show-trace`
-    trace: 'on',
-    // Always take screenshots
-    screenshot: 'on',
-    // Always record videos
-    video: 'on',
+    // Keep diagnostics for failures/retries without overloading CI runners.
+    trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
+    screenshot: 'only-on-failure',
+    video: process.env.CI ? 'retain-on-failure' : 'off',
   },
   
   projects: [

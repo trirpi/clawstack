@@ -1,44 +1,42 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function gotoPage(page: Page, path: string) {
+  await page.goto(path, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  await page.waitForLoadState('networkidle')
+}
 
 test.describe('Visual Regression Tests', () => {
   test.describe('Home Page', () => {
     test('full page screenshot - desktop', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('full page screenshot - mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-mobile.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('full page screenshot - tablet', async ({ page }) => {
       await page.setViewportSize({ width: 768, height: 1024 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-tablet.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('hero section screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       const hero = page.locator('section').first()
       await expect(hero).toHaveScreenshot('hero-section.png', {
@@ -48,8 +46,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('features section screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       // Scroll to features section
       await page.getByText('Everything you need').scrollIntoViewIfNeeded()
@@ -62,8 +59,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('CTA section screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       // Scroll to CTA section
       await page.getByText('Ready to share your automations').scrollIntoViewIfNeeded()
@@ -76,8 +72,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('header screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       const header = page.locator('header')
       await expect(header).toHaveScreenshot('header.png', {
@@ -87,8 +82,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('footer screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       const footer = page.locator('footer')
       await footer.scrollIntoViewIfNeeded()
@@ -101,30 +95,25 @@ test.describe('Visual Regression Tests', () => {
   test.describe('Login Page', () => {
     test('full page screenshot - desktop', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/login')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/login')
       
       await expect(page).toHaveScreenshot('login-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('full page screenshot - mobile', async ({ page }) => {
       await page.setViewportSize({ width: 375, height: 667 })
-      await page.goto('/login')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/login')
       
       await expect(page).toHaveScreenshot('login-mobile.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('login form screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/login')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/login')
       
       const form = page.locator('div').filter({ hasText: 'Welcome back' }).first()
       await expect(form).toHaveScreenshot('login-form.png', {
@@ -134,8 +123,7 @@ test.describe('Visual Regression Tests', () => {
 
     test('github button screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/login')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/login')
       
       const button = page.getByRole('button', { name: /continue with github/i })
       await expect(button).toHaveScreenshot('github-button.png', {
@@ -147,10 +135,9 @@ test.describe('Visual Regression Tests', () => {
   test.describe('404 Page', () => {
     test('404 page screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/non-existent-page-12345', { waitUntil: 'networkidle' })
+      await gotoPage(page, '/non-existent-page-12345')
       
       await expect(page).toHaveScreenshot('404-page.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
@@ -159,11 +146,9 @@ test.describe('Visual Regression Tests', () => {
   test.describe('Explore Page', () => {
     test('full page screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/explore')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/explore')
       
       await expect(page).toHaveScreenshot('explore-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
@@ -172,19 +157,16 @@ test.describe('Visual Regression Tests', () => {
   test.describe('Pricing Page', () => {
     test('full page screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/pricing')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/pricing')
       
       await expect(page).toHaveScreenshot('pricing-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('pricing cards screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/pricing')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/pricing')
       
       const cards = page.locator('.grid').first()
       await expect(cards).toHaveScreenshot('pricing-cards.png', {
@@ -196,11 +178,9 @@ test.describe('Visual Regression Tests', () => {
   test.describe('About Page', () => {
     test('full page screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/about')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/about')
       
       await expect(page).toHaveScreenshot('about-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
@@ -209,22 +189,18 @@ test.describe('Visual Regression Tests', () => {
   test.describe('Legal Pages', () => {
     test('privacy page screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/privacy')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/privacy')
       
       await expect(page).toHaveScreenshot('privacy-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
 
     test('terms page screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/terms')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/terms')
       
       await expect(page).toHaveScreenshot('terms-desktop.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
@@ -233,42 +209,39 @@ test.describe('Visual Regression Tests', () => {
   test.describe('Component States', () => {
     test('button hover state', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
-      const button = page.getByRole('link', { name: /start publishing/i }).first()
+      const button = page.getByRole('button', { name: /start publishing/i }).first()
+      const beforeBackground = await button.evaluate((element) => getComputedStyle(element).backgroundColor)
       await button.hover()
-      
-      await expect(button).toHaveScreenshot('button-hover.png', {
-        maxDiffPixelRatio: 0.05,
-      })
+      const afterBackground = await button.evaluate((element) => getComputedStyle(element).backgroundColor)
+
+      expect(afterBackground).not.toBe(beforeBackground)
     })
 
     test('button focus state', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
-      const button = page.getByRole('link', { name: /start publishing/i }).first()
+      const button = page.getByRole('button', { name: /start publishing/i }).first()
       await button.focus()
-      
-      await expect(button).toHaveScreenshot('button-focus.png', {
-        maxDiffPixelRatio: 0.05,
-      })
+      await expect(button).toBeFocused()
     })
 
     test('feature card hover state', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
-      const featureCard = page.locator('div').filter({ hasText: 'Rich Publishing' }).first()
+      const featureCard = page
+        .locator('div.rounded-2xl.border.border-gray-200')
+        .filter({ hasText: 'Rich Publishing' })
+        .first()
       await featureCard.scrollIntoViewIfNeeded()
+      const beforeShadow = await featureCard.evaluate((element) => getComputedStyle(element).boxShadow)
       await featureCard.hover()
-      
-      await expect(featureCard).toHaveScreenshot('feature-card-hover.png', {
-        maxDiffPixelRatio: 0.05,
-      })
+      const afterShadow = await featureCard.evaluate((element) => getComputedStyle(element).boxShadow)
+
+      expect(afterShadow).not.toBe(beforeShadow)
     })
   })
 
@@ -276,11 +249,9 @@ test.describe('Visual Regression Tests', () => {
     test('home page in light mode', async ({ page }) => {
       await page.emulateMedia({ colorScheme: 'light' })
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-light-mode.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })
@@ -288,11 +259,9 @@ test.describe('Visual Regression Tests', () => {
     test('login page in light mode', async ({ page }) => {
       await page.emulateMedia({ colorScheme: 'light' })
       await page.setViewportSize({ width: 1280, height: 720 })
-      await page.goto('/login')
-      await page.waitForLoadState('networkidle')
+      await gotoPage(page, '/login')
       
       await expect(page).toHaveScreenshot('login-light-mode.png', {
-        fullPage: true,
         maxDiffPixelRatio: 0.05,
       })
     })

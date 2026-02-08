@@ -1,8 +1,13 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
+
+async function gotoPage(page: Page, url: string) {
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+}
 
 test.describe('Accessibility', () => {
   test('home page should have proper heading hierarchy', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
+    await expect(page.getByRole('heading', { level: 1 }).first()).toBeVisible({ timeout: 15000 })
     
     // Should have exactly one h1
     const h1s = await page.getByRole('heading', { level: 1 }).count()
@@ -14,7 +19,7 @@ test.describe('Accessibility', () => {
   })
 
   test('buttons should be keyboard accessible', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Tab to the first button
     await page.keyboard.press('Tab')
@@ -25,7 +30,7 @@ test.describe('Accessibility', () => {
   })
 
   test('links should have descriptive text', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Get all links
     const links = page.getByRole('link')
@@ -40,7 +45,7 @@ test.describe('Accessibility', () => {
   })
 
   test('images should have alt text', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const images = page.locator('img')
     const count = await images.count()
@@ -54,7 +59,7 @@ test.describe('Accessibility', () => {
   })
 
   test('form inputs should have labels', async ({ page }) => {
-    await page.goto('/login')
+    await gotoPage(page, '/login')
     
     // Any inputs should have associated labels or aria-labels
     const inputs = page.locator('input, textarea')
@@ -73,7 +78,7 @@ test.describe('Accessibility', () => {
   })
 
   test('interactive elements should have focus styles', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Focus on a button
     const button = page.getByRole('link', { name: /start publishing/i }).first()
@@ -84,14 +89,14 @@ test.describe('Accessibility', () => {
   })
 
   test('page should have a main landmark', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     const main = page.getByRole('main')
     await expect(main).toBeVisible()
   })
 
   test('color contrast should be sufficient', async ({ page }) => {
-    await page.goto('/')
+    await gotoPage(page, '/')
     
     // Check that text elements are visible (basic contrast check)
     const heading = page.getByRole('heading', { level: 1 })

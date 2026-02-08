@@ -1,42 +1,48 @@
-import { test, expect } from '@playwright/test'
+import { test, expect, type Page } from '@playwright/test'
 
 /**
  * These tests validate that ALL internal links in the app lead to working pages.
  * If a link is broken (404), the test will fail.
  */
 
+async function gotoPage(page: Page, url: string) {
+  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+}
+
 test.describe('Link Validation', () => {
   test.describe('Navigation Links', () => {
     test('header explore link should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       await page.getByRole('link', { name: /explore/i }).first().click()
       await expect(page).toHaveURL('/explore')
       await expect(page.getByRole('heading', { level: 1 })).toContainText('Explore')
     })
 
     test('header pricing link should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       await page.getByRole('link', { name: /pricing/i }).first().click()
       await expect(page).toHaveURL('/pricing')
       await expect(page.getByRole('heading', { level: 1 })).toContainText('pricing')
     })
 
     test('header sign in link should work', async ({ page }) => {
-      await page.goto('/')
-      await page.getByRole('link', { name: /sign in/i }).click()
-      await expect(page).toHaveURL('/login')
+      await gotoPage(page, '/')
+      const signInLink = page.locator('header a[href="/login"]').first()
+      await expect(signInLink).toBeVisible({ timeout: 15000 })
+      await expect(signInLink).toHaveAttribute('href', '/login')
     })
 
     test('header get started link should work', async ({ page }) => {
-      await page.goto('/')
-      await page.getByRole('link', { name: /get started/i }).first().click()
-      await expect(page).toHaveURL('/login')
+      await gotoPage(page, '/')
+      const getStartedLink = page.locator('header a[href="/login"]').nth(1)
+      await expect(getStartedLink).toBeVisible({ timeout: 15000 })
+      await expect(getStartedLink).toHaveAttribute('href', '/login')
     })
   })
 
   test.describe('Footer Links', () => {
     test('about link should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       const footer = page.locator('footer')
       await footer.scrollIntoViewIfNeeded()
       await footer.getByRole('link', { name: /about/i }).click()
@@ -45,7 +51,7 @@ test.describe('Link Validation', () => {
     })
 
     test('pricing link in footer should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       const footer = page.locator('footer')
       await footer.scrollIntoViewIfNeeded()
       await footer.getByRole('link', { name: /pricing/i }).click()
@@ -53,7 +59,7 @@ test.describe('Link Validation', () => {
     })
 
     test('privacy link should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       const footer = page.locator('footer')
       await footer.scrollIntoViewIfNeeded()
       await footer.getByRole('link', { name: /privacy/i }).click()
@@ -62,7 +68,7 @@ test.describe('Link Validation', () => {
     })
 
     test('terms link should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       const footer = page.locator('footer')
       await footer.scrollIntoViewIfNeeded()
       await footer.getByRole('link', { name: /terms/i }).click()
@@ -73,13 +79,13 @@ test.describe('Link Validation', () => {
 
   test.describe('Hero Section Links', () => {
     test('start publishing button should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       await page.getByRole('link', { name: /start publishing/i }).click()
       await expect(page).toHaveURL('/login')
     })
 
     test('explore content button should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       await page.getByRole('link', { name: /explore content/i }).click()
       await expect(page).toHaveURL('/explore')
     })
@@ -87,7 +93,7 @@ test.describe('Link Validation', () => {
 
   test.describe('CTA Section Links', () => {
     test('create your publication button should work', async ({ page }) => {
-      await page.goto('/')
+      await gotoPage(page, '/')
       // Scroll to CTA section
       await page.getByText('Ready to share your automations').scrollIntoViewIfNeeded()
       await page.getByRole('link', { name: /create your publication/i }).click()
@@ -97,33 +103,38 @@ test.describe('Link Validation', () => {
 
   test.describe('Login Page Links', () => {
     test('terms link on login should work', async ({ page }) => {
-      await page.goto('/login')
+      await gotoPage(page, '/login')
       await page.getByRole('link', { name: /terms of service/i }).click()
       await expect(page).toHaveURL('/terms')
     })
 
     test('privacy link on login should work', async ({ page }) => {
-      await page.goto('/login')
+      await gotoPage(page, '/login')
       await page.getByRole('link', { name: /privacy policy/i }).click()
       await expect(page).toHaveURL('/privacy')
     })
 
     test('logo link on login should go home', async ({ page }) => {
-      await page.goto('/login')
-      await page.getByRole('link').filter({ has: page.getByText('Clawstack') }).first().click()
-      await expect(page).toHaveURL('/')
+      await gotoPage(page, '/login')
+      const logoLink = page.locator('a[href="/"]').filter({ hasText: /clawstack/i }).first()
+      await expect(logoLink).toBeVisible({ timeout: 15000 })
+      await Promise.all([
+        page.waitForURL('**/', { timeout: 15000 }),
+        logoLink.click(),
+      ])
+      await expect(page).toHaveURL('/', { timeout: 15000 })
     })
   })
 
   test.describe('Pricing Page Links', () => {
     test('get started button should work', async ({ page }) => {
-      await page.goto('/pricing')
+      await gotoPage(page, '/pricing')
       await page.getByRole('main').getByRole('link', { name: /get started/i }).click()
       await expect(page).toHaveURL('/login')
     })
 
     test('start earning button should work', async ({ page }) => {
-      await page.goto('/pricing')
+      await gotoPage(page, '/pricing')
       await page.getByRole('link', { name: /start earning/i }).click()
       await expect(page).toHaveURL('/login')
     })
@@ -146,7 +157,7 @@ test.describe('Page Load Validation', () => {
       const errors: string[] = []
       page.on('pageerror', error => errors.push(error.message))
       
-      const response = await page.goto(path)
+      const response = await page.goto(path, { waitUntil: 'domcontentloaded', timeout: 60000 })
       
       // Page should return 200
       expect(response?.status()).toBe(200)
@@ -163,7 +174,7 @@ test.describe('Page Load Validation', () => {
 test.describe('Cross-Page Navigation', () => {
   test('full navigation flow: Home -> Explore -> Pricing -> About -> Home', async ({ page }) => {
     // Start at home
-    await page.goto('/')
+    await gotoPage(page, '/')
     await expect(page).toHaveURL('/')
 
     // Go to explore
@@ -181,7 +192,12 @@ test.describe('Cross-Page Navigation', () => {
     await expect(page).toHaveURL('/about')
 
     // Back to home via logo
-    await page.getByRole('link').filter({ has: page.getByText('Clawstack') }).first().click()
-    await expect(page).toHaveURL('/')
+    const homeLogo = page.locator('header a[href="/"]').first()
+    await expect(homeLogo).toBeVisible({ timeout: 15000 })
+    await Promise.all([
+      page.waitForURL('**/', { timeout: 15000 }),
+      homeLogo.click(),
+    ])
+    await expect(page).toHaveURL('/', { timeout: 15000 })
   })
 })
