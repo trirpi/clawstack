@@ -46,7 +46,7 @@ export default defineConfig({
   ],
   
   webServer: {
-    command: 'DATABASE_URL="file:./dev.db" npm run db:local:ci && env -u NO_COLOR FORCE_COLOR=0 NEXT_DISABLE_TURBOPACK=1 npm run dev -- --hostname 127.0.0.1 --port 3001',
+    command: 'env -u NO_COLOR FORCE_COLOR=0 NEXT_DISABLE_TURBOPACK=1 bash scripts/playwright-webserver.sh',
     url: 'http://127.0.0.1:3001',
     reuseExistingServer: true,
     timeout: 120000,

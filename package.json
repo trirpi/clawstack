@@ -21,7 +21,7 @@
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
     "db:local": "cp prisma/schema.sqlite.prisma prisma/schema.prisma && prisma generate && prisma db push",
-    "db:local:ci": "prisma generate --schema prisma/schema.sqlite.prisma && prisma db push --schema prisma/schema.sqlite.prisma",
+    "db:local:ci": "PRISMA_HIDE_UPDATE_MESSAGE=1 prisma generate && prisma db push",
     "db:postgres": "git checkout prisma/schema.prisma && prisma generate",
     "db:reset": "rm -f prisma/dev.db prisma/dev.db-journal && npm run db:local"
   },
