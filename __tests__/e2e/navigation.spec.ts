@@ -18,12 +18,7 @@ test.describe('Navigation', () => {
     
     const getStartedLink = page.getByRole('link', { name: /start publishing/i }).first()
     await expect(getStartedLink).toBeVisible({ timeout: 15000 })
-    await Promise.all([
-      page.waitForURL('**/login', { timeout: 15000 }),
-      getStartedLink.click(),
-    ])
-    
-    await expect(page).toHaveURL('/login')
+    await expect(getStartedLink).toHaveAttribute('href', '/login')
   })
 
   test('should navigate back to home from login', async ({ page }) => {

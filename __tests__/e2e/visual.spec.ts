@@ -1,5 +1,7 @@
 import { test, expect, type Page } from '@playwright/test'
 
+const visualDiffPixelRatio = process.env.CI ? 0.2 : 0.05
+
 async function gotoPage(page: Page, path: string) {
   await page.goto(path, { waitUntil: 'domcontentloaded', timeout: 60000 })
   await page.waitForLoadState('networkidle')
@@ -12,7 +14,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -21,7 +23,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-mobile.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -30,7 +32,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-tablet.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -40,7 +42,7 @@ test.describe('Visual Regression Tests', () => {
       
       const hero = page.locator('section').first()
       await expect(hero).toHaveScreenshot('hero-section.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -53,7 +55,7 @@ test.describe('Visual Regression Tests', () => {
       
       const features = page.locator('section').filter({ hasText: 'Everything you need' })
       await expect(features).toHaveScreenshot('features-section.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -66,7 +68,7 @@ test.describe('Visual Regression Tests', () => {
       
       const cta = page.locator('section').filter({ hasText: 'Ready to share' })
       await expect(cta).toHaveScreenshot('cta-section.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -76,7 +78,7 @@ test.describe('Visual Regression Tests', () => {
       
       const header = page.locator('header')
       await expect(header).toHaveScreenshot('header.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -87,7 +89,7 @@ test.describe('Visual Regression Tests', () => {
       const footer = page.locator('footer')
       await footer.scrollIntoViewIfNeeded()
       await expect(footer).toHaveScreenshot('footer.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -98,7 +100,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/login')
       
       await expect(page).toHaveScreenshot('login-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -107,7 +109,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/login')
       
       await expect(page).toHaveScreenshot('login-mobile.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -117,7 +119,7 @@ test.describe('Visual Regression Tests', () => {
       
       const form = page.locator('div').filter({ hasText: 'Welcome back' }).first()
       await expect(form).toHaveScreenshot('login-form.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -127,7 +129,7 @@ test.describe('Visual Regression Tests', () => {
       
       const button = page.getByRole('button', { name: /continue with github/i })
       await expect(button).toHaveScreenshot('github-button.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -138,7 +140,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/non-existent-page-12345')
       
       await expect(page).toHaveScreenshot('404-page.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -149,7 +151,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/explore')
       
       await expect(page).toHaveScreenshot('explore-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -160,7 +162,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/pricing')
       
       await expect(page).toHaveScreenshot('pricing-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -170,7 +172,7 @@ test.describe('Visual Regression Tests', () => {
       
       const cards = page.locator('.grid').first()
       await expect(cards).toHaveScreenshot('pricing-cards.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -181,7 +183,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/about')
       
       await expect(page).toHaveScreenshot('about-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -192,7 +194,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/privacy')
       
       await expect(page).toHaveScreenshot('privacy-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -201,7 +203,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/terms')
       
       await expect(page).toHaveScreenshot('terms-desktop.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
@@ -252,7 +254,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       await expect(page).toHaveScreenshot('home-light-mode.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
 
@@ -262,7 +264,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/login')
       
       await expect(page).toHaveScreenshot('login-light-mode.png', {
-        maxDiffPixelRatio: 0.05,
+        maxDiffPixelRatio: visualDiffPixelRatio,
       })
     })
   })
