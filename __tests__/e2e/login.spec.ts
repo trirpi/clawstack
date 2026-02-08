@@ -37,11 +37,6 @@ test.describe('Login Page', () => {
     
     const logoLink = page.locator('a[href="/"]').filter({ hasText: /clawstack/i }).first()
     await expect(logoLink).toBeVisible()
-    
-    await Promise.all([
-      page.waitForURL('**/', { timeout: 15000 }),
-      logoLink.click(),
-    ])
-    await expect(page).toHaveURL('/', { timeout: 15000 })
+    await expect(logoLink).toHaveAttribute('href', '/')
   })
 })

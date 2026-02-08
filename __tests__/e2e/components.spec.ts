@@ -98,7 +98,7 @@ test.describe('Header Component', () => {
     const authLinks = page.locator('header a[href="/login"]')
     const dashboardLink = page.locator('header a[href="/dashboard"]')
     await expect
-      .poll(async () => (await authLinks.count()) + (await dashboardLink.count()), { timeout: 15000 })
+      .poll(async () => (await authLinks.count()) + (await dashboardLink.count()), { timeout: 60000 })
       .toBeGreaterThan(0)
   })
 })

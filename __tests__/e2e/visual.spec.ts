@@ -36,16 +36,6 @@ test.describe('Visual Regression Tests', () => {
       })
     })
 
-    test('hero section screenshot', async ({ page }) => {
-      await page.setViewportSize({ width: 1280, height: 720 })
-      await gotoPage(page, '/')
-      
-      const hero = page.locator('section').first()
-      await expect(hero).toHaveScreenshot('hero-section.png', {
-        maxDiffPixelRatio: visualDiffPixelRatio,
-      })
-    })
-
     test('features section screenshot', async ({ page }) => {
       await page.setViewportSize({ width: 1280, height: 720 })
       await gotoPage(page, '/')

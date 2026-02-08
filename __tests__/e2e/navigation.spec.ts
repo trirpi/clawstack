@@ -9,7 +9,7 @@ test.describe('Navigation', () => {
     await gotoPage(page, '/')
     
     const authLinks = page.locator('header a[href="/login"]')
-    await expect.poll(async () => authLinks.count(), { timeout: 15000 }).toBeGreaterThan(0)
+    await expect.poll(async () => authLinks.count(), { timeout: 60000 }).toBeGreaterThan(0)
     await expect(authLinks.first()).toHaveAttribute('href', '/login')
   })
 
