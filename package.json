@@ -40,6 +40,7 @@
     "@tiptap/extension-underline": "^3.18.0",
     "@tiptap/react": "^3.18.0",
     "@tiptap/starter-kit": "^3.18.0",
+    "@vercel/blob": "^2.2.0",
     "clsx": "^2.1.1",
     "dotenv": "^17.2.3",
     "lowlight": "^3.3.0",

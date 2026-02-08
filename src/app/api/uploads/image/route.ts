@@ -1,12 +1,14 @@
 import { randomUUID } from 'crypto'
 import { mkdir, writeFile } from 'fs/promises'
 import path from 'path'
+import { put } from '@vercel/blob'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 
 export const runtime = 'nodejs'
 
-const MAX_FILE_SIZE_BYTES = 10 * 1024 * 1024
+// Vercel serverless request payload limits are low, so keep uploads conservative.
+const MAX_FILE_SIZE_BYTES = 4 * 1024 * 1024
 
 const ALLOWED_MIME_TYPES: Record<string, string> = {
   'image/jpeg': 'jpg',
@@ -40,11 +42,8 @@ export async function POST(request: NextRequest) {
   }
 
   if (file.size > MAX_FILE_SIZE_BYTES) {
-    return NextResponse.json({ error: 'Image must be 10MB or smaller.' }, { status: 400 })
+    return NextResponse.json({ error: 'Image must be 4MB or smaller.' }, { status: 400 })
   }
-
-  const uploadDirectory = path.join(process.cwd(), 'public', 'uploads')
-  await mkdir(uploadDirectory, { recursive: true })
 
   const safeBaseName = file.name
     .toLowerCase()
@@ -55,8 +54,19 @@ export async function POST(request: NextRequest) {
 
   const fallbackBaseName = safeBaseName || 'image'
   const filename = `${Date.now()}-${randomUUID()}-${fallbackBaseName}.${extension}`
-  const destination = path.join(uploadDirectory, filename)
 
+  if (process.env.BLOB_READ_WRITE_TOKEN) {
+    const blob = await put(`uploads/${filename}`, file, {
+      access: 'public',
+      addRandomSuffix: false,
+    })
+
+    return NextResponse.json({ url: blob.url })
+  }
+
+  const uploadDirectory = path.join(process.cwd(), 'public', 'uploads')
+  await mkdir(uploadDirectory, { recursive: true })
+  const destination = path.join(uploadDirectory, filename)
   const bytes = await file.arrayBuffer()
   await writeFile(destination, Buffer.from(bytes))
 
