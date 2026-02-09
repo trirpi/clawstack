@@ -2,9 +2,10 @@ import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import { prisma } from '@/lib/prisma'
+import { getSession } from '@/lib/auth'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
-import { Button } from '@/components/ui/Button'
+import { SubscribeButton } from '@/components/content/SubscribeButton'
 import { formatDate } from '@/lib/utils'
 
 interface Props {
@@ -13,6 +14,7 @@ interface Props {
 
 export default async function PublicationPage({ params }: Props) {
   const { username } = await params
+  const session = await getSession()
 
   const publication = await prisma.publication.findUnique({
     where: { slug: username },
@@ -32,6 +34,17 @@ export default async function PublicationPage({ params }: Props) {
     notFound()
   }
   type PublicationPost = (typeof publication.posts)[number]
+  const isOwner = session?.user?.id === publication.userId
+  const existingSubscription = session?.user?.id
+    ? await prisma.subscription.findUnique({
+        where: {
+          userId_publicationId: {
+            userId: session.user.id,
+            publicationId: publication.id,
+          },
+        },
+      })
+    : null
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -67,7 +80,12 @@ export default async function PublicationPage({ params }: Props) {
               <span>{publication.posts.length} posts</span>
             </div>
             <div className="mt-6">
-              <Button size="lg">Subscribe</Button>
+              <SubscribeButton
+                publicationId={publication.id}
+                initialSubscribed={Boolean(existingSubscription)}
+                isOwner={Boolean(isOwner)}
+                size="lg"
+              />
             </div>
           </div>
         </div>

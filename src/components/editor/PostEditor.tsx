@@ -15,6 +15,7 @@ import { common, createLowlight } from 'lowlight'
 import { Button } from '@/components/ui/Button'
 import { slugify } from '@/lib/utils'
 import { EditorToolbar } from './EditorToolbar'
+import { Notice } from '@/components/ui/Notice'
 
 const lowlight = createLowlight(common)
 
@@ -54,6 +55,7 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
   const [visibility, setVisibility] = useState(initialData?.visibility || 'FREE')
   const [saving, setSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
+  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
 
   const editor = useEditor({
     extensions: [
@@ -104,11 +106,12 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
 
   const handleSave = useCallback(async (publish: boolean) => {
     if (!title.trim()) {
-      alert('Please add a title')
+      setMessage({ tone: 'error', text: 'Please add a title.' })
       return
     }
 
     setSaving(true)
+    setMessage(null)
 
     try {
       const content = editor?.getHTML() || ''
@@ -135,6 +138,10 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
       }
 
       setLastSaved(new Date())
+      setMessage({
+        tone: 'success',
+        text: publish ? 'Post published successfully.' : 'Draft saved.',
+      })
       
       if (publish || !initialData) {
         router.push('/dashboard')
@@ -142,7 +149,7 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
       }
     } catch (error) {
       console.error('Error saving post:', error)
-      alert('Failed to save post')
+      setMessage({ tone: 'error', text: 'Failed to save post.' })
     } finally {
       setSaving(false)
     }
@@ -160,6 +167,8 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
 
   return (
     <div className="max-w-4xl mx-auto">
+      {message && <div className="mb-4"><Notice tone={message.tone} message={message.text} /></div>}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <button

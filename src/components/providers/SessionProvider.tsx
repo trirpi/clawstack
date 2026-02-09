@@ -7,5 +7,9 @@ interface Props {
 }
 
 export function SessionProvider({ children }: Props) {
-  return <NextAuthSessionProvider>{children}</NextAuthSessionProvider>
+  return (
+    <NextAuthSessionProvider refetchOnWindowFocus={false} refetchInterval={0}>
+      {children}
+    </NextAuthSessionProvider>
+  )
 }

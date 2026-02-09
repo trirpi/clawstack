@@ -1,7 +1,42 @@
 import { test, expect, type Page } from '@playwright/test'
 
 async function gotoPage(page: Page, url: string) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  let lastError: unknown
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+      return
+    } catch (error) {
+      lastError = error
+      const message = error instanceof Error ? error.message : String(error)
+      if (!message.includes('ERR_NETWORK_IO_SUSPENDED') || attempt === 2) {
+        throw error
+      }
+      await page.waitForTimeout(500 * (attempt + 1))
+    }
+  }
+
+  throw lastError
+}
+
+async function gotoPageWithResponse(page: Page, url: string) {
+  let lastError: unknown
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      return await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
+    } catch (error) {
+      lastError = error
+      const message = error instanceof Error ? error.message : String(error)
+      if (!message.includes('ERR_NETWORK_IO_SUSPENDED') || attempt === 2) {
+        throw error
+      }
+      await page.waitForTimeout(500 * (attempt + 1))
+    }
+  }
+
+  throw lastError
 }
 
 test.describe('Navigation', () => {
@@ -35,14 +70,14 @@ test.describe('Navigation', () => {
   })
 
   test('should show 404 for non-existent pages', async ({ page }) => {
-    const response = await page.goto('/this-page-does-not-exist-12345')
+    const response = await gotoPageWithResponse(page, '/this-page-does-not-exist-12345')
     
     // Should return 404
     expect(response?.status()).toBe(404)
   })
 
   test('should show 404 for non-existent publication', async ({ page }) => {
-    const response = await page.goto('/nonexistent-user-abc123')
+    const response = await gotoPageWithResponse(page, '/nonexistent-user-abc123')
     
     expect(response?.status()).toBe(404)
   })

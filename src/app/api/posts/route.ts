@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { sanitizeHtmlBasic } from '@/lib/sanitize'
+import { hasSameOriginHeader, validatePostPayload } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -9,9 +11,15 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  if (!hasSameOriginHeader(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
 
   try {
-    const body = await request.json()
+    const payload = validatePostPayload(await request.json())
+    if (!payload || !payload.publicationId) {
+      return NextResponse.json({ error: 'Invalid post payload' }, { status: 400 })
+    }
     const {
       publicationId,
       title,
@@ -21,7 +29,7 @@ export async function POST(request: NextRequest) {
       category,
       visibility,
       published,
-    } = body
+    } = payload
 
     // Verify the user owns this publication
     const publication = await prisma.publication.findUnique({
@@ -51,7 +59,7 @@ export async function POST(request: NextRequest) {
       data: {
         title,
         slug: finalSlug,
-        content,
+        content: sanitizeHtmlBasic(content),
         excerpt: excerpt || null,
         category,
         visibility,
@@ -77,9 +85,15 @@ export async function PUT(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  if (!hasSameOriginHeader(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
 
   try {
-    const body = await request.json()
+    const payload = validatePostPayload(await request.json())
+    if (!payload?.id) {
+      return NextResponse.json({ error: 'Invalid post payload' }, { status: 400 })
+    }
     const {
       id,
       title,
@@ -89,7 +103,7 @@ export async function PUT(request: NextRequest) {
       category,
       visibility,
       published,
-    } = body
+    } = payload
 
     // Get the post and verify ownership
     const existingPost = await prisma.post.findUnique({
@@ -122,7 +136,7 @@ export async function PUT(request: NextRequest) {
       data: {
         title,
         slug: finalSlug,
-        content,
+        content: sanitizeHtmlBasic(content),
         excerpt: excerpt || null,
         category,
         visibility,

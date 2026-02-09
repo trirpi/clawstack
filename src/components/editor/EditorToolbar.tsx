@@ -565,7 +565,7 @@ export function EditorToolbar({ editor }: EditorToolbarProps) {
                   <>
                     <span className="text-sm font-medium text-gray-700">Drag and drop an image</span>
                     <span className="text-xs text-gray-500 mt-1">or click to browse</span>
-                    <span className="text-xs text-gray-400 mt-2">PNG, JPG, WEBP, GIF, AVIF up to 10MB</span>
+                    <span className="text-xs text-gray-400 mt-2">PNG, JPG, WEBP, GIF, AVIF up to 4MB</span>
                   </>
                 )}
                 <input

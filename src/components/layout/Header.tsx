@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/Button'
 
 export function Header() {
   const { data: session, status } = useSession()
+  const isAuthenticated = status !== 'loading' && Boolean(session)
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-200 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60">
@@ -33,9 +34,7 @@ export function Header() {
           </div>
 
           <div className="flex items-center gap-4">
-            {status === 'loading' ? (
-              <div className="h-8 w-20 bg-gray-200 animate-pulse rounded" />
-            ) : session ? (
+            {isAuthenticated ? (
               <>
                 <Link href="/dashboard">
                   <Button variant="ghost" size="sm">

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Resend } from 'resend'
+import { sanitizeHtmlBasic, sanitizePlainText } from '@/lib/sanitize'
+import { hasSameOriginHeader, validateSendPostPayload } from '@/lib/validation'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
@@ -12,6 +14,9 @@ export async function POST(request: NextRequest) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    if (!hasSameOriginHeader(request)) {
+      return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+    }
 
     const user = await getCurrentUser()
     
@@ -19,11 +24,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'No publication found' }, { status: 404 })
     }
 
-    const { postId } = await request.json()
-
-    if (!postId) {
-      return NextResponse.json({ error: 'Post ID is required' }, { status: 400 })
+    const payload = validateSendPostPayload(await request.json())
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid newsletter payload' }, { status: 400 })
     }
+    const { postId } = payload
 
     // Get the post
     const post = await prisma.post.findFirst({
@@ -40,7 +45,10 @@ export async function POST(request: NextRequest) {
 
     // Get all subscribers
     const subscribers = await prisma.subscription.findMany({
-      where: { publicationId: user.publication.id },
+      where: {
+        publicationId: user.publication.id,
+        status: 'ACTIVE',
+      },
       include: {
         user: {
           select: {
@@ -69,30 +77,33 @@ export async function POST(request: NextRequest) {
     type Subscriber = (typeof subscribers)[number]
     
     const emails = subscribers.map((sub: Subscriber) => sub.user.email)
+    const safeTitle = sanitizePlainText(post.title).slice(0, 180)
+    const safePublicationName = sanitizePlainText(user.publication.name).slice(0, 100) || 'Clawstack'
+    const safePostHtml = sanitizeHtmlBasic(post.content)
     
     // Strip HTML tags for plain text version
-    const plainContent = post.content.replace(/<[^>]*>/g, '').substring(0, 500)
+    const plainContent = sanitizePlainText(post.content).substring(0, 500)
 
     await resend.emails.send({
-      from: `${user.publication.name} <newsletter@resend.dev>`,
+      from: `${safePublicationName} <newsletter@resend.dev>`,
       to: emails,
-      subject: post.title,
+      subject: safeTitle,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
-          <h1 style="color: #111; font-size: 24px;">${post.title}</h1>
+          <h1 style="color: #111; font-size: 24px;">${safeTitle}</h1>
           <div style="color: #444; line-height: 1.6;">
-            ${post.content}
+            ${safePostHtml}
           </div>
           <hr style="border: none; border-top: 1px solid #eee; margin: 32px 0;" />
           <p style="color: #666; font-size: 14px;">
             <a href="${postUrl}" style="color: #f97316;">Read on Clawstack</a>
           </p>
           <p style="color: #999; font-size: 12px;">
-            You're receiving this because you subscribed to ${user.publication.name}.
+            You're receiving this because you subscribed to ${safePublicationName}.
           </p>
         </div>
       `,
-      text: `${post.title}\n\n${plainContent}...\n\nRead more: ${postUrl}`,
+      text: `${safeTitle}\n\n${plainContent}...\n\nRead more: ${postUrl}`,
     })
 
     return NextResponse.json({ 

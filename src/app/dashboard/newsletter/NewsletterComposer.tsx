@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
+import { Notice } from '@/components/ui/Notice'
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 
 interface NewsletterComposerProps {
   subscriberCount: number
@@ -13,24 +15,25 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
   const [content, setContent] = useState('')
   const [sending, setSending] = useState(false)
   const [sent, setSent] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
 
   const handleSend = async () => {
     if (!subject.trim() || !content.trim()) {
-      alert('Please fill in both subject and content')
+      setMessage({ tone: 'error', text: 'Please fill in both subject and content.' })
       return
     }
 
     if (subscriberCount === 0) {
-      alert('You have no subscribers yet')
+      setMessage({ tone: 'error', text: 'You have no subscribers yet.' })
       return
     }
 
-    const confirmed = confirm(
-      `Send this newsletter to ${subscriberCount} subscriber${subscriberCount === 1 ? '' : 's'}?`
-    )
-    
-    if (!confirmed) return
+    setMessage(null)
+    setConfirmOpen(true)
+  }
 
+  const confirmSend = async () => {
     setSending(true)
     try {
       const res = await fetch('/api/newsletter/send', {
@@ -45,12 +48,20 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
       }
 
       setSent(true)
+      setMessage({
+        tone: 'success',
+        text: `Sent to ${subscriberCount} subscriber${subscriberCount === 1 ? '' : 's'}.`,
+      })
       setSubject('')
       setContent('')
     } catch (error) {
-      alert(error instanceof Error ? error.message : 'Failed to send newsletter')
+      setMessage({
+        tone: 'error',
+        text: error instanceof Error ? error.message : 'Failed to send newsletter',
+      })
     } finally {
       setSending(false)
+      setConfirmOpen(false)
     }
   }
 
@@ -73,6 +84,8 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
 
   return (
     <div className="space-y-4">
+      {message && <Notice tone={message.tone} message={message.text} />}
+
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
           Subject
@@ -110,6 +123,16 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
           {sending ? 'Sending...' : 'Send Newsletter'}
         </Button>
       </div>
+
+      <ConfirmDialog
+        open={confirmOpen}
+        title="Send Newsletter"
+        description={`Send this newsletter to ${subscriberCount} subscriber${subscriberCount === 1 ? '' : 's'} now?`}
+        confirmLabel="Send now"
+        loading={sending}
+        onCancel={() => setConfirmOpen(false)}
+        onConfirm={confirmSend}
+      />
     </div>
   )
 }

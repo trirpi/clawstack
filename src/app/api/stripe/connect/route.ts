@@ -2,13 +2,17 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { stripe, createConnectAccount, createAccountLink } from '@/lib/stripe'
+import { hasSameOriginHeader } from '@/lib/validation'
 
-export async function POST() {
+export async function POST(request: Request) {
   try {
     const session = await getSession()
     
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+    if (!hasSameOriginHeader(request)) {
+      return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
     }
 
     // Check if Stripe is configured

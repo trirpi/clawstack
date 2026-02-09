@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
+import { Notice } from '@/components/ui/Notice'
 
 interface StripeConnectButtonProps {
   isConnected?: boolean
@@ -9,9 +10,11 @@ interface StripeConnectButtonProps {
 
 export function StripeConnectButton({ isConnected = false }: StripeConnectButtonProps) {
   const [loading, setLoading] = useState(false)
+  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
 
   const handleConnect = async () => {
     setLoading(true)
+    setMessage(null)
     try {
       const res = await fetch('/api/stripe/connect', {
         method: 'POST',
@@ -27,7 +30,7 @@ export function StripeConnectButton({ isConnected = false }: StripeConnectButton
     } catch (error) {
       console.error('Stripe connect error:', error)
       const message = error instanceof Error ? error.message : 'Failed to connect Stripe. Please try again.'
-      alert(message)
+      setMessage({ tone: 'error', text: message })
     } finally {
       setLoading(false)
     }
@@ -35,6 +38,7 @@ export function StripeConnectButton({ isConnected = false }: StripeConnectButton
 
   const handleDashboard = async () => {
     setLoading(true)
+    setMessage(null)
     try {
       const res = await fetch('/api/stripe/dashboard', {
         method: 'POST',
@@ -46,7 +50,7 @@ export function StripeConnectButton({ isConnected = false }: StripeConnectButton
       window.open(url, '_blank')
     } catch (error) {
       console.error('Stripe dashboard error:', error)
-      alert('Failed to open Stripe dashboard. Please try again.')
+      setMessage({ tone: 'error', text: 'Failed to open Stripe dashboard. Please try again.' })
     } finally {
       setLoading(false)
     }
@@ -54,15 +58,21 @@ export function StripeConnectButton({ isConnected = false }: StripeConnectButton
 
   if (isConnected) {
     return (
-      <Button variant="outline" onClick={handleDashboard} disabled={loading}>
-        {loading ? 'Loading...' : 'Open Stripe Dashboard'}
-      </Button>
+      <div className="flex flex-col items-start gap-2">
+        <Button variant="outline" onClick={handleDashboard} disabled={loading}>
+          {loading ? 'Loading...' : 'Open Stripe Dashboard'}
+        </Button>
+        {message && <Notice tone={message.tone} message={message.text} />}
+      </div>
     )
   }
 
   return (
-    <Button onClick={handleConnect} disabled={loading}>
-      {loading ? 'Connecting...' : 'Connect Stripe Account'}
-    </Button>
+    <div className="flex flex-col items-start gap-2">
+      <Button onClick={handleConnect} disabled={loading}>
+        {loading ? 'Connecting...' : 'Connect Stripe Account'}
+      </Button>
+      {message && <Notice tone={message.tone} message={message.text} />}
+    </div>
   )
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { hasSameOriginHeader, validateSettingsPayload } from '@/lib/validation'
 
 export async function PUT(request: Request) {
   try {
@@ -9,8 +10,15 @@ export async function PUT(request: Request) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    if (!hasSameOriginHeader(request)) {
+      return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+    }
 
-    const { publication, user } = await request.json()
+    const payload = validateSettingsPayload(await request.json())
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid settings payload' }, { status: 400 })
+    }
+    const { publication, user } = payload
 
     // Update user
     if (user) {

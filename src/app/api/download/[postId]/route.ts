@@ -9,7 +9,7 @@ interface Props {
 export async function GET(request: NextRequest, { params }: Props) {
   const { postId } = await params
 
-  const post = await prisma.post.findUnique({
+  const post = await prisma.post.findFirst({
     where: { id: postId, published: true },
     include: {
       publication: true,
@@ -37,7 +37,9 @@ export async function GET(request: NextRequest, { params }: Props) {
       },
     })
 
-    const hasAccess = subscription?.tier === 'PAID' && subscription?.status === 'ACTIVE'
+    const hasAccess =
+      post.publication.userId === session.user.id ||
+      (subscription?.tier === 'PAID' && subscription?.status === 'ACTIVE')
 
     if (!hasAccess) {
       return NextResponse.json(

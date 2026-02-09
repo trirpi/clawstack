@@ -73,10 +73,12 @@ function createImageFile(
 
 describe('POST /api/uploads/image', () => {
   const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
+  const originalVercel = process.env.VERCEL
 
   beforeEach(() => {
     vi.clearAllMocks()
     process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
+    process.env.VERCEL = originalVercel
   })
 
   it('returns 401 when user is not authenticated', async () => {
@@ -134,6 +136,7 @@ describe('POST /api/uploads/image', () => {
   })
 
   it('falls back to local public/uploads when blob token is missing', async () => {
+    delete process.env.VERCEL
     delete process.env.BLOB_READ_WRITE_TOKEN
     getSessionMock.mockResolvedValue({ user: { id: 'user_1' } })
 
@@ -148,5 +151,20 @@ describe('POST /api/uploads/image', () => {
     expect(mkdirMock).toHaveBeenCalledTimes(1)
     expect(writeFileMock).toHaveBeenCalledTimes(1)
     expect(body.url).toMatch(/^\/uploads\/.+\.png$/)
+  })
+
+  it('returns 503 on Vercel when blob token is missing', async () => {
+    process.env.VERCEL = '1'
+    delete process.env.BLOB_READ_WRITE_TOKEN
+    getSessionMock.mockResolvedValue({ user: { id: 'user_1' } })
+
+    const formData = new FormData()
+    formData.append('file', createImageFile(['abc'], 'image.png', 'image/png'))
+
+    const response = await POST(requestWithFormData(formData))
+    const body = await response.json()
+
+    expect(response.status).toBe(503)
+    expect(body.error).toContain('BLOB_READ_WRITE_TOKEN')
   })
 })

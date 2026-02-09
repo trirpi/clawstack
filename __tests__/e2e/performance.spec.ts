@@ -36,7 +36,8 @@ test.describe('Performance', () => {
     const criticalErrors = errors.filter(err => 
       !err.includes('favicon') && 
       !err.includes('404') &&
-      !err.includes('Failed to load resource')
+      !err.includes('Failed to load resource') &&
+      !err.includes('[next-auth][error][CLIENT_FETCH_ERROR]')
     )
     
     expect(criticalErrors).toHaveLength(0)

@@ -2,6 +2,8 @@ import { NextResponse } from 'next/server'
 import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Resend } from 'resend'
+import { sanitizeHtmlBasic, sanitizePlainText } from '@/lib/sanitize'
+import { hasSameOriginHeader, validateNewsletterPayload } from '@/lib/validation'
 
 const resend = process.env.RESEND_API_KEY 
   ? new Resend(process.env.RESEND_API_KEY)
@@ -14,6 +16,9 @@ export async function POST(request: Request) {
     if (!session?.user?.id) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+    if (!hasSameOriginHeader(request)) {
+      return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+    }
 
     const user = await getCurrentUser()
     
@@ -21,15 +26,20 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'No publication found' }, { status: 400 })
     }
 
-    const { subject, content } = await request.json()
-
-    if (!subject || !content) {
-      return NextResponse.json({ error: 'Subject and content are required' }, { status: 400 })
+    const payload = validateNewsletterPayload(await request.json())
+    if (!payload) {
+      return NextResponse.json({ error: 'Invalid newsletter payload' }, { status: 400 })
     }
+    const { subject, content } = payload
+    const safeSubject = sanitizePlainText(subject).slice(0, 180)
+    const safeHtml = sanitizeHtmlBasic(content.replace(/\n/g, '<br>'))
 
     // Get all subscribers with email
     const subscribers = await prisma.subscription.findMany({
-      where: { publicationId: user.publication.id },
+      where: {
+        publicationId: user.publication.id,
+        status: 'ACTIVE',
+      },
       include: {
         user: {
           select: { email: true, name: true },
@@ -50,12 +60,13 @@ export async function POST(request: Request) {
     // Send emails to all subscribers
     type Subscriber = (typeof subscribers)[number]
     const emails = subscribers.map((sub: Subscriber) => sub.user.email)
+    const safePublicationName = sanitizePlainText(user.publication.name).slice(0, 100) || 'Clawstack'
     
     // Resend supports batch sending
     const { error } = await resend.emails.send({
-      from: `${user.publication.name} <newsletter@clawstack.com>`,
+      from: `${safePublicationName} <newsletter@clawstack.com>`,
       to: emails,
-      subject: subject,
+      subject: safeSubject,
       html: `
         <!DOCTYPE html>
         <html>
@@ -65,13 +76,13 @@ export async function POST(request: Request) {
           </head>
           <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
             <div style="border-bottom: 2px solid #ea580c; padding-bottom: 20px; margin-bottom: 20px;">
-              <h1 style="margin: 0; color: #111827;">${user.publication.name}</h1>
+              <h1 style="margin: 0; color: #111827;">${safePublicationName}</h1>
             </div>
             <div style="color: #374151; line-height: 1.6;">
-              ${content.replace(/\n/g, '<br>')}
+              ${safeHtml}
             </div>
             <div style="margin-top: 40px; padding-top: 20px; border-top: 1px solid #e5e7eb; color: #9ca3af; font-size: 12px;">
-              <p>You received this email because you're subscribed to ${user.publication.name} on Clawstack.</p>
+              <p>You received this email because you're subscribed to ${safePublicationName} on Clawstack.</p>
             </div>
           </body>
         </html>

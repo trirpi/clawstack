@@ -11,12 +11,13 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:coverage": "vitest --coverage",
-    "test:e2e": "env -u NO_COLOR playwright test",
-    "test:e2e:ui": "env -u NO_COLOR playwright test --ui",
-    "test:e2e:visual": "env -u NO_COLOR playwright test __tests__/e2e/visual.spec.ts",
-    "test:e2e:update-snapshots": "env -u NO_COLOR playwright test --update-snapshots",
+    "test:e2e": "env -u FORCE_COLOR playwright test",
+    "test:e2e:ui": "env -u FORCE_COLOR playwright test --ui",
+    "test:e2e:visual": "env -u FORCE_COLOR playwright test __tests__/e2e/visual.spec.ts",
+    "test:e2e:update-snapshots": "env -u FORCE_COLOR playwright test --update-snapshots",
     "test:e2e:report": "playwright show-report",
     "test:e2e:trace": "playwright show-trace",
+    "ci:local": "bash scripts/ci-local.sh",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "db:generate": "prisma generate",
@@ -49,6 +50,7 @@
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "resend": "^6.9.1",
+    "sanitize-html": "^2.17.0",
     "stripe": "^20.3.0"
   },
   "devDependencies": {
@@ -59,6 +61,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "@types/sanitize-html": "^2.16.0",
     "@vitejs/plugin-react": "^5.1.2",
     "eslint": "^9",
     "eslint-config-next": "16.1.6",
@@ -67,5 +70,8 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^4.0.18"
+  },
+  "overrides": {
+    "cookie": "0.7.2"
   }
 }

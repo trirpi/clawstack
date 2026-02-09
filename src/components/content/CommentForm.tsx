@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
+import { Notice } from '@/components/ui/Notice'
 
 interface CommentFormProps {
   postId: string
@@ -15,6 +16,7 @@ export function CommentForm({ postId }: CommentFormProps) {
   const router = useRouter()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
 
   if (!session) {
     return (
@@ -32,6 +34,7 @@ export function CommentForm({ postId }: CommentFormProps) {
     if (!content.trim()) return
 
     setSubmitting(true)
+    setMessage(null)
     try {
       const response = await fetch('/api/comments', {
         method: 'POST',
@@ -42,10 +45,11 @@ export function CommentForm({ postId }: CommentFormProps) {
       if (!response.ok) throw new Error('Failed to post comment')
 
       setContent('')
+      setMessage({ tone: 'success', text: 'Comment posted.' })
       router.refresh()
     } catch (error) {
       console.error('Error posting comment:', error)
-      alert('Failed to post comment')
+      setMessage({ tone: 'error', text: 'Failed to post comment.' })
     } finally {
       setSubmitting(false)
     }
@@ -81,6 +85,7 @@ export function CommentForm({ postId }: CommentFormProps) {
               {submitting ? 'Posting...' : 'Post Comment'}
             </Button>
           </div>
+          {message && <div className="mt-2"><Notice tone={message.tone} message={message.text} /></div>}
         </div>
       </div>
     </form>

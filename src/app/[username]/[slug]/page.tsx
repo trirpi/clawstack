@@ -6,6 +6,7 @@ import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
+import { SubscribeButton } from '@/components/content/SubscribeButton'
 import { formatDate } from '@/lib/utils'
 import { sanitizeHtmlBasic } from '@/lib/sanitize'
 
@@ -39,20 +40,26 @@ export default async function PostPage({ params }: Props) {
   type PostComment = (typeof post.comments)[number]
 
   const session = await getSession()
+  const isOwner = session?.user?.id === post.publication.userId
 
   // Check if user has access to paid content
   let hasAccess = post.visibility === 'FREE'
+  let existingSubscription: { tier: string; status: string } | null = null
   
-  if (!hasAccess && session?.user?.id) {
-    const subscription = await prisma.subscription.findUnique({
+  if (session?.user?.id) {
+    existingSubscription = await prisma.subscription.findUnique({
       where: {
         userId_publicationId: {
           userId: session.user.id,
           publicationId: post.publicationId,
         },
       },
+      select: { tier: true, status: true },
     })
-    hasAccess = subscription?.tier === 'PAID' && subscription?.status === 'ACTIVE'
+    hasAccess =
+      hasAccess ||
+      Boolean(isOwner) ||
+      (existingSubscription?.tier === 'PAID' && existingSubscription?.status === 'ACTIVE')
   }
 
   // For preview posts, show teaser
@@ -127,7 +134,12 @@ export default async function PostPage({ params }: Props) {
                   This post is for subscribers only. Subscribe to{' '}
                   {post.publication.name} to access all content.
                 </p>
-                <Button size="lg">Subscribe</Button>
+                <SubscribeButton
+                  publicationId={post.publicationId}
+                  initialSubscribed={Boolean(existingSubscription)}
+                  isOwner={Boolean(isOwner)}
+                  size="lg"
+                />
               </div>
             </div>
           ) : (

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
+import { escapeCsvCell } from '@/lib/validation'
 
 export async function GET() {
   try {
@@ -34,10 +35,10 @@ export async function GET() {
     const csvHeader = 'Name,Email,Tier,Status,Subscribed Date\n'
     type Subscriber = (typeof subscribers)[number]
     const csvRows = subscribers.map((sub: Subscriber) => {
-      const name = (sub.user.name || 'Anonymous').replace(/,/g, ' ')
-      const email = sub.user.email
-      const tier = sub.tier
-      const status = sub.status
+      const name = escapeCsvCell(sub.user.name || 'Anonymous')
+      const email = escapeCsvCell(sub.user.email)
+      const tier = escapeCsvCell(sub.tier)
+      const status = escapeCsvCell(sub.status)
       const date = sub.createdAt.toISOString().split('T')[0]
       return `"${name}","${email}","${tier}","${status}","${date}"`
     }).join('\n')

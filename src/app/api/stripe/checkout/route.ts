@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { createCheckoutSession } from '@/lib/stripe'
+import { hasSameOriginHeader } from '@/lib/validation'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -10,10 +11,17 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  if (!hasSameOriginHeader(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
 
   try {
     const body = await request.json()
-    const { publicationId, priceId } = body
+    const publicationId = typeof body?.publicationId === 'string' ? body.publicationId.trim() : ''
+    const priceId = typeof body?.priceId === 'string' ? body.priceId.trim() : ''
+    if (!publicationId || !priceId) {
+      return NextResponse.json({ error: 'Invalid checkout payload' }, { status: 400 })
+    }
 
     // Get the publication
     const publication = await prisma.publication.findUnique({

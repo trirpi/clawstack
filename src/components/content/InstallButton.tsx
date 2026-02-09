@@ -10,6 +10,7 @@ interface InstallButtonProps {
 
 export function InstallButton({ postUrl, title }: InstallButtonProps) {
   const [showOptions, setShowOptions] = useState(false)
+  const [copied, setCopied] = useState(false)
 
   const handleInstall = () => {
     // Try deep link first
@@ -21,7 +22,8 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
 
   const handleCopyUrl = async () => {
     await navigator.clipboard.writeText(postUrl)
-    alert('URL copied! Paste in Clawstack to install.')
+    setCopied(true)
+    setTimeout(() => setCopied(false), 3000)
   }
 
   const handleDownloadClaw = () => {
@@ -80,6 +82,11 @@ export function InstallButton({ postUrl, title }: InstallButtonProps) {
               </Button>
             </a>
           </div>
+          {copied && (
+            <p className="mt-3 text-sm text-green-700">
+              URL copied. Paste it in Clawstack to install.
+            </p>
+          )}
         </div>
       )}
     </div>

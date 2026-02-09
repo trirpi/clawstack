@@ -18,6 +18,64 @@ const ALLOWED_MIME_TYPES: Record<string, string> = {
   'image/avif': 'avif',
 }
 
+function detectImageExtension(bytes: Uint8Array): string | null {
+  if (
+    bytes[0] === 0xff &&
+    bytes[1] === 0xd8 &&
+    bytes[2] === 0xff
+  ) {
+    return 'jpg'
+  }
+
+  if (
+    bytes[0] === 0x89 &&
+    bytes[1] === 0x50 &&
+    bytes[2] === 0x4e &&
+    bytes[3] === 0x47
+  ) {
+    return 'png'
+  }
+
+  if (
+    bytes[0] === 0x47 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x38
+  ) {
+    return 'gif'
+  }
+
+  if (
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  ) {
+    return 'webp'
+  }
+
+  const brand = String.fromCharCode(
+    bytes[8] || 0,
+    bytes[9] || 0,
+    bytes[10] || 0,
+    bytes[11] || 0,
+    bytes[12] || 0,
+    bytes[13] || 0,
+    bytes[14] || 0,
+    bytes[15] || 0,
+  )
+
+  if (brand.includes('avif')) {
+    return 'avif'
+  }
+
+  return null
+}
+
 export async function POST(request: NextRequest) {
   const session = await getSession()
 
@@ -32,7 +90,11 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Image file is required' }, { status: 400 })
   }
 
-  const extension = ALLOWED_MIME_TYPES[file.type]
+  const fullBuffer = new Uint8Array(await file.arrayBuffer())
+  const bytes = fullBuffer.subarray(0, 32)
+  const declaredExtension = ALLOWED_MIME_TYPES[file.type]
+  const detectedExtension = detectImageExtension(bytes)
+  const extension = detectedExtension || declaredExtension
 
   if (!extension) {
     return NextResponse.json(
@@ -55,6 +117,13 @@ export async function POST(request: NextRequest) {
   const fallbackBaseName = safeBaseName || 'image'
   const filename = `${Date.now()}-${randomUUID()}-${fallbackBaseName}.${extension}`
 
+  if (process.env.VERCEL && !process.env.BLOB_READ_WRITE_TOKEN) {
+    return NextResponse.json(
+      { error: 'Blob storage is not configured. Set BLOB_READ_WRITE_TOKEN.' },
+      { status: 503 },
+    )
+  }
+
   if (process.env.BLOB_READ_WRITE_TOKEN) {
     const blob = await put(`uploads/${filename}`, file, {
       access: 'public',
@@ -67,8 +136,7 @@ export async function POST(request: NextRequest) {
   const uploadDirectory = path.join(process.cwd(), 'public', 'uploads')
   await mkdir(uploadDirectory, { recursive: true })
   const destination = path.join(uploadDirectory, filename)
-  const bytes = await file.arrayBuffer()
-  await writeFile(destination, Buffer.from(bytes))
+  await writeFile(destination, Buffer.from(fullBuffer))
 
   return NextResponse.json({ url: `/uploads/${filename}` })
 }
