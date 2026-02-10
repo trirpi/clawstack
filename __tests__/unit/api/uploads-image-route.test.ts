@@ -35,6 +35,14 @@ import { POST } from '@/app/api/uploads/image/route'
 function requestWithFormData(formData: FormData) {
   return {
     formData: vi.fn().mockResolvedValue(formData),
+    headers: new Headers({ origin: 'http://localhost:3000' }),
+  } as unknown as NextRequest
+}
+
+function requestWithFormDataAndOrigin(formData: FormData, origin: string) {
+  return {
+    formData: vi.fn().mockResolvedValue(formData),
+    headers: new Headers({ origin }),
   } as unknown as NextRequest
 }
 
@@ -71,6 +79,12 @@ function createImageFile(
   return file
 }
 
+function createPngFile(size = 32, name = 'image.png') {
+  const bytes = new Uint8Array(Math.max(size, 8))
+  bytes.set([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a], 0)
+  return createImageFile([bytes], name, 'image/png')
+}
+
 describe('POST /api/uploads/image', () => {
   const originalBlobToken = process.env.BLOB_READ_WRITE_TOKEN
   const originalVercel = process.env.VERCEL
@@ -79,6 +93,7 @@ describe('POST /api/uploads/image', () => {
     vi.clearAllMocks()
     process.env.BLOB_READ_WRITE_TOKEN = originalBlobToken
     process.env.VERCEL = originalVercel
+    process.env.NEXTAUTH_URL = 'http://localhost:3000'
   })
 
   it('returns 401 when user is not authenticated', async () => {
@@ -96,6 +111,15 @@ describe('POST /api/uploads/image', () => {
 
     expect(response.status).toBe(400)
     expect(body.error).toContain('Image file is required')
+  })
+
+  it('returns 403 for cross-origin requests', async () => {
+    getSessionMock.mockResolvedValue({ user: { id: 'user_1' } })
+    const formData = new FormData()
+    formData.append('file', createPngFile())
+
+    const response = await POST(requestWithFormDataAndOrigin(formData, 'https://evil.example'))
+    expect(response.status).toBe(403)
   })
 
   it('returns 400 for unsupported mime types', async () => {
@@ -123,7 +147,7 @@ describe('POST /api/uploads/image', () => {
     putMock.mockResolvedValue({ url: 'https://example.blob.vercel-storage.com/uploads/test.png' })
 
     const formData = new FormData()
-    formData.append('file', createImageFile(['abc'], 'image.png', 'image/png'))
+    formData.append('file', createPngFile())
 
     const response = await POST(requestWithFormData(formData))
     const body = await response.json()
@@ -141,7 +165,7 @@ describe('POST /api/uploads/image', () => {
     getSessionMock.mockResolvedValue({ user: { id: 'user_1' } })
 
     const formData = new FormData()
-    formData.append('file', createImageFile(['abc'], 'image.png', 'image/png'))
+    formData.append('file', createPngFile())
 
     const response = await POST(requestWithFormData(formData))
     const body = await response.json()
@@ -159,7 +183,7 @@ describe('POST /api/uploads/image', () => {
     getSessionMock.mockResolvedValue({ user: { id: 'user_1' } })
 
     const formData = new FormData()
-    formData.append('file', createImageFile(['abc'], 'image.png', 'image/png'))
+    formData.append('file', createPngFile())
 
     const response = await POST(requestWithFormData(formData))
     const body = await response.json()

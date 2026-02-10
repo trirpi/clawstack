@@ -1,43 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-
-async function gotoPage(page: Page, url: string) {
-  let lastError: unknown
-
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
-      return
-    } catch (error) {
-      lastError = error
-      const message = error instanceof Error ? error.message : String(error)
-      if (!message.includes('ERR_NETWORK_IO_SUSPENDED') || attempt === 2) {
-        throw error
-      }
-      await page.waitForTimeout(500 * (attempt + 1))
-    }
-  }
-
-  throw lastError
-}
-
-async function gotoPageWithResponse(page: Page, url: string) {
-  let lastError: unknown
-
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      return await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
-    } catch (error) {
-      lastError = error
-      const message = error instanceof Error ? error.message : String(error)
-      if (!message.includes('ERR_NETWORK_IO_SUSPENDED') || attempt === 2) {
-        throw error
-      }
-      await page.waitForTimeout(500 * (attempt + 1))
-    }
-  }
-
-  throw lastError
-}
+import { test, expect } from '@playwright/test'
+import { gotoPage, gotoPageWithResponse } from './utils/navigation'
 
 test.describe('Navigation', () => {
   test('should navigate from home to login', async ({ page }) => {

@@ -5,6 +5,12 @@ import { prisma } from '@/lib/prisma'
 import { createCheckoutSession } from '@/lib/stripe'
 import { hasSameOriginHeader } from '@/lib/validation'
 
+function getAllowedStripePriceIds() {
+  return [process.env.STRIPE_PRICE_MONTHLY_ID, process.env.STRIPE_PRICE_YEARLY_ID]
+    .map((value) => (typeof value === 'string' ? value.trim() : ''))
+    .filter(Boolean)
+}
+
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
 
@@ -23,6 +29,11 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid checkout payload' }, { status: 400 })
     }
 
+    const allowedPriceIds = getAllowedStripePriceIds()
+    if (allowedPriceIds.length > 0 && !allowedPriceIds.includes(priceId)) {
+      return NextResponse.json({ error: 'Invalid price selection' }, { status: 400 })
+    }
+
     // Get the publication
     const publication = await prisma.publication.findUnique({
       where: { id: publicationId },
@@ -37,14 +48,19 @@ export async function POST(request: NextRequest) {
       where: { id: session.user.id },
     })
 
-    const origin = request.headers.get('origin') || 'http://localhost:3000'
+    if (publication.userId === session.user.id) {
+      return NextResponse.json({ error: 'Cannot subscribe to your own publication' }, { status: 400 })
+    }
+
+    const appBaseUrl = process.env.NEXTAUTH_URL || request.nextUrl.origin
 
     const checkoutSession = await createCheckoutSession({
       priceId,
       customerId: user?.stripeCustomerId || undefined,
+      userId: session.user.id,
       publicationId,
-      successUrl: `${origin}/${publication.slug}?subscribed=true`,
-      cancelUrl: `${origin}/${publication.slug}`,
+      successUrl: `${appBaseUrl}/${publication.slug}?subscribed=true`,
+      cancelUrl: `${appBaseUrl}/${publication.slug}`,
     })
 
     return NextResponse.json({ url: checkoutSession.url })

@@ -1,13 +1,10 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { gotoPage } from './utils/navigation'
 
 /**
  * These tests validate that ALL internal links in the app lead to working pages.
  * If a link is broken (404), the test will fail.
  */
-
-async function gotoPage(page: Page, url: string) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
-}
 
 test.describe('Link Validation', () => {
   test.describe('Navigation Links', () => {

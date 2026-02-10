@@ -1,8 +1,5 @@
-import { test, expect, type Page } from '@playwright/test'
-
-async function gotoPage(page: Page, url: string) {
-  await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
-}
+import { test, expect } from '@playwright/test'
+import { gotoPage } from './utils/navigation'
 
 test.describe('Login Page', () => {
   test('should display login page', async ({ page }) => {

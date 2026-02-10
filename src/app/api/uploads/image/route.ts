@@ -4,6 +4,7 @@ import path from 'path'
 import { put } from '@vercel/blob'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
+import { hasSameOriginHeader } from '@/lib/validation'
 
 export const runtime = 'nodejs'
 
@@ -82,6 +83,9 @@ export async function POST(request: NextRequest) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  if (!hasSameOriginHeader(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
 
   const formData = await request.formData()
   const file = formData.get('file')
@@ -90,22 +94,30 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: 'Image file is required' }, { status: 400 })
   }
 
+  if (file.size <= 0) {
+    return NextResponse.json({ error: 'Image file is empty.' }, { status: 400 })
+  }
+
+  if (file.size > MAX_FILE_SIZE_BYTES) {
+    return NextResponse.json({ error: 'Image must be 4MB or smaller.' }, { status: 400 })
+  }
+
   const fullBuffer = new Uint8Array(await file.arrayBuffer())
   const bytes = fullBuffer.subarray(0, 32)
   const declaredExtension = ALLOWED_MIME_TYPES[file.type]
   const detectedExtension = detectImageExtension(bytes)
-  const extension = detectedExtension || declaredExtension
 
-  if (!extension) {
+  if (!declaredExtension || !detectedExtension) {
     return NextResponse.json(
       { error: 'Unsupported image type. Use PNG, JPG, WEBP, GIF, or AVIF.' },
       { status: 400 },
     )
   }
 
-  if (file.size > MAX_FILE_SIZE_BYTES) {
-    return NextResponse.json({ error: 'Image must be 4MB or smaller.' }, { status: 400 })
+  if (declaredExtension !== detectedExtension) {
+    return NextResponse.json({ error: 'Image type mismatch.' }, { status: 400 })
   }
+  const extension = detectedExtension
 
   const safeBaseName = file.name
     .toLowerCase()

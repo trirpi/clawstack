@@ -50,6 +50,14 @@ describe('validation helpers', () => {
     expect(payload?.user?.name).toBe('Name')
   })
 
+  it('rejects settings payloads with empty publication name', () => {
+    const payload = validateSettingsPayload({
+      publication: { name: '   ', description: 'Desc' },
+    })
+
+    expect(payload).toBeNull()
+  })
+
   it('validates comment payloads', () => {
     expect(validateCommentPayload({ postId: 'post_1', content: 'hello' })).toEqual({
       postId: 'post_1',
@@ -124,6 +132,21 @@ describe('validation helpers', () => {
 
     expect(hasSameOriginHeader(sameOriginRequest)).toBe(true)
     expect(hasSameOriginHeader(crossOriginRequest)).toBe(false)
+  })
+
+  it('allows same-origin referer when origin header is missing', () => {
+    process.env.NEXTAUTH_URL = 'https://example.com'
+    const request = new Request('https://example.com/api/test', {
+      headers: { referer: 'https://example.com/dashboard' },
+    })
+
+    expect(hasSameOriginHeader(request)).toBe(true)
+  })
+
+  it('rejects state-changing requests without origin or referer when app url is configured', () => {
+    process.env.NEXTAUTH_URL = 'https://example.com'
+    const request = new Request('https://example.com/api/test')
+    expect(hasSameOriginHeader(request)).toBe(false)
   })
 
   it('escapes csv formula cells', () => {

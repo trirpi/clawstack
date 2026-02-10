@@ -18,12 +18,14 @@ function assertStripeConfigured(candidate: Stripe | null): asserts candidate is 
 export async function createCheckoutSession({
   priceId,
   customerId,
+  userId,
   publicationId,
   successUrl,
   cancelUrl,
 }: {
   priceId: string
   customerId?: string
+  userId: string
   publicationId: string
   successUrl: string
   cancelUrl: string
@@ -43,6 +45,7 @@ export async function createCheckoutSession({
     success_url: successUrl,
     cancel_url: cancelUrl,
     metadata: {
+      userId,
       publicationId,
     },
   })

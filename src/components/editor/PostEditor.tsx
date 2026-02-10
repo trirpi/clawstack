@@ -163,16 +163,6 @@ export function PostEditor({ publicationId, initialData, templateData }: PostEdi
     }
   }, [title, excerpt, category, visibility, editor, initialData, publicationId, router])
 
-  // Auto-save draft every 30 seconds
-  // useEffect(() => {
-  //   const interval = setInterval(() => {
-  //     if (title && editor?.getHTML()) {
-  //       handleSave(false)
-  //     }
-  //   }, 30000)
-  //   return () => clearInterval(interval)
-  // }, [title, editor, handleSave])
-
   return (
     <div className="max-w-4xl mx-auto">
       {message && <div className="mb-4"><Notice tone={message.tone} message={message.text} /></div>}

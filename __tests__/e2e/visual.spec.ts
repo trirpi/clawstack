@@ -1,9 +1,10 @@
 import { test, expect, type Page } from '@playwright/test'
+import { gotoPage as gotoPageBase } from './utils/navigation'
 
 const visualDiffPixelRatio = process.env.CI ? 0.2 : 0.05
 
 async function gotoPage(page: Page, path: string) {
-  await page.goto(path, { waitUntil: 'domcontentloaded', timeout: 60000 })
+  await gotoPageBase(page, path)
   await page.waitForLoadState('networkidle')
 }
 

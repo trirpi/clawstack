@@ -49,29 +49,33 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1">
         {/* Hero */}
-        <div className="bg-gradient-to-b from-stone-100 to-white py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
-            <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
+        <div className="py-14 sm:py-16">
+          <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
+            <div className="deco-kicker mb-3">Pricing</div>
+            <h1 className="deco-title text-4xl font-semibold text-gray-900 sm:text-5xl">
               Simple, transparent pricing
             </h1>
-            <p className="mt-4 text-xl text-gray-600">
+            <p className="mx-auto mt-4 max-w-2xl text-xl text-gray-800">
               Free to start. Only pay when you earn.
             </p>
           </div>
         </div>
 
         {/* Pricing Cards */}
-        <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8 py-12">
+        <div className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {plans.map((plan) => (
               <div
                 key={plan.name}
                 className={`rounded-2xl p-8 ${
                   plan.featured
-                    ? 'bg-stone-800 text-white ring-2 ring-stone-700/70 ring-offset-2'
-                    : 'bg-white border-2 border-gray-200'
+                    ? 'deco-frame bg-[#2f2a26] text-[#f5efe7]'
+                    : 'deco-card border-black/20 bg-white text-gray-900'
                 }`}
               >
+                {plan.featured && (
+                  <div className="deco-kicker mb-3 text-[#d8c7b3]">Most Popular</div>
+                )}
                 <h2 className={`text-2xl font-bold ${plan.featured ? 'text-white' : 'text-gray-900'}`}>
                   {plan.name}
                 </h2>
@@ -80,19 +84,19 @@ export default function PricingPage() {
                     {plan.price}
                   </span>
                   {plan.priceNote && (
-                    <span className={`ml-2 text-sm ${plan.featured ? 'text-stone-200' : 'text-gray-500'}`}>
+                    <span className={`ml-2 text-sm ${plan.featured ? 'text-[#d8c7b3]' : 'text-gray-600'}`}>
                       {plan.priceNote}
                     </span>
                   )}
                 </div>
-                <p className={`mt-2 ${plan.featured ? 'text-stone-200' : 'text-gray-600'}`}>
+                <p className={`mt-2 ${plan.featured ? 'text-[#d8c7b3]' : 'text-gray-700'}`}>
                   {plan.description}
                 </p>
                 <ul className="mt-8 space-y-4">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3">
                       <svg
-                        className={`w-5 h-5 ${plan.featured ? 'text-stone-300' : 'text-stone-700'}`}
+                        className={`w-5 h-5 ${plan.featured ? 'text-[#dcccb9]' : 'text-stone-700'}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"
@@ -113,7 +117,7 @@ export default function PricingPage() {
                     <Button
                       variant={plan.featured ? 'white' : 'primary'}
                       size="lg"
-                      className="w-full"
+                      className={`w-full ${plan.featured ? 'border border-white/25' : ''}`}
                     >
                       {plan.cta}
                     </Button>
@@ -125,28 +129,28 @@ export default function PricingPage() {
         </div>
 
         {/* FAQ */}
-        <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
-          <h2 className="text-2xl font-bold text-gray-900 text-center mb-8">
+        <div className="mx-auto max-w-3xl px-4 py-14 sm:px-6 lg:px-8">
+          <h2 className="deco-title text-2xl font-semibold text-gray-900 text-center mb-8">
             Frequently Asked Questions
           </h2>
           <div className="space-y-6">
-            <div>
+            <div className="deco-card rounded-2xl p-6">
               <h3 className="font-semibold text-gray-900">How does the 10% fee work?</h3>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-700">
                 We only charge when you earn. If you offer paid subscriptions, we take 10% of
                 the subscription revenue. Payment processing fees (Stripe) are separate.
               </p>
             </div>
-            <div>
+            <div className="deco-card rounded-2xl p-6">
               <h3 className="font-semibold text-gray-900">Can I switch plans later?</h3>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-700">
                 Yes! You can enable paid subscriptions at any time. There&apos;s no commitment
                 or contract.
               </p>
             </div>
-            <div>
+            <div className="deco-card rounded-2xl p-6">
               <h3 className="font-semibold text-gray-900">What payment methods do you accept?</h3>
-              <p className="mt-2 text-gray-600">
+              <p className="mt-2 text-gray-700">
                 We use Stripe for payments, which supports all major credit cards and
                 many local payment methods worldwide.
               </p>

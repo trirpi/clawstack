@@ -1,5 +1,6 @@
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { XLink } from '@/components/ui/XLink'
 
 export const metadata = {
   title: 'About - Clawstack',
@@ -29,20 +30,19 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-gray-900 mt-12">What We Offer</h2>
             <ul className="text-gray-600 space-y-2">
               <li>
-                <strong>Rich Publishing</strong> — Write articles with syntax-highlighted code
-                blocks, perfect for sharing technical content.
+                <strong>Rich Publishing</strong> — Write long-form posts with headings, code blocks,
+                links, images, and highlights.
               </li>
               <li>
-                <strong>One-Click Install</strong> — Your readers can install scripts directly
-                to their Clawstack with a single click.
+                <strong>Access Controls</strong> — Publish posts as Free, Preview, or Paid.
               </li>
               <li>
                 <strong>Monetization</strong> — Offer paid subscriptions and keep 90% of the
                 revenue.
               </li>
               <li>
-                <strong>Community</strong> — Build an audience with comments, subscribers, and
-                engagement tools.
+                <strong>Moderation</strong> — End-users can report content and admins can resolve
+                reports from the dashboard.
               </li>
             </ul>
 
@@ -56,14 +56,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-bold text-gray-900 mt-12">Contact</h2>
             <p className="text-gray-600">
               Have questions? Say hello on{' '}
-              <a
-                href="https://x.com/trirpi"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-orange-700 hover:underline"
-              >
-                X (@trirpi)
-              </a>
+              <XLink className="inline-flex items-center gap-1.5 text-stone-700 hover:text-stone-900" />
             </p>
           </div>
         </div>

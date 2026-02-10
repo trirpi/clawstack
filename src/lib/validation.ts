@@ -96,10 +96,13 @@ export function validateSettingsPayload(payload: unknown) {
 
   if (!publication && !user) return null
 
+  const publicationName = publication ? toCleanString(publication.name, 120) : ''
+  if (publication && !publicationName) return null
+
   return {
     publication: publication
       ? {
-          name: toCleanString(publication.name, 120),
+          name: publicationName,
           description: toNullableString(publication.description, 400),
           priceMonthly: toNullableInteger(publication.priceMonthly, 0, 500_000),
           priceYearly: toNullableInteger(publication.priceYearly, 0, 5_000_000),
@@ -172,14 +175,16 @@ export function validateReportPayload(payload: unknown) {
 }
 
 export function hasSameOriginHeader(request: Request) {
-  const origin = request.headers.get('origin')
-  if (!origin) return true
-
   const appUrl = process.env.NEXTAUTH_URL
   if (!appUrl) return true
 
+  const origin = request.headers.get('origin')
+  const referer = request.headers.get('referer')
+  const candidate = origin || referer
+  if (!candidate) return false
+
   try {
-    return new URL(origin).origin === new URL(appUrl).origin
+    return new URL(candidate).origin === new URL(appUrl).origin
   } catch {
     return false
   }

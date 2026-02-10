@@ -31,7 +31,7 @@ const baseAllowedAttributes: sanitizeHtml.IOptions['allowedAttributes'] = {
   span: ['class'],
 }
 
-const baseAllowedSchemes = ['http', 'https', 'mailto', 'tel', 'data']
+const baseAllowedSchemes = ['http', 'https', 'mailto', 'tel']
 
 /**
  * Production-grade HTML sanitizer for editor/render/email content.

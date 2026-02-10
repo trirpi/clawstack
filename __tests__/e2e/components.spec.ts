@@ -1,28 +1,9 @@
-import { test, expect, type Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
+import { gotoPage } from './utils/navigation'
 
 /**
  * Comprehensive component tests - verify all interactive elements work correctly
  */
-
-async function gotoPage(page: Page, url: string) {
-  let lastError: unknown
-
-  for (let attempt = 0; attempt < 3; attempt += 1) {
-    try {
-      await page.goto(url, { waitUntil: 'domcontentloaded', timeout: 60000 })
-      return
-    } catch (error) {
-      lastError = error
-      const message = error instanceof Error ? error.message : String(error)
-      if (!message.includes('ERR_NETWORK_IO_SUSPENDED') || attempt === 2) {
-        throw error
-      }
-      await page.waitForTimeout(500 * (attempt + 1))
-    }
-  }
-
-  throw lastError
-}
 
 test.describe('Button Components', () => {
   test('all buttons on home page should be clickable', async ({ page }) => {

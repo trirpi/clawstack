@@ -1,5 +1,7 @@
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
+import { XLink } from '@/components/ui/XLink'
+import { TERMS_LAST_UPDATED } from '@/lib/legal'
 
 export const metadata = {
   title: 'Terms of Service - Clawstack',
@@ -13,7 +15,7 @@ export default function TermsPage() {
       <main className="flex-1">
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-16">
           <h1 className="text-4xl font-bold text-gray-900">Terms of Service</h1>
-          <p className="mt-4 text-gray-500">Last updated: {new Date().toLocaleDateString()}</p>
+          <p className="mt-4 text-gray-500">Last updated: {TERMS_LAST_UPDATED}</p>
           
           <div className="mt-8 prose prose-lg text-gray-600">
             <h2 className="text-2xl font-bold text-gray-900 mt-8">1. Acceptance of Terms</h2>
@@ -114,14 +116,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-bold text-gray-900 mt-8">13. Contact</h2>
             <p>
               Questions about these terms? Say hello on{' '}
-              <a
-                href="https://x.com/trirpi"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-orange-700 hover:underline"
-              >
-                X (@trirpi)
-              </a>
+              <XLink className="inline-flex items-center gap-1.5 text-stone-700 hover:text-stone-900" />
             </p>
           </div>
         </div>

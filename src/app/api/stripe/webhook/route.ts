@@ -73,6 +73,7 @@ async function handleCheckoutComplete(
   session: Stripe.Checkout.Session
 ) {
   const publicationId = session.metadata?.publicationId
+  const userIdFromMetadata = session.metadata?.userId
   const customerId = session.customer as string
   const subscriptionId = session.subscription as string
 
@@ -81,13 +82,26 @@ async function handleCheckoutComplete(
     return
   }
 
-  // Get customer email to find user
-  const customer = await stripeClient.customers.retrieve(customerId)
-  if (customer.deleted) return
+  let user = userIdFromMetadata
+    ? await prisma.user.findUnique({
+        where: { id: userIdFromMetadata },
+      })
+    : null
 
-  const user = await prisma.user.findUnique({
-    where: { email: customer.email! },
-  })
+  if (!user) {
+    user = await prisma.user.findFirst({
+      where: { stripeCustomerId: customerId },
+    })
+  }
+
+  if (!user) {
+    const customer = await stripeClient.customers.retrieve(customerId)
+    if (!customer.deleted && customer.email) {
+      user = await prisma.user.findUnique({
+        where: { email: customer.email },
+      })
+    }
+  }
 
   if (!user) {
     console.error('User not found for customer:', customerId)
