@@ -11,7 +11,7 @@ describe('Button', () => {
   it('applies primary variant by default', () => {
     render(<Button>Primary</Button>)
     const button = screen.getByRole('button')
-    expect(button.className).toContain('bg-orange-600')
+    expect(button.className).toContain('bg-stone-800')
   })
 
   it('applies secondary variant', () => {
@@ -30,7 +30,7 @@ describe('Button', () => {
     render(<Button variant="white">White</Button>)
     const button = screen.getByRole('button')
     expect(button.className).toContain('bg-white')
-    expect(button.className).toContain('text-orange-600')
+    expect(button.className).toContain('text-stone-800')
   })
 
   it('applies size classes', () => {

@@ -21,7 +21,7 @@
   --foreground: #0f0f0f;
   --font-inter: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-serif: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Times New Roman', serif;
-  --deco-accent: #9a3412;
+  --deco-accent: #8a3b1c;
   --deco-ink: #111111;
 }
 
@@ -82,18 +82,14 @@ body {
 
 .deco-hero-glow {
   background:
-    radial-gradient(circle at 22% 20%, rgba(154, 52, 18, 0.16), transparent 38%),
+    radial-gradient(circle at 22% 20%, rgba(138, 59, 28, 0.14), transparent 38%),
     radial-gradient(circle at 78% 10%, rgba(0, 0, 0, 0.1), transparent 32%);
 }
 
-.deco-sunburst {
+.deco-poster-glow {
   background:
-    repeating-conic-gradient(
-      from -9deg,
-      rgba(17, 17, 17, 0.24) 0deg 2deg,
-      rgba(17, 17, 17, 0.02) 2deg 9deg
-    );
-  animation: deco-spin 36s linear infinite;
+    radial-gradient(circle at 20% 25%, rgba(255, 255, 255, 0.55), transparent 40%),
+    radial-gradient(circle at 75% 10%, rgba(138, 59, 28, 0.12), transparent 42%);
 }
 
 .deco-grain {
@@ -102,21 +98,6 @@ body {
     radial-gradient(rgba(17, 17, 17, 0.06) 0.7px, transparent 0.7px);
   background-size: 4px 4px, 5px 5px;
   background-position: 0 0, 1px 1px;
-}
-
-@keyframes deco-spin {
-  from {
-    transform: translateX(-50%) rotate(0deg);
-  }
-  to {
-    transform: translateX(-50%) rotate(360deg);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .deco-sunburst {
-    animation: none;
-  }
 }
 
 /* Custom scrollbar */
@@ -234,7 +215,7 @@ code {
 
 /* Focus styles */
 *:focus-visible {
-  outline: 2px solid #ea580c;
+  outline: 2px solid #b45309;
   outline-offset: 2px;
 }
 

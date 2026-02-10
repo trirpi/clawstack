@@ -98,7 +98,7 @@ test.describe('Link Validation', () => {
       // Scroll to CTA section
       await page.getByText('Ready to share your automations').scrollIntoViewIfNeeded()
       await page.getByRole('link', { name: /create your publication/i }).click()
-      await expect(page).toHaveURL('/login')
+      await expect(page).toHaveURL(/\/login\?callbackUrl=/)
     })
   })
 

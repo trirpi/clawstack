@@ -49,7 +49,7 @@ export default function PricingPage() {
       <Header />
       <main className="flex-1">
         {/* Hero */}
-        <div className="bg-gradient-to-b from-orange-50 to-white py-16">
+        <div className="bg-gradient-to-b from-stone-100 to-white py-16">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
             <h1 className="text-4xl font-bold text-gray-900 sm:text-5xl">
               Simple, transparent pricing
@@ -68,7 +68,7 @@ export default function PricingPage() {
                 key={plan.name}
                 className={`rounded-2xl p-8 ${
                   plan.featured
-                    ? 'bg-orange-600 text-white ring-4 ring-orange-600 ring-offset-2'
+                    ? 'bg-stone-800 text-white ring-2 ring-stone-700/70 ring-offset-2'
                     : 'bg-white border-2 border-gray-200'
                 }`}
               >
@@ -80,19 +80,19 @@ export default function PricingPage() {
                     {plan.price}
                   </span>
                   {plan.priceNote && (
-                    <span className={`ml-2 text-sm ${plan.featured ? 'text-orange-100' : 'text-gray-500'}`}>
+                    <span className={`ml-2 text-sm ${plan.featured ? 'text-stone-200' : 'text-gray-500'}`}>
                       {plan.priceNote}
                     </span>
                   )}
                 </div>
-                <p className={`mt-2 ${plan.featured ? 'text-orange-100' : 'text-gray-600'}`}>
+                <p className={`mt-2 ${plan.featured ? 'text-stone-200' : 'text-gray-600'}`}>
                   {plan.description}
                 </p>
                 <ul className="mt-8 space-y-4">
                   {plan.features.map((feature) => (
                     <li key={feature} className="flex items-center gap-3">
                       <svg
-                        className={`w-5 h-5 ${plan.featured ? 'text-orange-200' : 'text-orange-600'}`}
+                        className={`w-5 h-5 ${plan.featured ? 'text-stone-300' : 'text-stone-700'}`}
                         fill="none"
                         stroke="currentColor"
                         viewBox="0 0 24 24"

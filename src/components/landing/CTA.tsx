@@ -15,7 +15,7 @@ export function CTA() {
             direct reader relationship.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
-            <Link href="/login">
+            <Link href="/dashboard/new">
               <Button size="lg" variant="white" className="border border-black/20">
                 Create Your Publication
               </Button>
