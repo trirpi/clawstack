@@ -55,9 +55,14 @@ export default function AboutPage() {
 
             <h2 className="text-2xl font-bold text-gray-900 mt-12">Contact</h2>
             <p className="text-gray-600">
-              Have questions? Reach out to us at{' '}
-              <a href="mailto:hello@clawstack.com" className="text-orange-600 hover:underline">
-                hello@clawstack.com
+              Have questions? Say hello on{' '}
+              <a
+                href="https://x.com/trirpi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-orange-700 hover:underline"
+              >
+                X (@trirpi)
               </a>
             </p>
           </div>

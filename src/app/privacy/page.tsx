@@ -64,9 +64,14 @@ export default function PrivacyPage() {
 
             <h2 className="text-2xl font-bold text-gray-900 mt-8">6. Contact Us</h2>
             <p>
-              If you have questions about this privacy policy, please contact us at{' '}
-              <a href="mailto:privacy@clawstack.com" className="text-orange-600 hover:underline">
-                privacy@clawstack.com
+              If you have questions about this privacy policy, say hello on{' '}
+              <a
+                href="https://x.com/trirpi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-orange-700 hover:underline"
+              >
+                X (@trirpi)
               </a>
             </p>
           </div>

@@ -77,7 +77,7 @@ export default async function ExplorePage() {
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
             <div className="deco-kicker mb-2">Discover</div>
             <h1 className="deco-title text-4xl font-semibold text-gray-900">Explore</h1>
-            <p className="mt-2 text-lg text-gray-600">
+            <p className="mt-2 text-lg text-gray-700">
               Discover scripts, plugins, prompts, and tutorials from the community
             </p>
           </div>
@@ -114,13 +114,13 @@ export default async function ExplorePage() {
                       )}
                       <div>
                         <h3 className="font-semibold text-gray-900">{pub.name}</h3>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-sm text-gray-600">
                           {pub._count.subscribers} subscribers · {pub._count.posts} posts
                         </p>
                       </div>
                     </div>
                     {pub.description && (
-                      <p className="mt-4 text-gray-600 text-sm line-clamp-2">
+                      <p className="mt-4 text-gray-700 text-sm line-clamp-2">
                         {pub.description}
                       </p>
                     )}
@@ -154,11 +154,11 @@ export default async function ExplorePage() {
                         {post.title}
                       </h3>
                       {post.excerpt && (
-                        <p className="mt-2 text-gray-600 line-clamp-2">
+                        <p className="mt-2 text-gray-700 line-clamp-2">
                           {post.excerpt}
                         </p>
                       )}
-                      <div className="mt-3 flex items-center gap-3 text-sm text-gray-500">
+                      <div className="mt-3 flex items-center gap-3 text-sm text-gray-600">
                         <span>{post.publication.name}</span>
                         <span>·</span>
                         <span>{formatDate(post.publishedAt!)}</span>
@@ -168,39 +168,44 @@ export default async function ExplorePage() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                {boilerplatePosts.map((post, index) => (
-                  <article
-                    key={`${post.title}-${index}`}
-                    className="deco-card rounded-xl p-6 border-dashed border-amber-800/30"
-                  >
-                    <div className="flex items-start gap-2 mb-2">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
-                        {post.category}
-                      </span>
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
-                        Boilerplate
-                      </span>
-                    </div>
-                    <h3 className="deco-title text-xl font-semibold text-gray-900">
-                      {post.title}
-                    </h3>
-                    <p className="mt-2 text-gray-600">{post.excerpt}</p>
-                    <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
-                      <span>{post.publicationName}</span>
-                      <Link href="/login" className="text-amber-700 hover:text-amber-800 font-medium">
-                        Use template
-                      </Link>
-                    </div>
-                  </article>
-                ))}
+              <div className="rounded-xl border border-gray-300 bg-white p-8 text-center">
+                <p className="text-gray-700">No published posts yet.</p>
               </div>
             )}
-            {!hasPosts && (
-              <div className="mt-8 text-center">
-                <p className="text-gray-500">No published posts yet. Start with these templates.</p>
-              </div>
-            )}
+          </section>
+
+          <section className="mt-14">
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">Starter Templates</h2>
+            <p className="text-sm text-gray-700 mb-6">
+              Prebuilt post ideas you can adapt and publish quickly.
+            </p>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {boilerplatePosts.map((post, index) => (
+                <article
+                  key={`${post.title}-${index}`}
+                  className="deco-card rounded-xl p-6 border-dashed border-amber-800/30"
+                >
+                  <div className="flex items-start gap-2 mb-2">
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                      {post.category}
+                    </span>
+                    <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                      Boilerplate
+                    </span>
+                  </div>
+                  <h3 className="deco-title text-xl font-semibold text-gray-900">
+                    {post.title}
+                  </h3>
+                  <p className="mt-2 text-gray-700">{post.excerpt}</p>
+                  <div className="mt-3 flex items-center justify-between text-sm text-gray-600">
+                    <span>{post.publicationName}</span>
+                    <Link href="/login" className="text-amber-700 hover:text-amber-800 font-medium">
+                      Use template
+                    </Link>
+                  </div>
+                </article>
+              ))}
+            </div>
           </section>
         </div>
       </main>

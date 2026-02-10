@@ -66,15 +66,15 @@ export default async function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-500">Total Posts</div>
+            <div className="text-sm text-gray-700">Total Posts</div>
             <div className="text-3xl font-bold text-gray-900 mt-1">{posts.length}</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-500">Subscribers</div>
+            <div className="text-sm text-gray-700">Subscribers</div>
             <div className="text-3xl font-bold text-gray-900 mt-1">{subscriberCount}</div>
           </div>
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
-            <div className="text-sm text-gray-500">Publication</div>
+            <div className="text-sm text-gray-700">Publication</div>
             <div className="text-xl font-semibold text-gray-900 mt-1 truncate">
               {publication.name}
             </div>
@@ -115,7 +115,7 @@ export default async function DashboardPage() {
                     >
                       {post.title}
                     </Link>
-                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-500">
+                    <div className="flex items-center gap-4 mt-2 text-sm text-gray-600">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${
                         post.published
                           ? 'bg-green-100 text-green-800'

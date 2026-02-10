@@ -42,8 +42,35 @@ function getPriority(reason: string, reportCountForPost: number, reporterCount: 
   return 'LOW'
 }
 
+function isModerationSchemaError(error: unknown) {
+  if (!(error instanceof Error)) return false
+  const message = error.message.toLowerCase()
+  return (
+    message.includes('p2021') ||
+    message.includes('table') && message.includes('does not exist') ||
+    message.includes('relation') && message.includes('does not exist')
+  )
+}
+
 interface Props {
   searchParams: Promise<{ status?: string; reason?: string }>
+}
+
+interface ReportRow {
+  id: string
+  postId: string
+  reason: string
+  status: string
+  createdAt: Date
+  reporterEmail: string | null
+  reporterIp: string | null
+  details: string | null
+  post: {
+    id: string
+    title: string
+    slug: string
+    published: boolean
+  }
 }
 
 export default async function ReportsPage({ searchParams }: Props) {
@@ -68,17 +95,39 @@ export default async function ReportsPage({ searchParams }: Props) {
     ...(activeReason === 'ALL' ? {} : { reason: activeReason }),
   }
 
-  const [
-    reports,
-    statusBreakdown,
-    reasonBreakdown,
-    postReportBreakdown,
-    reporterEmailBreakdown,
-    reporterIpBreakdown,
-    filteredCount,
-    totalCount,
-  ] =
-    await Promise.all([
+  const statusCounts: Record<ReportStatus, number> = {
+    OPEN: 0,
+    IN_REVIEW: 0,
+    RESOLVED: 0,
+    DISMISSED: 0,
+  }
+  const reasonCounts: Record<ReportReason, number> = {
+    adult: 0,
+    ip: 0,
+    copyright: 0,
+    violent_extremism: 0,
+    other: 0,
+  }
+  const reportsByPostId = new Map<string, number>()
+  const reportsByEmail = new Map<string, number>()
+  const reportsByIp = new Map<string, number>()
+
+  let reports: ReportRow[] = []
+  let filteredCount = 0
+  let totalReports = 0
+  let missingModerationSchema = false
+
+  try {
+    const [
+      reportRows,
+      statusBreakdown,
+      reasonBreakdown,
+      postReportBreakdown,
+      reporterEmailBreakdown,
+      reporterIpBreakdown,
+      filteredReportCount,
+      totalReportCount,
+    ] = await Promise.all([
       prisma.report.findMany({
         where,
         include: {
@@ -123,42 +172,42 @@ export default async function ReportsPage({ searchParams }: Props) {
       prisma.report.count({ where: { publicationId: publication.id } }),
     ])
 
-  const statusCounts: Record<ReportStatus, number> = {
-    OPEN: 0,
-    IN_REVIEW: 0,
-    RESOLVED: 0,
-    DISMISSED: 0,
-  }
-  for (const item of statusBreakdown) {
-    if ((STATUS_OPTIONS as readonly string[]).includes(item.status)) {
-      statusCounts[item.status as ReportStatus] = item._count._all
-    }
-  }
-  const reasonCounts: Record<ReportReason, number> = {
-    adult: 0,
-    ip: 0,
-    copyright: 0,
-    violent_extremism: 0,
-    other: 0,
-  }
-  for (const item of reasonBreakdown) {
-    if ((REASON_OPTIONS as readonly string[]).includes(item.reason)) {
-      reasonCounts[item.reason as ReportReason] = item._count._all
-    }
-  }
+    reports = reportRows
+    filteredCount = filteredReportCount
+    totalReports = totalReportCount
 
-  const reportsByPostId = new Map(postReportBreakdown.map((item) => [item.postId, item._count._all]))
-  const reportsByEmail = new Map(
-    reporterEmailBreakdown
-      .filter((item) => Boolean(item.reporterEmail))
-      .map((item) => [item.reporterEmail as string, item._count._all]),
-  )
-  const reportsByIp = new Map(
-    reporterIpBreakdown
-      .filter((item) => Boolean(item.reporterIp))
-      .map((item) => [item.reporterIp as string, item._count._all]),
-  )
-  const totalReports = totalCount
+    for (const item of statusBreakdown) {
+      if ((STATUS_OPTIONS as readonly string[]).includes(item.status)) {
+        statusCounts[item.status as ReportStatus] = item._count._all
+      }
+    }
+
+    for (const item of reasonBreakdown) {
+      if ((REASON_OPTIONS as readonly string[]).includes(item.reason)) {
+        reasonCounts[item.reason as ReportReason] = item._count._all
+      }
+    }
+
+    for (const item of postReportBreakdown) {
+      reportsByPostId.set(item.postId, item._count._all)
+    }
+    for (const item of reporterEmailBreakdown) {
+      if (item.reporterEmail) {
+        reportsByEmail.set(item.reporterEmail, item._count._all)
+      }
+    }
+    for (const item of reporterIpBreakdown) {
+      if (item.reporterIp) {
+        reportsByIp.set(item.reporterIp, item._count._all)
+      }
+    }
+  } catch (error) {
+    if (isModerationSchemaError(error)) {
+      missingModerationSchema = true
+    } else {
+      throw error
+    }
+  }
 
   function buildFilterHref(nextStatus: ReportStatusFilter, nextReason: ReportReasonFilter) {
     const params = new URLSearchParams()
@@ -179,35 +228,55 @@ export default async function ReportsPage({ searchParams }: Props) {
             <p className="text-sm text-gray-600">
               Review reports for content in your publication.
             </p>
+            <p className="text-xs text-gray-700 mt-1">
+              Admin for this dashboard is the publication owner account.
+            </p>
           </div>
-          <Notice
-            tone="info"
-            message={`Showing ${Math.min(reports.length, filteredCount)} of ${filteredCount} filtered report${
-              filteredCount === 1 ? '' : 's'
-            } (${totalReports} total)`}
-          />
+          {!missingModerationSchema && (
+            <Notice
+              tone="info"
+              message={`Showing ${Math.min(reports.length, filteredCount)} of ${filteredCount} filtered report${
+                filteredCount === 1 ? '' : 's'
+              } (${totalReports} total)`}
+            />
+          )}
         </div>
 
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        {missingModerationSchema && (
+          <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-5">
+            <h2 className="text-base font-semibold text-amber-900">Moderation storage is not initialized</h2>
+            <p className="mt-2 text-sm text-amber-900/90">
+              Reports table is missing in this environment. Run schema sync for your production database, then refresh.
+            </p>
+            <code className="mt-3 block rounded bg-amber-100 px-3 py-2 text-xs text-amber-950">
+              npx prisma db push
+            </code>
+          </div>
+        )}
+
+        {!missingModerationSchema && (
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
           <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Open</div>
+            <div className="text-xs text-gray-600">Open</div>
             <div className="text-xl font-semibold text-gray-900">{statusCounts.OPEN}</div>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">In Review</div>
+            <div className="text-xs text-gray-600">In Review</div>
             <div className="text-xl font-semibold text-gray-900">{statusCounts.IN_REVIEW}</div>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Resolved</div>
+            <div className="text-xs text-gray-600">Resolved</div>
             <div className="text-xl font-semibold text-gray-900">{statusCounts.RESOLVED}</div>
           </div>
           <div className="rounded-xl border border-gray-200 bg-white p-4">
-            <div className="text-xs text-gray-500">Dismissed</div>
+            <div className="text-xs text-gray-600">Dismissed</div>
             <div className="text-xl font-semibold text-gray-900">{statusCounts.DISMISSED}</div>
           </div>
-        </div>
+          </div>
+        )}
 
-        <div className="mb-6 flex flex-wrap gap-2">
+        {!missingModerationSchema && (
+          <div className="mb-6 flex flex-wrap gap-2">
           {(['ALL', ...STATUS_OPTIONS] as const).map((filter) => {
             const isActive = activeFilter === filter
             const label = filter === 'ALL' ? 'All' : filter.replace('_', ' ')
@@ -228,8 +297,10 @@ export default async function ReportsPage({ searchParams }: Props) {
               </Link>
             )
           })}
-        </div>
-        <div className="mb-6 flex flex-wrap gap-2">
+          </div>
+        )}
+        {!missingModerationSchema && (
+          <div className="mb-6 flex flex-wrap gap-2">
           {(['ALL', ...REASON_OPTIONS] as const).map((filter) => {
             const isActive = activeReason === filter
             const label = formatReason(filter)
@@ -250,9 +321,10 @@ export default async function ReportsPage({ searchParams }: Props) {
               </Link>
             )
           })}
-        </div>
+          </div>
+        )}
 
-        {reports.length === 0 ? (
+        {!missingModerationSchema && reports.length === 0 && (
           <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
             <div className="text-3xl mb-2">✅</div>
             <h2 className="text-lg font-semibold text-gray-900">No reports</h2>
@@ -260,7 +332,8 @@ export default async function ReportsPage({ searchParams }: Props) {
               When users report content, it will appear here.
             </p>
           </div>
-        ) : (
+        )}
+        {!missingModerationSchema && reports.length > 0 && (
           <div className="space-y-4">
             {reports.map((report) => (
               <div key={report.id} className="bg-white border border-gray-200 rounded-xl p-5">
@@ -293,7 +366,7 @@ export default async function ReportsPage({ searchParams }: Props) {
                         </div>
                       )
                     })()}
-                    <div className="flex items-center gap-2 text-xs text-gray-500">
+                    <div className="flex items-center gap-2 text-xs text-gray-700">
                       <span className="uppercase tracking-wide">Reported</span>
                       <span>{formatDate(report.createdAt)}</span>
                       <span>•</span>
@@ -342,7 +415,7 @@ export default async function ReportsPage({ searchParams }: Props) {
                     </a>
                   </div>
                 </div>
-                <div className="mt-3 text-xs text-gray-500">
+                <div className="mt-3 text-xs text-gray-700">
                   Reporter: {report.reporterEmail || report.reporterIp || 'Anonymous'} • Status: {report.status}
                 </div>
               </div>

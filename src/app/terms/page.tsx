@@ -113,9 +113,14 @@ export default function TermsPage() {
 
             <h2 className="text-2xl font-bold text-gray-900 mt-8">13. Contact</h2>
             <p>
-              Questions about these terms? Contact us at{' '}
-              <a href="mailto:legal@clawstack.com" className="text-orange-600 hover:underline">
-                legal@clawstack.com
+              Questions about these terms? Say hello on{' '}
+              <a
+                href="https://x.com/trirpi"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-orange-700 hover:underline"
+              >
+                X (@trirpi)
               </a>
             </p>
           </div>

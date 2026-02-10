@@ -12,7 +12,7 @@ export function Hero() {
             <span className="text-amber-700">Clawstack</span>{' '}
             creations with the world
           </h1>
-          <p className="mt-6 text-lg leading-8 text-gray-600">
+          <p className="mt-6 text-lg leading-8 text-gray-700">
             The publishing platform for AI automation creators. Share scripts,
             plugins, prompts, and tutorials. Build an audience and earn from your
             expertise.
@@ -33,15 +33,15 @@ export function Hero() {
         <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
           <div className="text-center deco-card rounded-2xl p-5">
             <div className="deco-title text-4xl font-semibold text-amber-700">10K+</div>
-            <div className="mt-2 text-gray-600">Active Creators</div>
+            <div className="mt-2 text-gray-700">Active Creators</div>
           </div>
           <div className="text-center deco-card rounded-2xl p-5">
             <div className="deco-title text-4xl font-semibold text-amber-700">50K+</div>
-            <div className="mt-2 text-gray-600">Scripts Shared</div>
+            <div className="mt-2 text-gray-700">Scripts Shared</div>
           </div>
           <div className="text-center deco-card rounded-2xl p-5">
             <div className="deco-title text-4xl font-semibold text-amber-700">90%</div>
-            <div className="mt-2 text-gray-600">Creator Earnings</div>
+            <div className="mt-2 text-gray-700">Creator Earnings</div>
           </div>
         </div>
       </div>

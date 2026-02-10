@@ -46,7 +46,7 @@ export function Features() {
           <h2 className="deco-title text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
             Everything you need to share AI automations
           </h2>
-          <p className="mt-4 text-lg text-gray-600">
+          <p className="mt-4 text-lg text-gray-700">
             Built specifically for the Clawstack community
           </p>
         </div>
@@ -61,7 +61,7 @@ export function Features() {
               <h3 className="deco-title text-xl font-semibold text-gray-900">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-gray-600">{feature.description}</p>
+              <p className="mt-2 text-gray-700">{feature.description}</p>
             </div>
           ))}
         </div>
