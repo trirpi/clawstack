@@ -31,6 +31,14 @@ test.describe('Link Validation', () => {
       await expect.poll(async () => authLinks.count(), { timeout: 15000 }).toBeGreaterThan(0)
       await expect(authLinks.first()).toHaveAttribute('href', '/login')
     })
+
+    test('starter template should preserve callback through login redirect', async ({ page }) => {
+      await gotoPage(page, '/explore')
+      const templateLink = page.getByRole('link', { name: 'Use template' }).first()
+      await expect(templateLink).toHaveAttribute('href', /\/dashboard\/new\?template=/)
+      await templateLink.click()
+      await expect(page).toHaveURL(/\/login\?callbackUrl=/)
+    })
   })
 
   test.describe('Footer Links', () => {

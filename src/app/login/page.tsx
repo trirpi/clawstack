@@ -26,6 +26,11 @@ function LoginContent() {
   const searchParams = useSearchParams()
   const error = searchParams.get('error')
   const errorMessage = error ? (errorMessages[error] || errorMessages.Default) : null
+  const callbackUrlParam = searchParams.get('callbackUrl')
+  const callbackUrl =
+    callbackUrlParam && callbackUrlParam.startsWith('/') && !callbackUrlParam.startsWith('//')
+      ? callbackUrlParam
+      : '/dashboard'
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -64,7 +69,7 @@ function LoginContent() {
 
         <div className="mt-8 space-y-4">
           <Button
-            onClick={() => signIn('github', { callbackUrl: '/dashboard' })}
+            onClick={() => signIn('github', { callbackUrl })}
             className="w-full flex items-center justify-center gap-3"
             size="lg"
           >

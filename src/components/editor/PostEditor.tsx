@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/Button'
 import { slugify } from '@/lib/utils'
 import { EditorToolbar } from './EditorToolbar'
 import { Notice } from '@/components/ui/Notice'
+import type { PostCategory, PostVisibility } from '@/lib/postTemplates'
 
 const lowlight = createLowlight(common)
 
@@ -29,6 +30,13 @@ interface PostEditorProps {
     category: string
     visibility: string
     published: boolean
+  }
+  templateData?: {
+    title: string
+    content: string
+    excerpt: string
+    category: PostCategory
+    visibility: PostVisibility
   }
 }
 
@@ -47,12 +55,12 @@ const visibilities = [
   { value: 'PAID', label: 'Paid - Subscribers only' },
 ]
 
-export function PostEditor({ publicationId, initialData }: PostEditorProps) {
+export function PostEditor({ publicationId, initialData, templateData }: PostEditorProps) {
   const router = useRouter()
-  const [title, setTitle] = useState(initialData?.title || '')
-  const [excerpt, setExcerpt] = useState(initialData?.excerpt || '')
-  const [category, setCategory] = useState(initialData?.category || 'ARTICLE')
-  const [visibility, setVisibility] = useState(initialData?.visibility || 'FREE')
+  const [title, setTitle] = useState(initialData?.title ?? templateData?.title ?? '')
+  const [excerpt, setExcerpt] = useState(initialData?.excerpt ?? templateData?.excerpt ?? '')
+  const [category, setCategory] = useState(initialData?.category ?? templateData?.category ?? 'ARTICLE')
+  const [visibility, setVisibility] = useState(initialData?.visibility ?? templateData?.visibility ?? 'FREE')
   const [saving, setSaving] = useState(false)
   const [lastSaved, setLastSaved] = useState<Date | null>(null)
   const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
@@ -96,7 +104,7 @@ export function PostEditor({ publicationId, initialData }: PostEditorProps) {
         },
       }),
     ],
-    content: initialData?.content || '',
+    content: initialData?.content ?? templateData?.content ?? '',
     editorProps: {
       attributes: {
         class: 'prose prose-lg max-w-none focus:outline-none min-h-[500px] px-8 py-6',

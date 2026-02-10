@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { formatDate } from '@/lib/utils'
+import { POST_TEMPLATES } from '@/lib/postTemplates'
 
 export const metadata = {
   title: 'Explore - Clawstack',
@@ -12,30 +13,6 @@ export const metadata = {
 
 // Make this page dynamic (not pre-rendered at build time)
 export const dynamic = 'force-dynamic'
-
-const boilerplatePosts = [
-  {
-    category: 'SCRIPT',
-    title: 'Weekly Pipeline Health Check (Boilerplate)',
-    excerpt:
-      'A ready-to-publish issue template for checking failed automations, flaky tests, and on-call notes.',
-    publicationName: 'Clawstack Editorial',
-  },
-  {
-    category: 'TUTORIAL',
-    title: 'Prompt Versioning Workflow (Boilerplate)',
-    excerpt:
-      'A practical structure for publishing prompt changelogs with rollout notes and fallback guidance.',
-    publicationName: 'Clawstack Editorial',
-  },
-  {
-    category: 'PLUGIN',
-    title: 'Incident Digest Generator (Boilerplate)',
-    excerpt:
-      'A starter template for a daily incident digest post with severity tags and remediation checklist.',
-    publicationName: 'Clawstack Editorial',
-  },
-] as const
 
 export default async function ExplorePage() {
   // Get recent published posts
@@ -180,7 +157,7 @@ export default async function ExplorePage() {
               Prebuilt post ideas you can adapt and publish quickly.
             </p>
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {boilerplatePosts.map((post, index) => (
+              {POST_TEMPLATES.map((post, index) => (
                 <article
                   key={`${post.title}-${index}`}
                   className="deco-card rounded-xl p-6 border-dashed border-amber-800/30"
@@ -199,7 +176,10 @@ export default async function ExplorePage() {
                   <p className="mt-2 text-gray-700">{post.excerpt}</p>
                   <div className="mt-3 flex items-center justify-between text-sm text-gray-600">
                     <span>{post.publicationName}</span>
-                    <Link href="/login" className="text-amber-700 hover:text-amber-800 font-medium">
+                    <Link
+                      href={`/dashboard/new?template=${post.key}`}
+                      className="text-amber-700 hover:text-amber-800 font-medium"
+                    >
                       Use template
                     </Link>
                   </div>
