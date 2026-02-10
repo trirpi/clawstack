@@ -48,37 +48,56 @@ export default function TermsPage() {
               <li>Is spam, misleading, or fraudulent</li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">5. Payments</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">5. Acceptable Use and Monetization Restrictions</h2>
+            <p>
+              You may not monetize content or services in the following categories on Clawstack:
+            </p>
+            <ul>
+              <li>
+                Adult content and services, including nudity or explicit sexual acts (for example,
+                subscriber-only nude images, adult audio or video live chat).
+              </li>
+              <li>Intellectual property or proprietary rights infringement.</li>
+              <li>Copyright-infringing content (for example, leaked music albums).</li>
+              <li>
+                Violent extremism, including content that engages in, encourages, promotes, or
+                celebrates unlawful violence or hate speech toward any group based on race,
+                religion, disability, gender, sexual orientation, national origin, or any other
+                immutable characteristic.
+              </li>
+            </ul>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">6. Payments</h2>
             <p>
               If you offer paid subscriptions, Clawstack takes a 10% platform fee from subscription
               revenue. Payment processing is handled by Stripe and subject to their terms.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">6. Termination</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">7. Termination</h2>
             <p>
               We may terminate or suspend your account at any time for violations of these terms.
               You may also delete your account at any time.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">7. Disclaimers</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">8. Disclaimers</h2>
             <p>
               Clawstack is provided &quot;as is&quot; without warranties of any kind. We do not guarantee
               that the service will be uninterrupted, secure, or error-free.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">8. Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">9. Limitation of Liability</h2>
             <p>
               To the fullest extent permitted by law, Clawstack shall not be liable for any
               indirect, incidental, special, or consequential damages.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">9. Changes to Terms</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">10. Changes to Terms</h2>
             <p>
               We may update these terms from time to time. Continued use of the service after
               changes constitutes acceptance of the new terms.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">10. Contact</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">11. Contact</h2>
             <p>
               Questions about these terms? Contact us at{' '}
               <a href="mailto:legal@clawstack.com" className="text-orange-600 hover:underline">
