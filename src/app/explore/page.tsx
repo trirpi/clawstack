@@ -13,6 +13,30 @@ export const metadata = {
 // Make this page dynamic (not pre-rendered at build time)
 export const dynamic = 'force-dynamic'
 
+const boilerplatePosts = [
+  {
+    category: 'SCRIPT',
+    title: 'Weekly Pipeline Health Check (Boilerplate)',
+    excerpt:
+      'A ready-to-publish issue template for checking failed automations, flaky tests, and on-call notes.',
+    publicationName: 'Clawstack Editorial',
+  },
+  {
+    category: 'TUTORIAL',
+    title: 'Prompt Versioning Workflow (Boilerplate)',
+    excerpt:
+      'A practical structure for publishing prompt changelogs with rollout notes and fallback guidance.',
+    publicationName: 'Clawstack Editorial',
+  },
+  {
+    category: 'PLUGIN',
+    title: 'Incident Digest Generator (Boilerplate)',
+    excerpt:
+      'A starter template for a daily incident digest post with severity tags and remediation checklist.',
+    publicationName: 'Clawstack Editorial',
+  },
+] as const
+
 export default async function ExplorePage() {
   // Get recent published posts
   const posts = await prisma.post.findMany({
@@ -42,14 +66,17 @@ export default async function ExplorePage() {
   type ExplorePublication = (typeof publications)[number]
   type ExplorePost = (typeof posts)[number]
 
+  const hasPosts = posts.length > 0
+
   return (
     <div className="min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
         {/* Hero */}
-        <div className="bg-gradient-to-b from-orange-50 to-white py-12">
+        <div className="py-12">
           <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-            <h1 className="text-4xl font-bold text-gray-900">Explore</h1>
+            <div className="deco-kicker mb-2">Discover</div>
+            <h1 className="deco-title text-4xl font-semibold text-gray-900">Explore</h1>
             <p className="mt-2 text-lg text-gray-600">
               Discover scripts, plugins, prompts, and tutorials from the community
             </p>
@@ -68,7 +95,7 @@ export default async function ExplorePage() {
                   <Link
                     key={pub.id}
                     href={`/${pub.slug}`}
-                    className="block p-6 bg-white rounded-xl border border-gray-200 hover:border-orange-200 hover:shadow-lg transition-all"
+                    className="deco-card block p-6 rounded-xl hover:-translate-y-0.5 transition-all"
                   >
                     <div className="flex items-center gap-4">
                       {pub.user.image ? (
@@ -108,17 +135,7 @@ export default async function ExplorePage() {
             <h2 className="text-2xl font-bold text-gray-900 mb-6">
               Recent Posts
             </h2>
-            {posts.length === 0 ? (
-              <div className="text-center py-12 bg-gray-50 rounded-xl">
-                <p className="text-gray-500">No posts yet. Be the first to publish!</p>
-                <Link
-                  href="/login"
-                  className="inline-block mt-4 px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-                >
-                  Start Publishing
-                </Link>
-              </div>
-            ) : (
+            {hasPosts ? (
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {posts.map((post: ExplorePost) => (
                   <article key={post.id} className="group">
@@ -149,6 +166,39 @@ export default async function ExplorePage() {
                     </Link>
                   </article>
                 ))}
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {boilerplatePosts.map((post, index) => (
+                  <article
+                    key={`${post.title}-${index}`}
+                    className="deco-card rounded-xl p-6 border-dashed border-amber-800/30"
+                  >
+                    <div className="flex items-start gap-2 mb-2">
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                        {post.category}
+                      </span>
+                      <span className="text-xs px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">
+                        Boilerplate
+                      </span>
+                    </div>
+                    <h3 className="deco-title text-xl font-semibold text-gray-900">
+                      {post.title}
+                    </h3>
+                    <p className="mt-2 text-gray-600">{post.excerpt}</p>
+                    <div className="mt-3 flex items-center justify-between text-sm text-gray-500">
+                      <span>{post.publicationName}</span>
+                      <Link href="/login" className="text-amber-700 hover:text-amber-800 font-medium">
+                        Use template
+                      </Link>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )}
+            {!hasPosts && (
+              <div className="mt-8 text-center">
+                <p className="text-gray-500">No published posts yet. Start with these templates.</p>
               </div>
             )}
           </section>

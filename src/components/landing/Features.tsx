@@ -39,10 +39,11 @@ const features = [
 
 export function Features() {
   return (
-    <section className="py-20 sm:py-32 bg-white">
+    <section className="py-20 sm:py-32">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
-          <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+          <div className="deco-kicker mb-3">Craft + Commerce</div>
+          <h2 className="deco-title text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
             Everything you need to share AI automations
           </h2>
           <p className="mt-4 text-lg text-gray-600">
@@ -54,10 +55,10 @@ export function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="rounded-2xl border border-gray-200 p-8 hover:border-orange-200 hover:shadow-lg transition-all"
+              className="deco-card rounded-2xl p-8 hover:-translate-y-0.5 transition-all"
             >
               <div className="text-4xl mb-4">{feature.icon}</div>
-              <h3 className="text-xl font-semibold text-gray-900">
+              <h3 className="deco-title text-xl font-semibold text-gray-900">
                 {feature.title}
               </h3>
               <p className="mt-2 text-gray-600">{feature.description}</p>

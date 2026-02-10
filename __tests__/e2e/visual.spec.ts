@@ -225,15 +225,14 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       const featureCard = page
-        .locator('div.rounded-2xl.border.border-gray-200')
-        .filter({ hasText: 'Rich Publishing' })
+        .getByRole('heading', { name: 'Rich Publishing' })
+        .locator('xpath=ancestor::div[contains(@class,"deco-card")]')
         .first()
       await featureCard.scrollIntoViewIfNeeded()
-      const beforeShadow = await featureCard.evaluate((element) => getComputedStyle(element).boxShadow)
       await featureCard.hover()
-      const afterShadow = await featureCard.evaluate((element) => getComputedStyle(element).boxShadow)
-
-      expect(afterShadow).not.toBe(beforeShadow)
+      await expect(featureCard).toHaveScreenshot('feature-card-hover.png', {
+        maxDiffPixelRatio: visualDiffPixelRatio,
+      })
     })
   })
 

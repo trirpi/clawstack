@@ -226,7 +226,9 @@ test.describe('Explore Page Components', () => {
   test('explore page should have description', async ({ page }) => {
     await gotoPage(page, '/explore')
     
-    await expect(page.getByText(/discover|scripts|plugins/i)).toBeVisible()
+    await expect(
+      page.getByText('Discover scripts, plugins, prompts, and tutorials from the community')
+    ).toBeVisible()
   })
 })
 
