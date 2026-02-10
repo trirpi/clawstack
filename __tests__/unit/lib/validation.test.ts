@@ -80,6 +80,7 @@ describe('validation helpers', () => {
 
     expect(payload?.postId).toBe('post_1')
     expect(payload?.publicationId).toBe('pub_1')
+    expect(payload?.reason).toBe('copyright')
   })
 
   it('checks same origin headers', () => {

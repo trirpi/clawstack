@@ -1,0 +1,57 @@
+import { NextResponse } from 'next/server'
+import { getSession, getCurrentUser } from '@/lib/auth'
+import { prisma } from '@/lib/prisma'
+import { hasSameOriginHeader } from '@/lib/validation'
+
+const STATUS_OPTIONS = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED'] as const
+type ReportStatus = (typeof STATUS_OPTIONS)[number]
+
+function isValidStatus(value: string): value is ReportStatus {
+  return STATUS_OPTIONS.includes(value as ReportStatus)
+}
+
+interface Props {
+  params: Promise<{ id: string }>
+}
+
+export async function POST(request: Request, { params }: Props) {
+  const session = await getSession()
+
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+
+  if (!hasSameOriginHeader(request)) {
+    return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+
+  const user = await getCurrentUser()
+  if (!user?.publication) {
+    return NextResponse.json({ error: 'No publication found' }, { status: 404 })
+  }
+
+  const { id } = await params
+  const formData = await request.formData()
+  const status = String(formData.get('status') || '').trim()
+
+  if (!isValidStatus(status)) {
+    return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+  }
+
+  const report = await prisma.report.findUnique({
+    where: { id },
+    select: { publicationId: true },
+  })
+
+  if (!report || report.publicationId !== user.publication.id) {
+    return NextResponse.json({ error: 'Report not found' }, { status: 404 })
+  }
+
+  await prisma.report.update({
+    where: { id },
+    data: { status },
+  })
+
+  return NextResponse.redirect(new URL('/dashboard/reports', request.url))
+}
+

@@ -144,6 +144,7 @@ model Report {
   postSlug        String?
   publicationSlug String?
   sourceUrl       String?
+  reporterIp      String?
   status          String   @default("OPEN")
   createdAt       DateTime @default(now())
 
