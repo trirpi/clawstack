@@ -10,6 +10,20 @@ jobs:
   unit-tests:
     runs-on: ubuntu-latest
     name: Unit Tests
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd="pg_isready -U postgres"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
 
     steps:
       - name: Checkout
@@ -26,6 +40,17 @@ jobs:
 
       - name: Generate Prisma client
         run: npx prisma generate
+
+      - name: Prepare migration diff databases
+        run: |
+          psql postgresql://postgres:postgres@localhost:5432/postgres -c "CREATE DATABASE clawstack;"
+          psql postgresql://postgres:postgres@localhost:5432/postgres -c "CREATE DATABASE clawstack_shadow;"
+
+      - name: Verify Prisma migrations are in sync
+        run: npm run db:migrate:diff
+        env:
+          DATABASE_URL: postgresql://postgres:postgres@localhost:5432/clawstack
+          SHADOW_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/clawstack_shadow
 
       - name: Run unit tests
         run: npm run test -- --run

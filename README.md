@@ -53,7 +53,7 @@ cp .env.example .env
 ```bash
 npm run db:local
 ```
-This copies `prisma/schema.sqlite.prisma` into `prisma/schema.prisma` and pushes the schema to a local `dev.db`.
+This initializes `prisma/dev.db` from `prisma/schema.sqlite.prisma`.
 
 Edit `.env` with your credentials:
 - Create a GitHub OAuth app at https://github.com/settings/developers
@@ -62,7 +62,7 @@ Edit `.env` with your credentials:
 4. Set up the database:
 ```bash
 npx prisma generate
-npx prisma db push
+npm run db:local
 ```
 
 5. Start the development server:
@@ -83,7 +83,28 @@ npm run test       # Run unit tests
 npm run test:watch # Run tests in watch mode
 npm run test:e2e   # Run E2E tests
 npm run db:push    # Push schema to database
+npm run db:migrate:deploy # Apply pending PostgreSQL migrations
+npm run db:migrate:status # Show migration status
+npm run db:migrate:diff   # Verify migrations match schema.prisma (requires DATABASE_URL + SHADOW_DATABASE_URL)
 npm run db:studio  # Open Prisma Studio
+```
+
+## Prisma Migrations
+
+Production uses migration files under `prisma/migrations`.
+
+- New PostgreSQL environments: `npm run db:migrate:deploy`
+- Existing PostgreSQL environments that were previously created with `db push`:
+```bash
+npx prisma migrate resolve --applied 20260210231500_init
+```
+Then deploy as usual.
+
+Optional local drift check:
+```bash
+DATABASE_URL=postgresql://postgres:postgres@localhost:5432/clawstack \
+SHADOW_DATABASE_URL=postgresql://postgres:postgres@localhost:5432/clawstack_shadow \
+npm run db:migrate:diff
 ```
 
 ## Project Structure
