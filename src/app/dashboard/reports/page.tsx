@@ -7,32 +7,35 @@ import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { Button } from '@/components/ui/Button'
 import { formatDate } from '@/lib/utils'
 import { Notice } from '@/components/ui/Notice'
+import {
+  REPORT_REASON_LABELS,
+  REPORT_REASON_VALUES,
+  REPORT_STATUS_VALUES,
+  type ReportReason,
+  type ReportStatus,
+} from '@/lib/moderation'
 
 export const metadata = {
   title: 'Reports - Clawstack',
   description: 'Review and manage content reports',
 }
 
-const STATUS_OPTIONS = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED'] as const
-const REASON_OPTIONS = ['adult', 'ip', 'copyright', 'violent_extremism', 'other'] as const
-type ReportStatus = (typeof STATUS_OPTIONS)[number]
 type ReportStatusFilter = ReportStatus | 'ALL'
-type ReportReason = (typeof REASON_OPTIONS)[number]
 type ReportReasonFilter = ReportReason | 'ALL'
 
 function normalizeFilter(value: string | undefined): ReportStatusFilter {
   if (!value) return 'ALL'
-  return (STATUS_OPTIONS as readonly string[]).includes(value) ? (value as ReportStatus) : 'ALL'
+  return (REPORT_STATUS_VALUES as readonly string[]).includes(value) ? (value as ReportStatus) : 'ALL'
 }
 
 function normalizeReasonFilter(value: string | undefined): ReportReasonFilter {
   if (!value) return 'ALL'
-  return (REASON_OPTIONS as readonly string[]).includes(value) ? (value as ReportReason) : 'ALL'
+  return (REPORT_REASON_VALUES as readonly string[]).includes(value) ? (value as ReportReason) : 'ALL'
 }
 
 function formatReason(reason: ReportReason | 'ALL') {
   if (reason === 'ALL') return 'All reasons'
-  return reason.replaceAll('_', ' ')
+  return REPORT_REASON_LABELS[reason]
 }
 
 function getPriority(reason: string, reportCountForPost: number, reporterCount: number) {
@@ -194,13 +197,13 @@ export default async function ReportsPage({ searchParams }: Props) {
     totalReports = totalReportCount
 
     for (const item of statusBreakdown) {
-      if ((STATUS_OPTIONS as readonly string[]).includes(item.status)) {
+      if ((REPORT_STATUS_VALUES as readonly string[]).includes(item.status)) {
         statusCounts[item.status as ReportStatus] = item._count._all
       }
     }
 
     for (const item of reasonBreakdown) {
-      if ((REASON_OPTIONS as readonly string[]).includes(item.reason)) {
+      if ((REPORT_REASON_VALUES as readonly string[]).includes(item.reason)) {
         reasonCounts[item.reason as ReportReason] = item._count._all
       }
     }
@@ -298,7 +301,7 @@ export default async function ReportsPage({ searchParams }: Props) {
 
         {!missingModerationSchema && (
           <div className="mb-6 flex flex-wrap gap-2">
-          {(['ALL', ...STATUS_OPTIONS] as const).map((filter) => {
+          {(['ALL', ...REPORT_STATUS_VALUES] as const).map((filter) => {
             const isActive = activeFilter === filter
             const label = filter === 'ALL' ? 'All' : filter.replace('_', ' ')
             const count = filter === 'ALL' ? totalReports : statusCounts[filter]
@@ -322,7 +325,7 @@ export default async function ReportsPage({ searchParams }: Props) {
         )}
         {!missingModerationSchema && (
           <div className="mb-6 flex flex-wrap gap-2">
-          {(['ALL', ...REASON_OPTIONS] as const).map((filter) => {
+          {(['ALL', ...REPORT_REASON_VALUES] as const).map((filter) => {
             const isActive = activeReason === filter
             const label = formatReason(filter)
             const count = filter === 'ALL' ? totalReports : reasonCounts[filter]
@@ -415,7 +418,7 @@ export default async function ReportsPage({ searchParams }: Props) {
                         defaultValue={report.status as ReportStatus}
                         className="h-9 rounded-lg border border-gray-300 bg-white px-2 text-sm text-gray-700"
                       >
-                        {STATUS_OPTIONS.map((status) => (
+                        {REPORT_STATUS_VALUES.map((status) => (
                           <option key={status} value={status}>
                             {status.replace('_', ' ')}
                           </option>

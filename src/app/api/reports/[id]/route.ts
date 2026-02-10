@@ -2,12 +2,10 @@ import { NextResponse } from 'next/server'
 import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasSameOriginHeader } from '@/lib/validation'
-
-const STATUS_OPTIONS = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED'] as const
-type ReportStatus = (typeof STATUS_OPTIONS)[number]
+import { REPORT_STATUS_VALUES, type ReportStatus } from '@/lib/moderation'
 
 function isValidStatus(value: string): value is ReportStatus {
-  return STATUS_OPTIONS.includes(value as ReportStatus)
+  return REPORT_STATUS_VALUES.includes(value as ReportStatus)
 }
 
 interface Props {

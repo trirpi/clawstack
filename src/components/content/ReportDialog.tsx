@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/Notice'
+import { REPORT_REASON_LABELS, REPORT_REASON_VALUES, type ReportReason } from '@/lib/moderation'
 
 interface ReportDialogProps {
   postId: string
@@ -11,18 +12,14 @@ interface ReportDialogProps {
   publicationSlug: string
 }
 
-const REASONS = [
-  { value: 'adult', label: 'Adult content or services' },
-  { value: 'ip', label: 'Intellectual property infringement' },
-  { value: 'copyright', label: 'Copyright-infringing content' },
-  { value: 'violent_extremism', label: 'Violent extremism or hate speech' },
-  { value: 'other', label: 'Other' },
-] as const
-type ReportReason = (typeof REASONS)[number]['value']
+const REASONS = REPORT_REASON_VALUES.map((value) => ({
+  value,
+  label: REPORT_REASON_LABELS[value],
+}))
 
 export function ReportDialog({ postId, publicationId, postSlug, publicationSlug }: ReportDialogProps) {
   const [open, setOpen] = useState(false)
-  const [reason, setReason] = useState<ReportReason>(REASONS[0].value)
+  const [reason, setReason] = useState<ReportReason>(REPORT_REASON_VALUES[0])
   const [email, setEmail] = useState('')
   const [details, setDetails] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -60,7 +57,7 @@ export function ReportDialog({ postId, publicationId, postSlug, publicationSlug 
       }
 
       setMessage({ tone: 'success', text: 'Report submitted. Thanks for letting us know.' })
-      setReason(REASONS[0].value)
+      setReason(REPORT_REASON_VALUES[0])
       setEmail('')
       setDetails('')
       setOpen(false)

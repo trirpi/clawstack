@@ -40,6 +40,20 @@ describe('validation helpers', () => {
     expect(payload).toBeNull()
   })
 
+  it('rejects post payloads with invalid slugs', () => {
+    const payload = validatePostPayload({
+      publicationId: 'pub_1',
+      title: 'Hello',
+      slug: 'Hello World',
+      content: '<p>Hi</p>',
+      category: 'ARTICLE',
+      visibility: 'FREE',
+      published: false,
+    })
+
+    expect(payload).toBeNull()
+  })
+
   it('validates settings payloads', () => {
     const payload = validateSettingsPayload({
       publication: { name: 'Publication', description: 'Desc', priceMonthly: 500, priceYearly: 5000 },
@@ -121,6 +135,17 @@ describe('validation helpers', () => {
     ).toBeNull()
   })
 
+  it('rejects report payloads with invalid slugs', () => {
+    expect(
+      validateReportPayload({
+        postId: 'post_1',
+        publicationId: 'pub_1',
+        reason: 'copyright',
+        postSlug: 'Bad Slug',
+      }),
+    ).toBeNull()
+  })
+
   it('checks same origin headers', () => {
     process.env.NEXTAUTH_URL = 'https://example.com'
     const sameOriginRequest = new Request('https://example.com/api/test', {
@@ -147,6 +172,19 @@ describe('validation helpers', () => {
     process.env.NEXTAUTH_URL = 'https://example.com'
     const request = new Request('https://example.com/api/test')
     expect(hasSameOriginHeader(request)).toBe(false)
+  })
+
+  it('rejects missing origin/referer in production when NEXTAUTH_URL is missing', () => {
+    const previousNodeEnv = process.env.NODE_ENV
+    const previousAppUrl = process.env.NEXTAUTH_URL
+    process.env.NODE_ENV = 'production'
+    delete process.env.NEXTAUTH_URL
+
+    const request = new Request('https://example.com/api/test')
+    expect(hasSameOriginHeader(request)).toBe(false)
+
+    process.env.NODE_ENV = previousNodeEnv
+    process.env.NEXTAUTH_URL = previousAppUrl
   })
 
   it('escapes csv formula cells', () => {

@@ -1,3 +1,5 @@
+import { REPORT_REASON_VALUES } from '@/lib/moderation'
+
 const SAFE_CATEGORY_VALUES = new Set([
   'ARTICLE',
   'SCRIPT',
@@ -8,13 +10,8 @@ const SAFE_CATEGORY_VALUES = new Set([
 ])
 
 const SAFE_VISIBILITY_VALUES = new Set(['FREE', 'PREVIEW', 'PAID'])
-const SAFE_REPORT_REASON_VALUES = new Set([
-  'adult',
-  'ip',
-  'copyright',
-  'violent_extremism',
-  'other',
-])
+const SAFE_REPORT_REASON_VALUES = new Set<string>(REPORT_REASON_VALUES)
+const SAFE_SLUG_REGEX = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -22,7 +19,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function toCleanString(value: unknown, maxLength: number) {
   if (typeof value !== 'string') return ''
-  return value.trim().slice(0, maxLength)
+  return value
+    .replace(/[\u0000-\u001f\u007f]/g, '')
+    .trim()
+    .slice(0, maxLength)
 }
 
 function toNullableString(value: unknown, maxLength: number) {
@@ -32,6 +32,10 @@ function toNullableString(value: unknown, maxLength: number) {
 
 function isValidEmail(value: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function isValidSlug(value: string) {
+  return SAFE_SLUG_REGEX.test(value)
 }
 
 function toNullableHttpUrl(value: unknown, maxLength: number) {
@@ -71,6 +75,7 @@ export function validatePostPayload(payload: unknown) {
   const id = toNullableString(payload.id, 200)
 
   if (!title || !slug || !content) return null
+  if (!isValidSlug(slug)) return null
   if (!SAFE_CATEGORY_VALUES.has(category)) return null
   if (!SAFE_VISIBILITY_VALUES.has(visibility)) return null
   if (content.length > 1_000_000) return null
@@ -160,6 +165,8 @@ export function validateReportPayload(payload: unknown) {
   if (!postId || !publicationId || !reason) return null
   if (!SAFE_REPORT_REASON_VALUES.has(reason)) return null
   if (reporterEmail && !isValidEmail(reporterEmail)) return null
+  if (postSlug && !isValidSlug(postSlug)) return null
+  if (publicationSlug && !isValidSlug(publicationSlug)) return null
   if (rawSourceUrl && !sourceUrl) return null
 
   return {
@@ -176,7 +183,7 @@ export function validateReportPayload(payload: unknown) {
 
 export function hasSameOriginHeader(request: Request) {
   const appUrl = process.env.NEXTAUTH_URL
-  if (!appUrl) return true
+  if (!appUrl) return process.env.NODE_ENV !== 'production'
 
   const origin = request.headers.get('origin')
   const referer = request.headers.get('referer')

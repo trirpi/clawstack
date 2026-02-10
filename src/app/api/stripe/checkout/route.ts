@@ -30,7 +30,11 @@ export async function POST(request: NextRequest) {
     }
 
     const allowedPriceIds = getAllowedStripePriceIds()
-    if (allowedPriceIds.length > 0 && !allowedPriceIds.includes(priceId)) {
+    if (process.env.NODE_ENV === 'production' && allowedPriceIds.length === 0) {
+      return NextResponse.json({ error: 'Billing is not configured' }, { status: 503 })
+    }
+
+    if (!allowedPriceIds.includes(priceId)) {
       return NextResponse.json({ error: 'Invalid price selection' }, { status: 400 })
     }
 
@@ -41,6 +45,13 @@ export async function POST(request: NextRequest) {
 
     if (!publication) {
       return NextResponse.json({ error: 'Publication not found' }, { status: 404 })
+    }
+
+    if (priceId === process.env.STRIPE_PRICE_MONTHLY_ID && !publication.priceMonthly) {
+      return NextResponse.json({ error: 'Monthly plan is not available for this publication' }, { status: 400 })
+    }
+    if (priceId === process.env.STRIPE_PRICE_YEARLY_ID && !publication.priceYearly) {
+      return NextResponse.json({ error: 'Yearly plan is not available for this publication' }, { status: 400 })
     }
 
     // Get or create Stripe customer
