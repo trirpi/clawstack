@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { ConfirmDialog } from '@/components/ui/ConfirmDialog'
 import { Notice } from '@/components/ui/Notice'
+import { Button } from '@/components/ui/Button'
 
 interface SendPostButtonProps {
   postId: string
@@ -59,13 +60,9 @@ export function SendPostButton({ postId, postTitle }: SendPostButtonProps) {
   return (
     <>
       <div className="flex flex-col items-end gap-2">
-        <button
-          onClick={openConfirm}
-          disabled={loading}
-          className="px-4 py-2 text-sm font-medium text-orange-600 hover:text-orange-700 hover:bg-orange-50 rounded-lg transition-colors disabled:opacity-50"
-        >
+        <Button onClick={openConfirm} disabled={loading} variant="outline" size="sm">
           {loading ? 'Sending...' : 'Send to Subscribers'}
-        </button>
+        </Button>
         {message && <Notice tone={message.tone} message={message.text} />}
       </div>
       <ConfirmDialog

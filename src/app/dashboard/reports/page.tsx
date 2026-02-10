@@ -238,13 +238,13 @@ export default async function ReportsPage({ searchParams }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="app-canvas min-h-screen">
       <Header />
       <DashboardNav />
       <main className="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
+            <h1 className="app-heading text-3xl">Reports</h1>
             <p className="text-sm text-gray-600">
               {isPlatformAdmin
                 ? 'Review reports across all publications.'

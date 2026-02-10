@@ -2,10 +2,11 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
 import { Notice } from '@/components/ui/Notice'
+import { buildLoginHref } from '@/lib/routes'
 
 interface CommentFormProps {
   postId: string
@@ -14,15 +15,20 @@ interface CommentFormProps {
 export function CommentForm({ postId }: CommentFormProps) {
   const { data: session } = useSession()
   const router = useRouter()
+  const pathname = usePathname()
   const [content, setContent] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [message, setMessage] = useState<{ tone: 'success' | 'error' | 'info'; text: string } | null>(null)
 
   if (!session) {
     return (
-      <div className="bg-gray-50 rounded-lg p-4 text-center">
-        <p className="text-gray-600 mb-2">Sign in to leave a comment</p>
-        <Button onClick={() => router.push('/login')} variant="outline" size="sm">
+      <div className="deco-card rounded-xl p-4 text-center">
+        <p className="text-gray-700 mb-2">Sign in to leave a comment</p>
+        <Button
+          onClick={() => router.push(buildLoginHref(pathname || '/'))}
+          variant="outline"
+          size="sm"
+        >
           Sign In
         </Button>
       </div>
@@ -68,7 +74,7 @@ export function CommentForm({ postId }: CommentFormProps) {
             className="w-10 h-10 rounded-full"
           />
         ) : (
-          <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
+          <div className="w-10 h-10 rounded-full bg-[#e8d7be] flex items-center justify-center">
             🦞
           </div>
         )}
@@ -78,7 +84,7 @@ export function CommentForm({ postId }: CommentFormProps) {
             onChange={(e) => setContent(e.target.value)}
             placeholder="Write a comment..."
             rows={3}
-            className="w-full rounded-lg border-gray-300 focus:border-orange-500 focus:ring-orange-500 resize-none"
+            className="w-full rounded-lg border-gray-300 focus:border-amber-700 focus:ring-amber-700 resize-none"
           />
           <div className="mt-2 flex justify-end">
             <Button type="submit" disabled={submitting || !content.trim()}>

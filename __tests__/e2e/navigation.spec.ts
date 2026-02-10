@@ -15,7 +15,7 @@ test.describe('Navigation', () => {
     
     const getStartedLink = page.getByRole('link', { name: /start publishing/i }).first()
     await expect(getStartedLink).toBeVisible({ timeout: 15000 })
-    await expect(getStartedLink).toHaveAttribute('href', '/login')
+    await expect(getStartedLink).toHaveAttribute('href', /\/login\?callbackUrl=/)
   })
 
   test('should navigate back to home from login', async ({ page }) => {

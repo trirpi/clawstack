@@ -47,11 +47,11 @@ export default async function PublicationPage({ params }: Props) {
     : null
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="app-canvas min-h-screen flex flex-col">
       <Header />
       <main className="flex-1">
         {/* Publication Header */}
-        <div className="bg-gradient-to-b from-orange-50 to-white py-12">
+        <div className="border-b border-black/15 py-14">
           <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 text-center">
             {publication.avatar ? (
               <Image
@@ -63,21 +63,21 @@ export default async function PublicationPage({ params }: Props) {
                 className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-orange-100 flex items-center justify-center text-4xl">
+              <div className="w-24 h-24 rounded-full mx-auto mb-4 bg-[#e8d7be] flex items-center justify-center text-4xl">
                 🦞
               </div>
             )}
-            <h1 className="text-3xl font-bold text-gray-900">
+            <h1 className="deco-title text-4xl font-semibold text-gray-900">
               {publication.name}
             </h1>
             {publication.description && (
-              <p className="mt-2 text-lg text-gray-600">
+              <p className="mt-3 text-lg text-gray-700">
                 {publication.description}
               </p>
             )}
-            <div className="mt-4 flex items-center justify-center gap-4 text-sm text-gray-500">
-              <span>{publication._count.subscribers} subscribers</span>
-              <span>{publication.posts.length} posts</span>
+            <div className="mt-4 flex items-center justify-center gap-3 text-sm text-gray-700">
+              <span className="deco-badge">{publication._count.subscribers} subscribers</span>
+              <span className="deco-badge">{publication.posts.length} posts</span>
             </div>
             <div className="mt-6">
               <SubscribeButton
@@ -92,35 +92,33 @@ export default async function PublicationPage({ params }: Props) {
 
         {/* Posts */}
         <div className="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8 py-12">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">Latest Posts</h2>
+          <h2 className="deco-title text-2xl font-semibold text-gray-900 mb-6">Latest Posts</h2>
           {publication.posts.length === 0 ? (
-            <p className="text-gray-500 text-center py-12">
-              No posts published yet.
-            </p>
+            <div className="deco-card rounded-2xl p-8 text-center text-gray-700">No posts published yet.</div>
           ) : (
             <div className="space-y-8">
               {publication.posts.map((post: PublicationPost) => (
-                <article key={post.id} className="group">
+                <article key={post.id} className="deco-card rounded-2xl p-6 group">
                   <Link href={`/${username}/${post.slug}`}>
                     <div className="flex items-start gap-2">
-                      <span className="text-xs px-2 py-0.5 rounded-full bg-gray-100 text-gray-700">
+                      <span className="deco-badge">
                         {post.category}
                       </span>
                       {post.visibility === 'PAID' && (
-                        <span className="text-xs px-2 py-0.5 rounded-full bg-orange-100 text-orange-700">
+                        <span className="deco-badge bg-[#e7cfb1] text-amber-900">
                           Subscribers only
                         </span>
                       )}
                     </div>
-                    <h3 className="mt-2 text-xl font-semibold text-gray-900 group-hover:text-orange-600 transition-colors">
+                    <h3 className="deco-title mt-3 text-2xl font-semibold text-gray-900 group-hover:text-amber-800 transition-colors">
                       {post.title}
                     </h3>
                     {post.excerpt && (
-                      <p className="mt-2 text-gray-600 line-clamp-2">
+                      <p className="mt-2 text-gray-700 line-clamp-2">
                         {post.excerpt}
                       </p>
                     )}
-                    <div className="mt-3 text-sm text-gray-500">
+                    <div className="mt-3 text-sm text-gray-600">
                       {formatDate(post.publishedAt!)}
                     </div>
                   </Link>

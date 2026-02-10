@@ -1,7 +1,7 @@
-import Link from 'next/link'
 import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { Button } from '@/components/ui/Button'
+import { AuthCtaLink } from '@/components/ui/AuthCtaLink'
 
 export const metadata = {
   title: 'Pricing - Clawstack',
@@ -21,7 +21,7 @@ const plans = [
       'Email notifications',
     ],
     cta: 'Get Started',
-    href: '/login',
+    authHref: '/dashboard/new',
     featured: false,
   },
   {
@@ -38,7 +38,7 @@ const plans = [
       'Custom domain (coming soon)',
     ],
     cta: 'Start Earning',
-    href: '/login',
+    authHref: '/dashboard/earnings',
     featured: true,
   },
 ]
@@ -113,7 +113,7 @@ export default function PricingPage() {
                   ))}
                 </ul>
                 <div className="mt-8">
-                  <Link href={plan.href}>
+                  <AuthCtaLink authenticatedHref={plan.authHref} callbackHref={plan.authHref}>
                     <Button
                       variant={plan.featured ? 'white' : 'primary'}
                       size="lg"
@@ -121,7 +121,7 @@ export default function PricingPage() {
                     >
                       {plan.cta}
                     </Button>
-                  </Link>
+                  </AuthCtaLink>
                 </div>
               </div>
             ))}

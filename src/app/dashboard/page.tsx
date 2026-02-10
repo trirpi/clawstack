@@ -59,21 +59,21 @@ export default async function DashboardPage() {
   type DashboardPost = (typeof posts)[number]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="app-canvas min-h-screen">
       <Header />
       <DashboardNav />
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         {/* Stats */}
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-3 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="app-panel p-6">
             <div className="text-sm text-gray-700">Total Posts</div>
             <div className="text-3xl font-bold text-gray-900 mt-1">{posts.length}</div>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="app-panel p-6">
             <div className="text-sm text-gray-700">Subscribers</div>
             <div className="text-3xl font-bold text-gray-900 mt-1">{subscriberCount}</div>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="app-panel p-6">
             <div className="text-sm text-gray-700">Publication</div>
             <div className="text-xl font-semibold text-gray-900 mt-1 truncate">
               {publication.name}
@@ -83,7 +83,7 @@ export default async function DashboardPage() {
 
         {/* Actions */}
         <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-gray-900">Your Posts</h1>
+          <h1 className="app-heading text-3xl">Your Posts</h1>
           <Link href="/dashboard/new">
             <Button>New Post</Button>
           </Link>
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
 
         {/* Posts List */}
         {posts.length === 0 ? (
-          <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-200">
+          <div className="app-panel p-12 text-center">
             <div className="text-4xl mb-4">📝</div>
             <h2 className="text-xl font-semibold text-gray-900 mb-2">
               No posts yet
@@ -104,14 +104,14 @@ export default async function DashboardPage() {
             </Link>
           </div>
         ) : (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 divide-y divide-gray-200">
+          <div className="app-panel divide-y divide-black/10">
             {posts.map((post: DashboardPost) => (
-              <div key={post.id} className="p-6 hover:bg-gray-50 transition-colors">
+              <div key={post.id} className="p-6 hover:bg-black/5 transition-colors">
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <Link
                       href={`/dashboard/edit/${post.id}`}
-                      className="text-lg font-semibold text-gray-900 hover:text-orange-600"
+                      className="deco-title text-2xl font-semibold text-gray-900 hover:text-amber-800"
                     >
                       {post.title}
                     </Link>

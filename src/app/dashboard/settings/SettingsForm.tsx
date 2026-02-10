@@ -81,8 +81,8 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
       )}
 
       {/* Publication Settings */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Publication</h2>
+      <div className="app-panel p-6">
+        <h2 className="app-heading text-2xl mb-4">Publication</h2>
         
         <div className="space-y-4">
           <div>
@@ -93,7 +93,7 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
               type="text"
               value={pubName}
               onChange={(e) => setPubName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
               required
             />
           </div>
@@ -122,7 +122,7 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
               value={pubDescription}
               onChange={(e) => setPubDescription(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
               placeholder="What is your publication about?"
             />
           </div>
@@ -130,8 +130,8 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
       </div>
 
       {/* Pricing */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Subscription Pricing</h2>
+      <div className="app-panel p-6">
+        <h2 className="app-heading text-2xl mb-4">Subscription Pricing</h2>
         <p className="text-sm text-gray-600 mb-4">
           Set prices for paid subscriptions. Leave empty to only offer free content.
         </p>
@@ -147,7 +147,7 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
                 type="number"
                 value={monthlyPrice}
                 onChange={(e) => setMonthlyPrice(e.target.value)}
-                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
                 placeholder="500"
                 min="0"
               />
@@ -165,7 +165,7 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
                 type="number"
                 value={yearlyPrice}
                 onChange={(e) => setYearlyPrice(e.target.value)}
-                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+                className="w-full pl-8 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
                 placeholder="5000"
                 min="0"
               />
@@ -176,8 +176,8 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
       </div>
 
       {/* Profile Settings */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h2 className="text-lg font-semibold text-gray-900 mb-4">Profile</h2>
+      <div className="app-panel p-6">
+        <h2 className="app-heading text-2xl mb-4">Profile</h2>
         
         <div className="space-y-4">
           <div>
@@ -188,7 +188,7 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
               type="text"
               value={userName}
               onChange={(e) => setUserName(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
             />
           </div>
 
@@ -212,7 +212,7 @@ export function SettingsForm({ publication, user }: SettingsFormProps) {
               value={userBio}
               onChange={(e) => setUserBio(e.target.value)}
               rows={3}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
               placeholder="Tell readers about yourself..."
             />
           </div>

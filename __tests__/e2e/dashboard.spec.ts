@@ -125,6 +125,6 @@ test.describe('Form Validations', () => {
     
     const getStartedButton = page.getByRole('main').getByRole('link', { name: /get started/i })
     await getStartedButton.click()
-    await expect(page).toHaveURL('/login')
+    await expect(page).toHaveURL(/\/login\?callbackUrl=/)
   })
 })

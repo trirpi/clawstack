@@ -3,6 +3,7 @@ import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Header } from '@/components/layout/Header'
 import { PostEditor } from '@/components/editor/PostEditor'
+import { buildLoginHref } from '@/lib/routes'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -13,7 +14,7 @@ export default async function EditPostPage({ params }: Props) {
   const session = await getSession()
   
   if (!session?.user) {
-    redirect('/login')
+    redirect(buildLoginHref(`/dashboard/edit/${id}`))
   }
 
   const user = await getCurrentUser()
@@ -32,10 +33,10 @@ export default async function EditPostPage({ params }: Props) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="app-canvas min-h-screen">
       <Header />
       <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-6">Edit Post</h1>
+        <h1 className="app-heading text-3xl mb-6">Edit Post</h1>
         <PostEditor
           publicationId={user.publication.id}
           initialData={{

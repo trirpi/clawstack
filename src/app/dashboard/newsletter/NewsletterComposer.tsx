@@ -67,7 +67,7 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
 
   if (sent) {
     return (
-      <div className="text-center py-8">
+      <div className="deco-card rounded-xl text-center py-8">
         <div className="text-4xl mb-4">✉️</div>
         <h3 className="text-lg font-semibold text-gray-900 mb-2">
           Newsletter Sent!
@@ -95,7 +95,7 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
           value={subject}
           onChange={(e) => setSubject(e.target.value)}
           placeholder={`${publicationName} Newsletter`}
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700"
         />
       </div>
 
@@ -108,7 +108,7 @@ export function NewsletterComposer({ subscriberCount, publicationName }: Newslet
           onChange={(e) => setContent(e.target.value)}
           rows={8}
           placeholder="Write your newsletter content here..."
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 font-mono text-sm"
+          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-700 focus:border-amber-700 font-mono text-sm"
         />
         <p className="text-xs text-gray-500 mt-1">
           Supports basic formatting. HTML will be rendered.

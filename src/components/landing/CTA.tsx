@@ -1,5 +1,5 @@
-import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+import { AuthCtaLink } from '@/components/ui/AuthCtaLink'
 
 export function CTA() {
   return (
@@ -15,11 +15,11 @@ export function CTA() {
             direct reader relationship.
           </p>
           <div className="mt-10 flex items-center justify-center gap-4">
-            <Link href="/dashboard/new">
+            <AuthCtaLink authenticatedHref="/dashboard/new" callbackHref="/dashboard/new">
               <Button size="lg" variant="white" className="border border-black/20">
                 Create Your Publication
               </Button>
-            </Link>
+            </AuthCtaLink>
           </div>
         </div>
       </div>

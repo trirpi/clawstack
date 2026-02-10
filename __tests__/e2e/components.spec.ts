@@ -33,7 +33,7 @@ test.describe('Button Components', () => {
     
     // Verify the link works
     await primaryButton.click()
-    await expect(page).toHaveURL('/login')
+    await expect(page).toHaveURL(/\/login\?callbackUrl=/)
   })
 
   test('outline button should be visible and functional', async ({ page }) => {

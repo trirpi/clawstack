@@ -46,22 +46,22 @@ export default async function NewsletterPage() {
   type RecentPost = (typeof recentPosts)[number]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="app-canvas min-h-screen">
       <Header />
       <DashboardNav />
       <main className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-8">
-        <h1 className="text-2xl font-bold text-gray-900 mb-8">Newsletter</h1>
+        <h1 className="app-heading text-3xl mb-8">Newsletter</h1>
 
         {/* Stats */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="app-panel p-6">
             <div className="text-sm text-gray-500">Subscribers</div>
             <div className="text-3xl font-bold text-gray-900 mt-1">{subscriberCount}</div>
             <p className="text-sm text-gray-500 mt-2">
               Will receive your newsletter
             </p>
           </div>
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
+          <div className="app-panel p-6">
             <div className="text-sm text-gray-500">Email Provider</div>
             <div className="text-xl font-semibold text-gray-900 mt-1">
               {process.env.RESEND_API_KEY ? 'Resend' : 'Not configured'}
@@ -75,8 +75,8 @@ export default async function NewsletterPage() {
         </div>
 
         {/* Compose Newsletter */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Send Newsletter</h2>
+        <div className="app-panel p-6 mb-8">
+          <h2 className="app-heading text-2xl mb-4">Send Newsletter</h2>
           <NewsletterComposer 
             subscriberCount={subscriberCount}
             publicationName={user.publication.name}
@@ -85,8 +85,8 @@ export default async function NewsletterPage() {
 
         {/* Send Post as Newsletter */}
         {recentPosts.length > 0 && (
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-lg font-semibold text-gray-900 mb-4">
+          <div className="app-panel p-6">
+            <h2 className="app-heading text-2xl mb-4">
               Or Send a Published Post
             </h2>
             <p className="text-sm text-gray-600 mb-4">
@@ -96,7 +96,7 @@ export default async function NewsletterPage() {
               {recentPosts.map((post: RecentPost) => (
                 <div
                   key={post.id}
-                  className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  className="flex items-center justify-between p-4 bg-black/5 rounded-lg"
                 >
                   <div>
                     <div className="font-medium text-gray-900">{post.title}</div>

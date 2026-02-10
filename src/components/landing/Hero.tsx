@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
 import { HeroPoster } from '@/components/landing/HeroPoster'
+import { AuthCtaLink } from '@/components/ui/AuthCtaLink'
 
 const proofPoints = [
   {
@@ -35,9 +36,9 @@ export function Hero() {
               product already supports.
             </p>
             <div className="mt-10 flex flex-wrap items-center gap-4">
-              <Link href="/login">
+              <AuthCtaLink authenticatedHref="/dashboard/new" callbackHref="/dashboard/new">
                 <Button size="lg">Start Publishing</Button>
-              </Link>
+              </AuthCtaLink>
               <Link href="/explore">
                 <Button
                   variant="outline"

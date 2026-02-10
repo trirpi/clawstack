@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Notice } from '@/components/ui/Notice'
+import { Button } from '@/components/ui/Button'
 
 export function ExportSubscribersButton() {
   const [loading, setLoading] = useState(false)
@@ -40,13 +41,9 @@ export function ExportSubscribersButton() {
 
   return (
     <div className="flex flex-col items-end gap-2">
-      <button
-        onClick={handleExport}
-        disabled={loading}
-        className="text-sm text-orange-600 hover:text-orange-700 font-medium disabled:opacity-50"
-      >
+      <Button onClick={handleExport} disabled={loading} variant="outline" size="sm">
         {loading ? 'Exporting...' : 'Export CSV'}
-      </button>
+      </Button>
       {message && <Notice tone={message.tone} message={message.text} />}
     </div>
   )

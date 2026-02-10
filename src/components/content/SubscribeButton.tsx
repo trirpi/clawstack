@@ -4,6 +4,7 @@ import { useMemo, useState } from 'react'
 import { useRouter, usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { Button } from '@/components/ui/Button'
+import { buildLoginHref } from '@/lib/routes'
 
 interface SubscribeButtonProps {
   publicationId: string
@@ -34,8 +35,7 @@ export function SubscribeButton({
 
   const handleToggle = async () => {
     if (status !== 'authenticated') {
-      const callbackUrl = encodeURIComponent(pathname || '/')
-      router.push(`/login?callbackUrl=${callbackUrl}`)
+      router.push(buildLoginHref(pathname || '/'))
       return
     }
 
@@ -80,8 +80,7 @@ export function SubscribeButton({
       >
         {loading ? 'Updating...' : subscribed ? 'Subscribed' : 'Subscribe'}
       </Button>
-      {message && <p className="text-xs text-gray-600">{message}</p>}
+      {message && <p className="text-xs text-gray-700">{message}</p>}
     </div>
   )
 }
-

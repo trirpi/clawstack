@@ -79,7 +79,7 @@ test.describe('Link Validation', () => {
     test('start publishing button should work', async ({ page }) => {
       await gotoPage(page, '/')
       await page.getByRole('link', { name: /start publishing/i }).click()
-      await expect(page).toHaveURL('/login')
+      await expect(page).toHaveURL(/\/login\?callbackUrl=/)
     })
 
     test('explore content button should work', async ({ page }) => {
@@ -128,13 +128,13 @@ test.describe('Link Validation', () => {
     test('get started button should work', async ({ page }) => {
       await gotoPage(page, '/pricing')
       await page.getByRole('main').getByRole('link', { name: /get started/i }).click()
-      await expect(page).toHaveURL('/login')
+      await expect(page).toHaveURL(/\/login\?callbackUrl=/)
     })
 
     test('start earning button should work', async ({ page }) => {
       await gotoPage(page, '/pricing')
       await page.getByRole('link', { name: /start earning/i }).click()
-      await expect(page).toHaveURL('/login')
+      await expect(page).toHaveURL(/\/login\?callbackUrl=/)
     })
   })
 })
