@@ -3,6 +3,14 @@ import GitHubProvider from 'next-auth/providers/github'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './prisma'
 
+function normalizeEmail(value: unknown) {
+  return typeof value === 'string' && value.trim() ? value.trim().toLowerCase() : undefined
+}
+
+function getPlatformAdminEmail() {
+  return normalizeEmail(process.env.PLATFORM_ADMIN_EMAIL)
+}
+
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
   providers: [
@@ -18,6 +26,11 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user && token.sub) {
         session.user.id = token.sub
+        const platformAdminEmail = getPlatformAdminEmail()
+        const sessionEmail = normalizeEmail(session.user.email ?? token.email)
+        session.user.isPlatformAdmin = Boolean(
+          platformAdminEmail && sessionEmail === platformAdminEmail,
+        )
       }
       return session
     },
@@ -25,6 +38,11 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
       }
+
+      const platformAdminEmail = getPlatformAdminEmail()
+      token.isPlatformAdmin = Boolean(
+        platformAdminEmail && normalizeEmail(token.email) === platformAdminEmail,
+      )
       return token
     },
   },

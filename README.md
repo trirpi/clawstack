@@ -156,6 +156,7 @@ NEXTAUTH_SECRET=<run: openssl rand -base64 32>
 NEXTAUTH_URL=https://your-app.vercel.app
 GITHUB_ID=<from github.com/settings/developers>
 GITHUB_SECRET=<from GitHub OAuth app>
+PLATFORM_ADMIN_EMAIL=tristan.trouwen@gmail.com
 STRIPE_SECRET_KEY=sk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```

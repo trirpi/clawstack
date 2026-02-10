@@ -20,13 +20,14 @@ export async function POST(request: Request, { params }: Props) {
   if (!session?.user?.id) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
+  const isPlatformAdmin = session.user.isPlatformAdmin === true
 
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
   }
 
   const user = await getCurrentUser()
-  if (!user?.publication) {
+  if (!isPlatformAdmin && !user?.publication) {
     return NextResponse.json({ error: 'No publication found' }, { status: 404 })
   }
 
@@ -40,7 +41,11 @@ export async function POST(request: Request, { params }: Props) {
     select: { publicationId: true, postId: true },
   })
 
-  if (!report || report.publicationId !== user.publication.id) {
+  if (!report) {
+    return NextResponse.json({ error: 'Report not found' }, { status: 404 })
+  }
+
+  if (!isPlatformAdmin && report.publicationId !== user?.publication?.id) {
     return NextResponse.json({ error: 'Report not found' }, { status: 404 })
   }
 

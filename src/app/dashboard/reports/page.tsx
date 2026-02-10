@@ -71,6 +71,12 @@ interface ReportRow {
     slug: string
     published: boolean
   }
+  publication: {
+    id: string
+    slug: string
+    name: string
+    userId: string
+  }
 }
 
 export default async function ReportsPage({ searchParams }: Props) {
@@ -81,16 +87,19 @@ export default async function ReportsPage({ searchParams }: Props) {
   }
 
   const user = await getCurrentUser()
+  const isPlatformAdmin = session.user.isPlatformAdmin === true
 
-  if (!user?.publication) {
+  if (!isPlatformAdmin && !user?.publication) {
     redirect('/dashboard')
   }
-  const publication = user.publication
+
+  const publicationId = user?.publication?.id
+  const scopeWhere = isPlatformAdmin ? {} : { publicationId }
   const { status, reason } = await searchParams
   const activeFilter = normalizeFilter(status)
   const activeReason = normalizeReasonFilter(reason)
   const where = {
-    publicationId: publication.id,
+    ...scopeWhere,
     ...(activeFilter === 'ALL' ? {} : { status: activeFilter }),
     ...(activeReason === 'ALL' ? {} : { reason: activeReason }),
   }
@@ -131,6 +140,14 @@ export default async function ReportsPage({ searchParams }: Props) {
       prisma.report.findMany({
         where,
         include: {
+          publication: {
+            select: {
+              id: true,
+              slug: true,
+              name: true,
+              userId: true,
+            },
+          },
           post: {
             select: {
               id: true,
@@ -145,31 +162,31 @@ export default async function ReportsPage({ searchParams }: Props) {
       }),
       prisma.report.groupBy({
         by: ['status'],
-        where: { publicationId: publication.id },
+        where: scopeWhere,
         _count: { _all: true },
       }),
       prisma.report.groupBy({
         by: ['reason'],
-        where: { publicationId: publication.id },
+        where: scopeWhere,
         _count: { _all: true },
       }),
       prisma.report.groupBy({
         by: ['postId'],
-        where: { publicationId: publication.id },
+        where: scopeWhere,
         _count: { _all: true },
       }),
       prisma.report.groupBy({
         by: ['reporterEmail'],
-        where: { publicationId: publication.id, reporterEmail: { not: null } },
+        where: { ...scopeWhere, reporterEmail: { not: null } },
         _count: { _all: true },
       }),
       prisma.report.groupBy({
         by: ['reporterIp'],
-        where: { publicationId: publication.id, reporterIp: { not: null } },
+        where: { ...scopeWhere, reporterIp: { not: null } },
         _count: { _all: true },
       }),
       prisma.report.count({ where }),
-      prisma.report.count({ where: { publicationId: publication.id } }),
+      prisma.report.count({ where: scopeWhere }),
     ])
 
     reports = reportRows
@@ -226,10 +243,14 @@ export default async function ReportsPage({ searchParams }: Props) {
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Reports</h1>
             <p className="text-sm text-gray-600">
-              Review reports for content in your publication.
+              {isPlatformAdmin
+                ? 'Review reports across all publications.'
+                : 'Review reports for content in your publication.'}
             </p>
             <p className="text-xs text-gray-700 mt-1">
-              Admin for this dashboard is the publication owner account.
+              {isPlatformAdmin
+                ? 'Signed in as platform admin.'
+                : 'Admin for this dashboard is the publication owner account.'}
             </p>
           </div>
           {!missingModerationSchema && (
@@ -249,7 +270,7 @@ export default async function ReportsPage({ searchParams }: Props) {
               Reports table is missing in this environment. Run schema sync for your production database, then refresh.
             </p>
             <code className="mt-3 block rounded bg-amber-100 px-3 py-2 text-xs text-amber-950">
-              npx prisma db push
+              npx prisma migrate deploy
             </code>
           </div>
         )}
@@ -375,6 +396,11 @@ export default async function ReportsPage({ searchParams }: Props) {
                     <h3 className="mt-2 text-lg font-semibold text-gray-900">
                       {report.post.title}
                     </h3>
+                    {isPlatformAdmin && (
+                      <p className="mt-1 text-xs text-gray-600">
+                        Publication: {report.publication.name}
+                      </p>
+                    )}
                     {report.details && (
                       <p className="mt-2 text-sm text-gray-600">{report.details}</p>
                     )}
@@ -408,7 +434,7 @@ export default async function ReportsPage({ searchParams }: Props) {
                       </form>
                     )}
                     <a
-                      href={`/${publication.slug}/${report.post.slug}`}
+                      href={`/${report.publication.slug}/${report.post.slug}`}
                       className="text-sm text-orange-600 hover:text-orange-700"
                     >
                       View post
