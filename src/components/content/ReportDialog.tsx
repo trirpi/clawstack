@@ -18,10 +18,11 @@ const REASONS = [
   { value: 'violent_extremism', label: 'Violent extremism or hate speech' },
   { value: 'other', label: 'Other' },
 ] as const
+type ReportReason = (typeof REASONS)[number]['value']
 
 export function ReportDialog({ postId, publicationId, postSlug, publicationSlug }: ReportDialogProps) {
   const [open, setOpen] = useState(false)
-  const [reason, setReason] = useState(REASONS[0].value)
+  const [reason, setReason] = useState<ReportReason>(REASONS[0].value)
   const [email, setEmail] = useState('')
   const [details, setDetails] = useState('')
   const [submitting, setSubmitting] = useState(false)
@@ -100,7 +101,7 @@ export function ReportDialog({ postId, publicationId, postSlug, publicationSlug 
                 <label className="text-xs font-medium text-gray-600">Reason</label>
                 <select
                   value={reason}
-                  onChange={(event) => setReason(event.target.value)}
+                  onChange={(event) => setReason(event.target.value as ReportReason)}
                   className="mt-1 w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:border-orange-500 focus:ring-2 focus:ring-orange-500"
                 >
                   {REASONS.map((item) => (
