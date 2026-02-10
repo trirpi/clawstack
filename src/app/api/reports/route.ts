@@ -4,6 +4,7 @@ import { sanitizePlainText } from '@/lib/sanitize'
 import { hasSameOriginHeader, validateReportPayload } from '@/lib/validation'
 
 const MAX_REPORTS_PER_IP_PER_DAY = 10
+const DEDUPE_WINDOW_HOURS = 24
 
 export async function POST(request: Request) {
   if (!hasSameOriginHeader(request)) {
@@ -31,6 +32,34 @@ export async function POST(request: Request) {
   const payload = validateReportPayload(await request.json().catch(() => null))
   if (!payload) {
     return NextResponse.json({ error: 'Invalid report payload' }, { status: 400 })
+  }
+
+  const post = await prisma.post.findUnique({
+    where: { id: payload.postId },
+    select: {
+      id: true,
+      publicationId: true,
+      published: true,
+    },
+  })
+
+  if (!post || post.publicationId !== payload.publicationId || !post.published) {
+    return NextResponse.json({ error: 'Invalid report target' }, { status: 400 })
+  }
+
+  const dedupeSince = new Date(Date.now() - DEDUPE_WINDOW_HOURS * 60 * 60 * 1000)
+  const duplicateReport = await prisma.report.findFirst({
+    where: {
+      postId: payload.postId,
+      publicationId: payload.publicationId,
+      reporterIp: ip,
+      createdAt: { gte: dedupeSince },
+    },
+    select: { id: true },
+  })
+
+  if (duplicateReport) {
+    return NextResponse.json({ success: true, deduplicated: true, id: duplicateReport.id })
   }
 
   const report = await prisma.report.create({

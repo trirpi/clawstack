@@ -14,12 +14,25 @@ export const metadata = {
 }
 
 const STATUS_OPTIONS = ['OPEN', 'IN_REVIEW', 'RESOLVED', 'DISMISSED'] as const
+const REASON_OPTIONS = ['adult', 'ip', 'copyright', 'violent_extremism', 'other'] as const
 type ReportStatus = (typeof STATUS_OPTIONS)[number]
 type ReportStatusFilter = ReportStatus | 'ALL'
+type ReportReason = (typeof REASON_OPTIONS)[number]
+type ReportReasonFilter = ReportReason | 'ALL'
 
 function normalizeFilter(value: string | undefined): ReportStatusFilter {
   if (!value) return 'ALL'
   return (STATUS_OPTIONS as readonly string[]).includes(value) ? (value as ReportStatus) : 'ALL'
+}
+
+function normalizeReasonFilter(value: string | undefined): ReportReasonFilter {
+  if (!value) return 'ALL'
+  return (REASON_OPTIONS as readonly string[]).includes(value) ? (value as ReportReason) : 'ALL'
+}
+
+function formatReason(reason: ReportReason | 'ALL') {
+  if (reason === 'ALL') return 'All reasons'
+  return reason.replaceAll('_', ' ')
 }
 
 function getPriority(reason: string, reportCountForPost: number, reporterCount: number) {
@@ -30,7 +43,7 @@ function getPriority(reason: string, reportCountForPost: number, reporterCount: 
 }
 
 interface Props {
-  searchParams: Promise<{ status?: string }>
+  searchParams: Promise<{ status?: string; reason?: string }>
 }
 
 export default async function ReportsPage({ searchParams }: Props) {
@@ -46,14 +59,25 @@ export default async function ReportsPage({ searchParams }: Props) {
     redirect('/dashboard')
   }
   const publication = user.publication
-  const { status } = await searchParams
+  const { status, reason } = await searchParams
   const activeFilter = normalizeFilter(status)
+  const activeReason = normalizeReasonFilter(reason)
   const where = {
     publicationId: publication.id,
     ...(activeFilter === 'ALL' ? {} : { status: activeFilter }),
+    ...(activeReason === 'ALL' ? {} : { reason: activeReason }),
   }
 
-  const [reports, statusBreakdown, postReportBreakdown, reporterEmailBreakdown, reporterIpBreakdown] =
+  const [
+    reports,
+    statusBreakdown,
+    reasonBreakdown,
+    postReportBreakdown,
+    reporterEmailBreakdown,
+    reporterIpBreakdown,
+    filteredCount,
+    totalCount,
+  ] =
     await Promise.all([
       prisma.report.findMany({
         where,
@@ -76,6 +100,11 @@ export default async function ReportsPage({ searchParams }: Props) {
         _count: { _all: true },
       }),
       prisma.report.groupBy({
+        by: ['reason'],
+        where: { publicationId: publication.id },
+        _count: { _all: true },
+      }),
+      prisma.report.groupBy({
         by: ['postId'],
         where: { publicationId: publication.id },
         _count: { _all: true },
@@ -90,6 +119,8 @@ export default async function ReportsPage({ searchParams }: Props) {
         where: { publicationId: publication.id, reporterIp: { not: null } },
         _count: { _all: true },
       }),
+      prisma.report.count({ where }),
+      prisma.report.count({ where: { publicationId: publication.id } }),
     ])
 
   const statusCounts: Record<ReportStatus, number> = {
@@ -101,6 +132,18 @@ export default async function ReportsPage({ searchParams }: Props) {
   for (const item of statusBreakdown) {
     if ((STATUS_OPTIONS as readonly string[]).includes(item.status)) {
       statusCounts[item.status as ReportStatus] = item._count._all
+    }
+  }
+  const reasonCounts: Record<ReportReason, number> = {
+    adult: 0,
+    ip: 0,
+    copyright: 0,
+    violent_extremism: 0,
+    other: 0,
+  }
+  for (const item of reasonBreakdown) {
+    if ((REASON_OPTIONS as readonly string[]).includes(item.reason)) {
+      reasonCounts[item.reason as ReportReason] = item._count._all
     }
   }
 
@@ -115,7 +158,15 @@ export default async function ReportsPage({ searchParams }: Props) {
       .filter((item) => Boolean(item.reporterIp))
       .map((item) => [item.reporterIp as string, item._count._all]),
   )
-  const totalReports = Object.values(statusCounts).reduce((sum, count) => sum + count, 0)
+  const totalReports = totalCount
+
+  function buildFilterHref(nextStatus: ReportStatusFilter, nextReason: ReportReasonFilter) {
+    const params = new URLSearchParams()
+    if (nextStatus !== 'ALL') params.set('status', nextStatus)
+    if (nextReason !== 'ALL') params.set('reason', nextReason)
+    const query = params.toString()
+    return query ? `/dashboard/reports?${query}` : '/dashboard/reports'
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -129,7 +180,12 @@ export default async function ReportsPage({ searchParams }: Props) {
               Review reports for content in your publication.
             </p>
           </div>
-          <Notice tone="info" message={`${reports.length} total report${reports.length === 1 ? '' : 's'}`} />
+          <Notice
+            tone="info"
+            message={`Showing ${Math.min(reports.length, filteredCount)} of ${filteredCount} filtered report${
+              filteredCount === 1 ? '' : 's'
+            } (${totalReports} total)`}
+          />
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
@@ -156,13 +212,35 @@ export default async function ReportsPage({ searchParams }: Props) {
             const isActive = activeFilter === filter
             const label = filter === 'ALL' ? 'All' : filter.replace('_', ' ')
             const count = filter === 'ALL' ? totalReports : statusCounts[filter]
-            const href = filter === 'ALL' ? '/dashboard/reports' : `/dashboard/reports?status=${filter}`
+            const href = buildFilterHref(filter, activeReason)
 
             return (
               <Link
                 key={filter}
                 href={href}
                 className={`rounded-full border px-3 py-1.5 text-sm ${
+                  isActive
+                    ? 'border-orange-500 bg-orange-50 text-orange-700'
+                    : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
+                }`}
+              >
+                {label} ({count})
+              </Link>
+            )
+          })}
+        </div>
+        <div className="mb-6 flex flex-wrap gap-2">
+          {(['ALL', ...REASON_OPTIONS] as const).map((filter) => {
+            const isActive = activeReason === filter
+            const label = formatReason(filter)
+            const count = filter === 'ALL' ? totalReports : reasonCounts[filter]
+            const href = buildFilterHref(activeFilter, filter)
+
+            return (
+              <Link
+                key={filter}
+                href={href}
+                className={`rounded-full border px-3 py-1.5 text-sm capitalize ${
                   isActive
                     ? 'border-orange-500 bg-orange-50 text-orange-700'
                     : 'border-gray-300 bg-white text-gray-700 hover:border-gray-400'
@@ -219,7 +297,7 @@ export default async function ReportsPage({ searchParams }: Props) {
                       <span className="uppercase tracking-wide">Reported</span>
                       <span>{formatDate(report.createdAt)}</span>
                       <span>•</span>
-                      <span className="uppercase tracking-wide">{report.reason}</span>
+                      <span className="uppercase tracking-wide">{report.reason.replaceAll('_', ' ')}</span>
                     </div>
                     <h3 className="mt-2 text-lg font-semibold text-gray-900">
                       {report.post.title}

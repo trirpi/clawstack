@@ -8,6 +8,13 @@ const SAFE_CATEGORY_VALUES = new Set([
 ])
 
 const SAFE_VISIBILITY_VALUES = new Set(['FREE', 'PREVIEW', 'PAID'])
+const SAFE_REPORT_REASON_VALUES = new Set([
+  'adult',
+  'ip',
+  'copyright',
+  'violent_extremism',
+  'other',
+])
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === 'object' && !Array.isArray(value)
@@ -21,6 +28,25 @@ function toCleanString(value: unknown, maxLength: number) {
 function toNullableString(value: unknown, maxLength: number) {
   const next = toCleanString(value, maxLength)
   return next.length > 0 ? next : null
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)
+}
+
+function toNullableHttpUrl(value: unknown, maxLength: number) {
+  const next = toNullableString(value, maxLength)
+  if (!next) return null
+
+  try {
+    const url = new URL(next)
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') {
+      return null
+    }
+    return url.toString()
+  } catch {
+    return null
+  }
 }
 
 function toNullableInteger(value: unknown, min: number, max: number) {
@@ -125,9 +151,13 @@ export function validateReportPayload(payload: unknown) {
   const details = toNullableString(payload.details, 2000)
   const postSlug = toNullableString(payload.postSlug, 200)
   const publicationSlug = toNullableString(payload.publicationSlug, 200)
-  const sourceUrl = toNullableString(payload.sourceUrl, 500)
+  const rawSourceUrl = toNullableString(payload.sourceUrl, 500)
+  const sourceUrl = toNullableHttpUrl(payload.sourceUrl, 500)
 
   if (!postId || !publicationId || !reason) return null
+  if (!SAFE_REPORT_REASON_VALUES.has(reason)) return null
+  if (reporterEmail && !isValidEmail(reporterEmail)) return null
+  if (rawSourceUrl && !sourceUrl) return null
 
   return {
     postId,

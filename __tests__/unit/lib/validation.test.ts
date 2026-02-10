@@ -83,6 +83,36 @@ describe('validation helpers', () => {
     expect(payload?.reason).toBe('copyright')
   })
 
+  it('rejects report payloads with invalid reason or email', () => {
+    expect(
+      validateReportPayload({
+        postId: 'post_1',
+        publicationId: 'pub_1',
+        reason: 'spam',
+      }),
+    ).toBeNull()
+
+    expect(
+      validateReportPayload({
+        postId: 'post_1',
+        publicationId: 'pub_1',
+        reason: 'copyright',
+        reporterEmail: 'not-an-email',
+      }),
+    ).toBeNull()
+  })
+
+  it('rejects report payloads with invalid source URL', () => {
+    expect(
+      validateReportPayload({
+        postId: 'post_1',
+        publicationId: 'pub_1',
+        reason: 'copyright',
+        sourceUrl: 'javascript:alert(1)',
+      }),
+    ).toBeNull()
+  })
+
   it('checks same origin headers', () => {
     process.env.NEXTAUTH_URL = 'https://example.com'
     const sameOriginRequest = new Request('https://example.com/api/test', {
