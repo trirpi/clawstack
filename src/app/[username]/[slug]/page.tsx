@@ -9,6 +9,7 @@ import { Button } from '@/components/ui/Button'
 import { SubscribeButton } from '@/components/content/SubscribeButton'
 import { formatDate } from '@/lib/utils'
 import { sanitizeHtmlBasic } from '@/lib/sanitize'
+import { ReportDialog } from '@/components/content/ReportDialog'
 
 interface Props {
   params: Promise<{ username: string; slug: string }>
@@ -211,6 +212,13 @@ export default async function PostPage({ params }: Props) {
               )}
             </section>
           )}
+
+          <ReportDialog
+            postId={post.id}
+            publicationId={post.publicationId}
+            postSlug={post.slug}
+            publicationSlug={post.publication.slug}
+          />
         </article>
       </main>
       <Footer />

@@ -4,6 +4,7 @@ import {
   hasSameOriginHeader,
   validateCommentPayload,
   validateNewsletterPayload,
+  validateReportPayload,
   validatePostPayload,
   validateSettingsPayload,
 } from '@/lib/validation'
@@ -65,6 +66,22 @@ describe('validation helpers', () => {
     expect(validateNewsletterPayload({ subject: '', content: 'Body' })).toBeNull()
   })
 
+  it('validates report payloads', () => {
+    const payload = validateReportPayload({
+      postId: 'post_1',
+      publicationId: 'pub_1',
+      reason: 'copyright',
+      reporterEmail: 'test@example.com',
+      details: 'Details',
+      postSlug: 'slug',
+      publicationSlug: 'pub',
+      sourceUrl: 'https://example.com/pub/slug',
+    })
+
+    expect(payload?.postId).toBe('post_1')
+    expect(payload?.publicationId).toBe('pub_1')
+  })
+
   it('checks same origin headers', () => {
     process.env.NEXTAUTH_URL = 'https://example.com'
     const sameOriginRequest = new Request('https://example.com/api/test', {
@@ -83,4 +100,3 @@ describe('validation helpers', () => {
     expect(escapeCsvCell('safe')).toBe('safe')
   })
 })
-

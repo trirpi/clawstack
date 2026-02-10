@@ -67,37 +67,51 @@ export default function TermsPage() {
               </li>
             </ul>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">6. Payments</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">6. Reporting and Removal Requests</h2>
+            <p>
+              We provide a reporting channel that enables end-users, rights holders, or other
+              aggrieved parties to report content that violates our Acceptable Use Policy or Terms
+              of Service and to request removal.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">7. Repeat Violators</h2>
+            <p>
+              We maintain policies and practices to address repeat violators of our Acceptable Use
+              Policy and Terms of Service, including account warnings, content removal, and
+              suspension or termination where appropriate.
+            </p>
+
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">8. Payments</h2>
             <p>
               If you offer paid subscriptions, Clawstack takes a 10% platform fee from subscription
               revenue. Payment processing is handled by Stripe and subject to their terms.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">7. Termination</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">9. Termination</h2>
             <p>
               We may terminate or suspend your account at any time for violations of these terms.
               You may also delete your account at any time.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">8. Disclaimers</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">10. Disclaimers</h2>
             <p>
               Clawstack is provided &quot;as is&quot; without warranties of any kind. We do not guarantee
               that the service will be uninterrupted, secure, or error-free.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">9. Limitation of Liability</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">11. Limitation of Liability</h2>
             <p>
               To the fullest extent permitted by law, Clawstack shall not be liable for any
               indirect, incidental, special, or consequential damages.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">10. Changes to Terms</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">12. Changes to Terms</h2>
             <p>
               We may update these terms from time to time. Continued use of the service after
               changes constitutes acceptance of the new terms.
             </p>
 
-            <h2 className="text-2xl font-bold text-gray-900 mt-8">11. Contact</h2>
+            <h2 className="text-2xl font-bold text-gray-900 mt-8">13. Contact</h2>
             <p>
               Questions about these terms? Contact us at{' '}
               <a href="mailto:legal@clawstack.com" className="text-orange-600 hover:underline">

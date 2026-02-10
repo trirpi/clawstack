@@ -115,6 +115,32 @@ export function validateSendPostPayload(payload: unknown) {
   return { postId }
 }
 
+export function validateReportPayload(payload: unknown) {
+  if (!isRecord(payload)) return null
+
+  const postId = toCleanString(payload.postId, 200)
+  const publicationId = toCleanString(payload.publicationId, 200)
+  const reason = toCleanString(payload.reason, 50)
+  const reporterEmail = toNullableString(payload.reporterEmail, 200)
+  const details = toNullableString(payload.details, 2000)
+  const postSlug = toNullableString(payload.postSlug, 200)
+  const publicationSlug = toNullableString(payload.publicationSlug, 200)
+  const sourceUrl = toNullableString(payload.sourceUrl, 500)
+
+  if (!postId || !publicationId || !reason) return null
+
+  return {
+    postId,
+    publicationId,
+    reason,
+    reporterEmail,
+    details,
+    postSlug,
+    publicationSlug,
+    sourceUrl,
+  }
+}
+
 export function hasSameOriginHeader(request: Request) {
   const origin = request.headers.get('origin')
   if (!origin) return true
@@ -137,4 +163,3 @@ export function escapeCsvCell(value: string) {
   }
   return normalized
 }
-
