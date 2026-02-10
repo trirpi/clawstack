@@ -1,53 +1,53 @@
 const features = [
   {
-    icon: '📝',
-    title: 'Rich Publishing',
+    icon: '✍︎',
+    title: 'Rich Editor',
     description:
-      'Write articles, share code snippets with syntax highlighting, and embed scripts directly in your posts.',
+      'Write long-form posts with headings, code blocks, links, highlights, and image embeds.',
   },
   {
-    icon: '🔌',
-    title: 'One-Click Install',
+    icon: '🔐',
+    title: 'Access Controls',
     description:
-      'Readers can install your scripts and plugins directly to Clawstack with a single click.',
+      'Choose Free, Preview, or Paid visibility per post to tune what readers can access.',
   },
   {
     icon: '💰',
     title: 'Paid Subscriptions',
     description:
-      'Monetize your expertise. Offer free and premium content, keep 90% of subscription revenue.',
+      'Connect Stripe and monetize your publication with recurring subscriptions.',
   },
   {
-    icon: '📊',
-    title: 'Analytics',
+    icon: '📬',
+    title: 'Newsletter Sending',
     description:
-      'Track views, subscribers, and engagement. Understand what resonates with your audience.',
+      'Send post updates to subscribers directly from the dashboard newsletter flow.',
   },
   {
-    icon: '🤖',
-    title: 'AI-Native Format',
+    icon: '🧰',
+    title: 'Boilerplate Templates',
     description:
-      'Content formatted for AI agents. YAML frontmatter, .claw file downloads, and machine-readable metadata.',
+      'Start faster with template posts for scripts, tutorials, and incident reports.',
   },
   {
-    icon: '🌐',
-    title: 'Community',
+    icon: '🛡',
+    title: 'Reporting + Moderation',
     description:
-      'Comments, discussions, and recommendations. Connect with the Clawstack community.',
+      'Users can report violating content and admins can review, track, and resolve reports.',
   },
 ]
 
 export function Features() {
   return (
-    <section className="py-20 sm:py-32">
+    <section className="py-20 sm:py-24">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mx-auto max-w-2xl text-center">
           <div className="deco-kicker mb-3">Craft + Commerce</div>
           <h2 className="deco-title text-3xl font-semibold tracking-tight text-gray-900 sm:text-4xl">
-            Everything you need to share AI automations
+            Clear, practical tools for creator-run publications
           </h2>
-          <p className="mt-4 text-lg text-gray-700">
-            Built specifically for the Clawstack community
+          <p className="mt-4 text-lg text-gray-800">
+            Focused feature set, no hype copy
           </p>
         </div>
 
@@ -55,13 +55,15 @@ export function Features() {
           {features.map((feature) => (
             <div
               key={feature.title}
-              className="deco-card rounded-2xl p-8 hover:-translate-y-0.5 transition-all"
+              className="deco-card rounded-2xl p-8 transition-all hover:-translate-y-0.5"
             >
-              <div className="text-4xl mb-4">{feature.icon}</div>
+              <div className="mb-4 inline-flex rounded-lg border border-black/20 bg-[#f6e8d2] px-3 py-2 text-3xl">
+                {feature.icon}
+              </div>
               <h3 className="deco-title text-xl font-semibold text-gray-900">
                 {feature.title}
               </h3>
-              <p className="mt-2 text-gray-700">{feature.description}</p>
+              <p className="mt-2 text-gray-800">{feature.description}</p>
             </div>
           ))}
         </div>

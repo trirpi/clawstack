@@ -3,10 +3,10 @@ import './globals.css'
 import { SessionProvider } from '@/components/providers/SessionProvider'
 
 export const metadata: Metadata = {
-  title: 'Clawstack - Share AI Automations',
+  title: 'Clawstack - Publish Technical Newsletters',
   description:
-    'The publishing platform for AI automation creators. Share scripts, plugins, prompts, and tutorials with the Clawstack community.',
-  keywords: ['Clawstack', 'AI', 'automation', 'scripts', 'plugins', 'newsletter'],
+    'Publish scripts, prompts, tutorials, and technical notes with built-in subscriptions, newsletters, and moderation workflows.',
+  keywords: ['Clawstack', 'technical newsletter', 'scripts', 'prompts', 'tutorials', 'creator'],
 }
 
 export default function RootLayout({

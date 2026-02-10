@@ -167,8 +167,8 @@ test.describe('Hero Section', () => {
   test('hero should have stats section', async ({ page }) => {
     await gotoPage(page, '/')
     
-    await expect(page.getByText('Active Creators')).toBeVisible()
-    await expect(page.getByText('Scripts Shared')).toBeVisible()
+    await expect(page.getByText('Post formats available now')).toBeVisible()
+    await expect(page.getByText('Reader access modes')).toBeVisible()
   })
 })
 

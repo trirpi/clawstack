@@ -1,48 +1,67 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/Button'
+import { HeroPoster } from '@/components/landing/HeroPoster'
+
+const proofPoints = [
+  {
+    label: 'Post formats available now',
+    value: '6',
+  },
+  {
+    label: 'Reader access modes',
+    value: 'Free / Preview / Paid',
+  },
+  {
+    label: 'Publishing model',
+    value: 'Web posts + subscriber email',
+  },
+]
 
 export function Hero() {
   return (
-    <section className="relative overflow-hidden py-20 sm:py-32">
+    <section className="relative overflow-hidden py-16 sm:py-24">
+      <div className="deco-hero-glow pointer-events-none absolute inset-0" />
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center deco-card rounded-3xl px-6 py-10 sm:px-10 sm:py-14">
-          <div className="deco-kicker mb-4">Independent Publishing</div>
-          <h1 className="deco-title text-4xl font-semibold tracking-tight text-gray-900 sm:text-6xl">
-            Share your{' '}
-            <span className="text-amber-700">Clawstack</span>{' '}
-            creations with the world
-          </h1>
-          <p className="mt-6 text-lg leading-8 text-gray-700">
-            The publishing platform for AI automation creators. Share scripts,
-            plugins, prompts, and tutorials. Build an audience and earn from your
-            expertise.
-          </p>
-          <div className="mt-10 flex items-center justify-center gap-4">
-            <Link href="/login">
-              <Button size="lg">Start Publishing</Button>
-            </Link>
-            <Link href="/explore">
-              <Button variant="outline" size="lg">
-                Explore Content
-              </Button>
-            </Link>
+        <div className="grid items-center gap-10 lg:grid-cols-[1.1fr_0.9fr]">
+          <div>
+            <div className="deco-kicker mb-4">Independent Publishing</div>
+            <h1 className="deco-title text-4xl font-semibold tracking-tight text-gray-900 sm:text-6xl">
+              Publish technical newsletters on Clawstack
+              <span className="block text-amber-800">without the platform noise</span>
+            </h1>
+            <p className="mt-6 max-w-2xl text-lg leading-8 text-gray-800">
+              This publishing platform is for creators sharing scripts, prompts, tutorials, and
+              operator notes. No inflated vanity metrics on this page, just what the
+              product already supports.
+            </p>
+            <div className="mt-10 flex flex-wrap items-center gap-4">
+              <Link href="/login">
+                <Button size="lg">Start Publishing</Button>
+              </Link>
+              <Link href="/explore">
+                <Button
+                  variant="outline"
+                  size="lg"
+                  className="border-black/45 text-gray-900 hover:bg-black/5"
+                >
+                  Explore Content
+                </Button>
+              </Link>
+            </div>
+            <p className="mt-4 text-sm font-medium text-gray-700">
+              Built for clear writing, paid subscriptions, and practical moderation.
+            </p>
           </div>
+          <HeroPoster />
         </div>
 
-        {/* Stats */}
-        <div className="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-3">
-          <div className="text-center deco-card rounded-2xl p-5">
-            <div className="deco-title text-4xl font-semibold text-amber-700">10K+</div>
-            <div className="mt-2 text-gray-700">Active Creators</div>
-          </div>
-          <div className="text-center deco-card rounded-2xl p-5">
-            <div className="deco-title text-4xl font-semibold text-amber-700">50K+</div>
-            <div className="mt-2 text-gray-700">Scripts Shared</div>
-          </div>
-          <div className="text-center deco-card rounded-2xl p-5">
-            <div className="deco-title text-4xl font-semibold text-amber-700">90%</div>
-            <div className="mt-2 text-gray-700">Creator Earnings</div>
-          </div>
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {proofPoints.map((point) => (
+            <div key={point.label} className="deco-card rounded-2xl border-black/20 px-5 py-4">
+              <div className="deco-title text-xl font-semibold text-amber-800">{point.value}</div>
+              <div className="mt-1 text-sm font-medium text-gray-800">{point.label}</div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

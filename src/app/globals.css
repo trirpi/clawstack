@@ -17,11 +17,11 @@
 }
 
 :root {
-  --background: #f6f1e7;
-  --foreground: #101010;
+  --background: #f3eadb;
+  --foreground: #0f0f0f;
   --font-inter: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --font-serif: 'Iowan Old Style', 'Palatino Linotype', 'Book Antiqua', Palatino, 'Times New Roman', serif;
-  --deco-accent: #b45309;
+  --deco-accent: #9a3412;
   --deco-ink: #111111;
 }
 
@@ -36,9 +36,9 @@ body {
   background: var(--background);
   color: var(--foreground);
   background-image:
-    radial-gradient(circle at 15% 15%, rgba(180, 83, 9, 0.08), transparent 34%),
-    radial-gradient(circle at 85% 0%, rgba(17, 17, 17, 0.06), transparent 28%),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.45), rgba(246, 241, 231, 0.45));
+    radial-gradient(circle at 15% 15%, rgba(154, 52, 18, 0.08), transparent 34%),
+    radial-gradient(circle at 85% 0%, rgba(17, 17, 17, 0.06), transparent 30%),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.45), rgba(243, 234, 219, 0.6));
 }
 
 .deco-title {
@@ -56,10 +56,67 @@ body {
 
 .deco-card {
   border: 1px solid rgba(16, 16, 16, 0.15);
-  background: rgba(255, 255, 255, 0.86);
+  background: rgba(255, 255, 255, 0.9);
   box-shadow:
     0 1px 0 rgba(16, 16, 16, 0.08),
     0 10px 22px rgba(16, 16, 16, 0.06);
+}
+
+.deco-frame {
+  border: 1.5px solid rgba(16, 16, 16, 0.5);
+  box-shadow:
+    0 1px 0 rgba(16, 16, 16, 0.18),
+    0 16px 30px rgba(16, 16, 16, 0.08);
+}
+
+.deco-badge {
+  border: 1px solid rgba(16, 16, 16, 0.28);
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 9999px;
+  color: #111827;
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  padding: 0.32rem 0.6rem;
+}
+
+.deco-hero-glow {
+  background:
+    radial-gradient(circle at 22% 20%, rgba(154, 52, 18, 0.16), transparent 38%),
+    radial-gradient(circle at 78% 10%, rgba(0, 0, 0, 0.1), transparent 32%);
+}
+
+.deco-sunburst {
+  background:
+    repeating-conic-gradient(
+      from -9deg,
+      rgba(17, 17, 17, 0.24) 0deg 2deg,
+      rgba(17, 17, 17, 0.02) 2deg 9deg
+    );
+  animation: deco-spin 36s linear infinite;
+}
+
+.deco-grain {
+  background-image:
+    radial-gradient(rgba(17, 17, 17, 0.08) 0.7px, transparent 0.7px),
+    radial-gradient(rgba(17, 17, 17, 0.06) 0.7px, transparent 0.7px);
+  background-size: 4px 4px, 5px 5px;
+  background-position: 0 0, 1px 1px;
+}
+
+@keyframes deco-spin {
+  from {
+    transform: translateX(-50%) rotate(0deg);
+  }
+  to {
+    transform: translateX(-50%) rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .deco-sunburst {
+    animation: none;
+  }
 }
 
 /* Custom scrollbar */

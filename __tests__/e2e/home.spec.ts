@@ -47,17 +47,17 @@ test.describe('Home Page', () => {
     await gotoPage(page, '/')
     
     // Check for feature cards
-    await expect(page.getByText('Rich Publishing')).toBeVisible()
-    await expect(page.getByText('One-Click Install')).toBeVisible()
-    await expect(page.getByText('Paid Subscriptions')).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Rich Editor' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Access Controls' })).toBeVisible()
+    await expect(page.getByRole('heading', { name: 'Paid Subscriptions' })).toBeVisible()
   })
 
   test('should display stats section', async ({ page }) => {
     await gotoPage(page, '/')
     
-    await expect(page.getByText('Active Creators')).toBeVisible()
-    await expect(page.getByText('Scripts Shared')).toBeVisible()
-    await expect(page.getByText('Creator Earnings')).toBeVisible()
+    await expect(page.getByText('Post formats available now')).toBeVisible()
+    await expect(page.getByText('Reader access modes')).toBeVisible()
+    await expect(page.getByText('Publishing model')).toBeVisible()
   })
 
   test('should have Clawstack logo', async ({ page }) => {

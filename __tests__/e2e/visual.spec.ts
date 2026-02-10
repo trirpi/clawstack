@@ -41,9 +41,9 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       // Scroll to features section
-      await page.getByText('Everything you need').scrollIntoViewIfNeeded()
+      await page.getByText('Clear, practical tools').scrollIntoViewIfNeeded()
       
-      const features = page.locator('section').filter({ hasText: 'Everything you need' })
+      const features = page.locator('section').filter({ hasText: 'Clear, practical tools' })
       await expect(features).toHaveScreenshot('features-section.png', {
         maxDiffPixelRatio: visualDiffPixelRatio,
       })
@@ -225,7 +225,7 @@ test.describe('Visual Regression Tests', () => {
       await gotoPage(page, '/')
       
       const featureCard = page
-        .getByRole('heading', { name: 'Rich Publishing' })
+        .getByRole('heading', { name: 'Rich Editor' })
         .locator('xpath=ancestor::div[contains(@class,"deco-card")]')
         .first()
       await featureCard.scrollIntoViewIfNeeded()
