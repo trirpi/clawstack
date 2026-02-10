@@ -32,26 +32,39 @@ export async function POST(request: Request, { params }: Props) {
 
   const { id } = await params
   const formData = await request.formData()
+  const action = String(formData.get('action') || '').trim()
   const status = String(formData.get('status') || '').trim()
-
-  if (!isValidStatus(status)) {
-    return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
-  }
 
   const report = await prisma.report.findUnique({
     where: { id },
-    select: { publicationId: true },
+    select: { publicationId: true, postId: true },
   })
 
   if (!report || report.publicationId !== user.publication.id) {
     return NextResponse.json({ error: 'Report not found' }, { status: 404 })
   }
 
-  await prisma.report.update({
-    where: { id },
-    data: { status },
-  })
+  if (action === 'TAKEDOWN_RESOLVE') {
+    await prisma.$transaction([
+      prisma.post.update({
+        where: { id: report.postId },
+        data: { published: false, publishedAt: null },
+      }),
+      prisma.report.update({
+        where: { id },
+        data: { status: 'RESOLVED' },
+      }),
+    ])
+  } else {
+    if (!isValidStatus(status)) {
+      return NextResponse.json({ error: 'Invalid status' }, { status: 400 })
+    }
+
+    await prisma.report.update({
+      where: { id },
+      data: { status },
+    })
+  }
 
   return NextResponse.redirect(new URL('/dashboard/reports', request.url))
 }
-
