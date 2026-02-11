@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { createCheckoutSession } from '@/lib/stripe'
 import { hasSameOriginHeader } from '@/lib/validation'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 function getAllowedStripePriceIds() {
   return [process.env.STRIPE_PRICE_MONTHLY_ID, process.env.STRIPE_PRICE_YEARLY_ID]
@@ -19,6 +20,16 @@ export async function POST(request: NextRequest) {
   }
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:stripe:checkout',
+    limit: 20,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many checkout attempts. Please try again shortly.')
   }
 
   try {

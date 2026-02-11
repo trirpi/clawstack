@@ -31,6 +31,7 @@ function LoginContent() {
     callbackUrlParam && callbackUrlParam.startsWith('/') && !callbackUrlParam.startsWith('//')
       ? callbackUrlParam
       : '/dashboard'
+  const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -83,6 +84,23 @@ function LoginContent() {
             Continue with GitHub
           </Button>
 
+          {googleEnabled && (
+            <Button
+              onClick={() => signIn('google', { callbackUrl })}
+              variant="secondary"
+              className="w-full flex items-center justify-center gap-3 border border-black/15 bg-white"
+              size="lg"
+            >
+              <svg className="h-5 w-5" viewBox="0 0 24 24" aria-hidden>
+                <path
+                  fill="#EA4335"
+                  d="M12 10.2v3.9h5.4c-.2 1.2-1.5 3.6-5.4 3.6-3.2 0-5.9-2.7-5.9-6s2.7-6 5.9-6c1.8 0 3 .8 3.7 1.5l2.5-2.4C16.6 3.3 14.5 2.3 12 2.3A9.7 9.7 0 0 0 2.3 12 9.7 9.7 0 0 0 12 21.7c5.6 0 9.3-3.9 9.3-9.4 0-.6-.1-1.1-.2-1.6H12Z"
+                />
+              </svg>
+              Continue with Google
+            </Button>
+          )}
+
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300" />
@@ -96,11 +114,11 @@ function LoginContent() {
 
           <p className="text-center text-sm text-gray-600">
             By signing in, you agree to our{' '}
-            <Link href="/terms" className="text-orange-600 hover:underline">
+            <Link href="/terms" className="text-amber-700 hover:underline">
               Terms of Service
             </Link>{' '}
             and{' '}
-            <Link href="/privacy" className="text-orange-600 hover:underline">
+            <Link href="/privacy" className="text-amber-700 hover:underline">
               Privacy Policy
             </Link>
           </p>

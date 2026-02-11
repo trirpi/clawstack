@@ -3,6 +3,7 @@ import { getSession, getCurrentUser } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasSameOriginHeader } from '@/lib/validation'
 import { REPORT_STATUS_VALUES, type ReportStatus } from '@/lib/moderation'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 function isValidStatus(value: string): value is ReportStatus {
   return REPORT_STATUS_VALUES.includes(value as ReportStatus)
@@ -22,6 +23,16 @@ export async function POST(request: Request, { params }: Props) {
 
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:reports:moderate',
+    limit: 120,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many moderation requests. Please try again shortly.')
   }
 
   const user = await getCurrentUser()

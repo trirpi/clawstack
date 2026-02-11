@@ -20,6 +20,7 @@ export default async function DashboardPage() {
   }
 
   const user = await getCurrentUser()
+  const isPlatformAdmin = session.user.isPlatformAdmin === true
   
   // Get or create publication
   let publication = user?.publication
@@ -84,9 +85,16 @@ export default async function DashboardPage() {
         {/* Actions */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="app-heading text-3xl">Your Posts</h1>
-          <Link href="/dashboard/new">
-            <Button>New Post</Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            {isPlatformAdmin && (
+              <Link href="/dashboard/admin">
+                <Button variant="outline">Admin</Button>
+              </Link>
+            )}
+            <Link href="/dashboard/new">
+              <Button>New Post</Button>
+            </Link>
+          </div>
         </div>
 
         {/* Posts List */}

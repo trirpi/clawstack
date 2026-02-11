@@ -74,9 +74,11 @@ export default function PricingPage() {
                 }`}
               >
                 {plan.featured && (
-                  <div className="deco-kicker mb-3 text-[#d8c7b3]">Most Popular</div>
+                  <div className="deco-kicker mb-3 text-[#f2dfca]">Most Popular</div>
                 )}
-                <h2 className={`text-2xl font-bold ${plan.featured ? 'text-white' : 'text-gray-900'}`}>
+                <h2
+                  className={`deco-title text-3xl font-semibold ${plan.featured ? 'text-[#fff5ea]' : 'text-gray-900'}`}
+                >
                   {plan.name}
                 </h2>
                 <div className="mt-4">

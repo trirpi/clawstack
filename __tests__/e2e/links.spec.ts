@@ -32,9 +32,9 @@ test.describe('Link Validation', () => {
     test('starter template should preserve callback through login redirect', async ({ page }) => {
       await gotoPage(page, '/explore')
       const templateLink = page.getByRole('link', { name: 'Use template' }).first()
-      await expect(templateLink).toHaveAttribute('href', /\/dashboard\/new\?template=/)
+      await expect(templateLink).toHaveAttribute('href', /\/login\?callbackUrl=/)
       await templateLink.click()
-      await expect(page).toHaveURL(/\/login\?callbackUrl=/)
+      await expect(page).toHaveURL(/\/login\?callbackUrl=%2Fdashboard%2Fnew%3Ftemplate%3D/)
     })
   })
 

@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasSameOriginHeader } from '@/lib/validation'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 function getPublicationId(request: Request) {
   const url = new URL(request.url)
@@ -16,6 +17,16 @@ export async function POST(request: Request) {
   }
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:subscriptions:create',
+    limit: 50,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many subscription requests.')
   }
 
   const publicationId = getPublicationId(request)
@@ -71,6 +82,16 @@ export async function DELETE(request: Request) {
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
   }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:subscriptions:delete',
+    limit: 50,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many subscription requests.')
+  }
 
   const publicationId = getPublicationId(request)
   if (!publicationId) {
@@ -86,4 +107,3 @@ export async function DELETE(request: Request) {
 
   return NextResponse.json({ success: true })
 }
-

@@ -7,6 +7,7 @@ A publishing platform for AI automation creators. Share scripts, plugins, prompt
 - **Rich Publishing** - Write articles with syntax-highlighted code blocks
 - **One-Click Install** - Readers can install scripts directly to Clawstack
 - **Paid Subscriptions** - Monetize your content with Stripe
+- **Threaded Discussions** - Nested replies with per-reply upvotes
 - **AI-Native Format** - .claw file downloads and deep linking support
 - **Community** - Comments and subscriber engagement
 
@@ -15,7 +16,7 @@ A publishing platform for AI automation creators. Share scripts, plugins, prompt
 - **Framework**: Next.js 16 with App Router
 - **Styling**: Tailwind CSS
 - **Database**: Prisma ORM with PostgreSQL (Vercel Postgres, Neon, Supabase)
-- **Auth**: NextAuth.js with GitHub OAuth
+- **Auth**: NextAuth.js with GitHub OAuth (+ optional Google OAuth)
 - **Payments**: Stripe Checkout & Connect
 - **Editor**: Tiptap rich text editor
 - **Testing**: Vitest (unit) + Playwright (E2E)
@@ -27,6 +28,7 @@ A publishing platform for AI automation creators. Share scripts, plugins, prompt
 - Node.js 20+
 - npm or yarn
 - GitHub OAuth App (for authentication)
+- Optional Google OAuth App (for a second login provider)
 - Stripe account (for payments)
 
 ### Installation
@@ -57,6 +59,7 @@ This initializes `prisma/dev.db` from `prisma/schema.sqlite.prisma`.
 
 Edit `.env` with your credentials:
 - Create a GitHub OAuth app at https://github.com/settings/developers
+- Optional: create Google OAuth credentials at https://console.cloud.google.com/apis/credentials
 - Get Stripe keys from https://dashboard.stripe.com/apikeys
 
 4. Set up the database:
@@ -156,6 +159,9 @@ NEXTAUTH_SECRET=<run: openssl rand -base64 32>
 NEXTAUTH_URL=https://your-app.vercel.app
 GITHUB_ID=<from github.com/settings/developers>
 GITHUB_SECRET=<from GitHub OAuth app>
+GOOGLE_CLIENT_ID=<optional>
+GOOGLE_CLIENT_SECRET=<optional>
+NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
 PLATFORM_ADMIN_EMAIL=tristan.trouwen@gmail.com
 STRIPE_SECRET_KEY=sk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx

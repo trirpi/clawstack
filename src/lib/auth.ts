@@ -1,5 +1,6 @@
 import { NextAuthOptions, getServerSession } from 'next-auth'
 import GitHubProvider from 'next-auth/providers/github'
+import GoogleProvider from 'next-auth/providers/google'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { prisma } from './prisma'
 
@@ -13,12 +14,25 @@ function getPlatformAdminEmail() {
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma) as NextAuthOptions['adapter'],
-  providers: [
-    GitHubProvider({
-      clientId: process.env.GITHUB_ID || '',
-      clientSecret: process.env.GITHUB_SECRET || '',
-    }),
-  ],
+  providers: (() => {
+    const providers: NextAuthOptions['providers'] = [
+      GitHubProvider({
+        clientId: process.env.GITHUB_ID || '',
+        clientSecret: process.env.GITHUB_SECRET || '',
+      }),
+    ]
+
+    if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+      providers.push(
+        GoogleProvider({
+          clientId: process.env.GOOGLE_CLIENT_ID,
+          clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+        }),
+      )
+    }
+
+    return providers
+  })(),
   session: {
     strategy: 'jwt',
   },

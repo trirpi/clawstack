@@ -11,6 +11,7 @@ import { formatDate } from '@/lib/utils'
 import { sanitizeHtmlBasic } from '@/lib/sanitize'
 import { ReportDialog } from '@/components/content/ReportDialog'
 import { CommentForm } from '@/components/content/CommentForm'
+import { CommentThread } from '@/components/content/CommentThread'
 
 interface Props {
   params: Promise<{ username: string; slug: string }>
@@ -29,20 +30,49 @@ export default async function PostPage({ params }: Props) {
       publication: {
         include: { user: true },
       },
-      comments: {
-        include: { user: true },
-        orderBy: { createdAt: 'desc' },
-      },
     },
   })
 
   if (!post) {
     notFound()
   }
-  type PostComment = (typeof post.comments)[number]
-
   const session = await getSession()
   const isOwner = session?.user?.id === post.publication.userId
+  const rawComments = await prisma.comment.findMany({
+    where: { postId: post.id },
+    include: {
+      user: {
+        select: {
+          id: true,
+          name: true,
+          image: true,
+        },
+      },
+      _count: {
+        select: { upvotes: true },
+      },
+    },
+    orderBy: { createdAt: 'asc' },
+  })
+  const viewerVoteRows = session?.user?.id
+    ? await prisma.commentUpvote.findMany({
+        where: {
+          userId: session.user.id,
+          comment: { postId: post.id },
+        },
+        select: { commentId: true },
+      })
+    : []
+  const viewerVotes = new Set(viewerVoteRows.map((item) => item.commentId))
+  const comments = rawComments.map((comment) => ({
+    id: comment.id,
+    content: comment.content,
+    createdAt: comment.createdAt.toISOString(),
+    parentId: comment.parentId,
+    user: comment.user,
+    upvoteCount: comment._count.upvotes,
+    viewerHasUpvoted: viewerVotes.has(comment.id),
+  }))
 
   // Check if user has access to paid content
   let hasAccess = post.visibility === 'FREE'
@@ -172,45 +202,15 @@ export default async function PostPage({ params }: Props) {
           {!showPaywall && (
             <section className="mt-12 pt-8 border-t border-black/20">
               <h3 className="deco-title text-2xl font-semibold text-gray-900 mb-6">
-                Comments ({post.comments.length})
+                Comments ({comments.length})
               </h3>
               <CommentForm postId={post.id} />
-              {post.comments.length === 0 ? (
+              {comments.length === 0 ? (
                 <p className="text-gray-500">
                   No comments yet. Be the first to comment!
                 </p>
               ) : (
-                <div className="space-y-6">
-                  {post.comments.map((comment: PostComment) => (
-                    <div key={comment.id} className="flex gap-4">
-                      {comment.user.image ? (
-                        <Image
-                          src={comment.user.image}
-                          alt={comment.user.name || 'User'}
-                          width={40}
-                          height={40}
-                          unoptimized
-                          className="w-10 h-10 rounded-full"
-                        />
-                      ) : (
-                        <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
-                          👤
-                        </div>
-                      )}
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2">
-                          <span className="font-medium text-gray-900">
-                            {comment.user.name || 'Anonymous'}
-                          </span>
-                          <span className="text-sm text-gray-500">
-                            {formatDate(comment.createdAt)}
-                          </span>
-                        </div>
-                        <p className="mt-1 text-gray-700">{comment.content}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+                <CommentThread postId={post.id} comments={comments} />
               )}
             </section>
           )}

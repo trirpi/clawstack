@@ -2,9 +2,10 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useSession } from 'next-auth/react'
 import { clsx } from 'clsx'
 
-const navItems = [
+const baseNavItems = [
   { href: '/dashboard', label: 'Posts', icon: '📝' },
   { href: '/dashboard/subscribers', label: 'Subscribers', icon: '👥' },
   { href: '/dashboard/earnings', label: 'Earnings', icon: '💰' },
@@ -15,6 +16,11 @@ const navItems = [
 
 export function DashboardNav() {
   const pathname = usePathname()
+  const { data: session } = useSession()
+  const isPlatformAdmin = session?.user?.isPlatformAdmin === true
+  const navItems = isPlatformAdmin
+    ? [...baseNavItems, { href: '/dashboard/admin', label: 'Admin', icon: '🛡️' }]
+    : baseNavItems
 
   return (
     <nav className="border-b border-black/15 bg-[#f8f4ea]/95 backdrop-blur">

@@ -4,6 +4,7 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { sanitizeHtmlBasic } from '@/lib/sanitize'
 import { hasSameOriginHeader, validatePostPayload } from '@/lib/validation'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -13,6 +14,16 @@ export async function POST(request: NextRequest) {
   }
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:posts:create',
+    limit: 30,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many post creation requests.')
   }
 
   try {
@@ -87,6 +98,16 @@ export async function PUT(request: NextRequest) {
   }
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:posts:update',
+    limit: 60,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many post update requests.')
   }
 
   try {

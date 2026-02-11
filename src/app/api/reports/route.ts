@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { sanitizePlainText } from '@/lib/sanitize'
 import { hasSameOriginHeader, validateReportPayload } from '@/lib/validation'
+import { consumeRateLimit, getClientIp, rateLimitResponse } from '@/lib/rateLimit'
 
 const MAX_REPORTS_PER_IP_PER_DAY = 10
 const DEDUPE_WINDOW_HOURS = 24
@@ -10,11 +11,17 @@ export async function POST(request: Request) {
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
   }
+  const shortWindowLimit = consumeRateLimit({
+    request,
+    key: 'api:reports:create',
+    limit: 8,
+    windowMs: 15 * 60 * 1000,
+  })
+  if (!shortWindowLimit.allowed) {
+    return rateLimitResponse(shortWindowLimit, 'Too many reports submitted. Please try again later.')
+  }
 
-  const ip =
-    request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    request.headers.get('x-real-ip') ||
-    'unknown'
+  const ip = getClientIp(request)
   const today = new Date()
   today.setHours(0, 0, 0, 0)
 

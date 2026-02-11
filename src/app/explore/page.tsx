@@ -5,6 +5,7 @@ import { Header } from '@/components/layout/Header'
 import { Footer } from '@/components/layout/Footer'
 import { formatDate } from '@/lib/utils'
 import { POST_TEMPLATES } from '@/lib/postTemplates'
+import { AuthCtaLink } from '@/components/ui/AuthCtaLink'
 
 export const metadata = {
   title: 'Explore - Clawstack',
@@ -176,12 +177,14 @@ export default async function ExplorePage() {
                   <p className="mt-2 text-gray-700">{post.excerpt}</p>
                   <div className="mt-3 flex items-center justify-between text-sm text-gray-600">
                     <span>{post.publicationName}</span>
-                    <Link
-                      href={`/dashboard/new?template=${post.key}`}
-                      className="text-amber-700 hover:text-amber-800 font-medium"
+                    <AuthCtaLink
+                      authenticatedHref={`/dashboard/new?template=${post.key}`}
+                      callbackHref={`/dashboard/new?template=${post.key}`}
                     >
-                      Use template
-                    </Link>
+                      <span className="cursor-pointer text-amber-700 hover:text-amber-800 font-medium">
+                        Use template
+                      </span>
+                    </AuthCtaLink>
                   </div>
                 </article>
               ))}

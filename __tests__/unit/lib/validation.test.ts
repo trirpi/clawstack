@@ -3,6 +3,7 @@ import {
   escapeCsvCell,
   hasSameOriginHeader,
   validateCommentPayload,
+  validateCommentVotePayload,
   validateNewsletterPayload,
   validateReportPayload,
   validatePostPayload,
@@ -76,8 +77,23 @@ describe('validation helpers', () => {
     expect(validateCommentPayload({ postId: 'post_1', content: 'hello' })).toEqual({
       postId: 'post_1',
       content: 'hello',
+      parentId: null,
+    })
+    expect(
+      validateCommentPayload({ postId: 'post_1', content: 'hello', parentId: 'comment_1' }),
+    ).toEqual({
+      postId: 'post_1',
+      content: 'hello',
+      parentId: 'comment_1',
     })
     expect(validateCommentPayload({ postId: 'post_1', content: '' })).toBeNull()
+  })
+
+  it('validates comment vote payloads', () => {
+    expect(validateCommentVotePayload({ commentId: 'comment_1' })).toEqual({
+      commentId: 'comment_1',
+    })
+    expect(validateCommentVotePayload({ commentId: '' })).toBeNull()
   })
 
   it('validates newsletter payloads', () => {

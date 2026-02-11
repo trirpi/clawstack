@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma'
 import { Resend } from 'resend'
 import { sanitizeHtmlBasic, sanitizePlainText } from '@/lib/sanitize'
 import { hasSameOriginHeader, validateNewsletterPayload } from '@/lib/validation'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 const resend = process.env.RESEND_API_KEY 
   ? new Resend(process.env.RESEND_API_KEY)
@@ -18,6 +19,16 @@ export async function POST(request: Request) {
     }
     if (!hasSameOriginHeader(request)) {
       return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+    }
+    const rateLimit = consumeRateLimit({
+      request,
+      key: 'api:newsletter:send',
+      limit: 12,
+      windowMs: 60 * 60 * 1000,
+      identifier: session.user.id,
+    })
+    if (!rateLimit.allowed) {
+      return rateLimitResponse(rateLimit, 'Too many newsletter sends. Please try again later.')
     }
 
     const user = await getCurrentUser()

@@ -4,6 +4,7 @@ import path from 'path'
 import { put } from '@vercel/blob'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 import { hasSameOriginHeader } from '@/lib/validation'
 
 export const runtime = 'nodejs'
@@ -85,6 +86,16 @@ export async function POST(request: NextRequest) {
   }
   if (!hasSameOriginHeader(request)) {
     return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+  }
+  const rateLimit = consumeRateLimit({
+    request,
+    key: 'api:uploads:image',
+    limit: 40,
+    windowMs: 10 * 60 * 1000,
+    identifier: session.user.id,
+  })
+  if (!rateLimit.allowed) {
+    return rateLimitResponse(rateLimit, 'Too many image uploads. Please wait and retry.')
   }
 
   const formData = await request.formData()

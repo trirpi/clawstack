@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { hasSameOriginHeader, validateSettingsPayload } from '@/lib/validation'
+import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
 export async function PUT(request: Request) {
   try {
@@ -12,6 +13,16 @@ export async function PUT(request: Request) {
     }
     if (!hasSameOriginHeader(request)) {
       return NextResponse.json({ error: 'Invalid request origin' }, { status: 403 })
+    }
+    const rateLimit = consumeRateLimit({
+      request,
+      key: 'api:settings:update',
+      limit: 20,
+      windowMs: 10 * 60 * 1000,
+      identifier: session.user.id,
+    })
+    if (!rateLimit.allowed) {
+      return rateLimitResponse(rateLimit, 'Too many settings updates. Please wait a moment.')
     }
 
     const payload = validateSettingsPayload(await request.json())

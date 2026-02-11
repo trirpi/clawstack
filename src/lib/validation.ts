@@ -127,9 +127,19 @@ export function validateCommentPayload(payload: unknown) {
 
   const postId = toCleanString(payload.postId, 200)
   const content = toCleanString(payload.content, 4_000)
+  const parentId = toNullableString(payload.parentId, 200)
   if (!postId || !content) return null
 
-  return { postId, content }
+  return { postId, content, parentId }
+}
+
+export function validateCommentVotePayload(payload: unknown) {
+  if (!isRecord(payload)) return null
+
+  const commentId = toCleanString(payload.commentId, 200)
+  if (!commentId) return null
+
+  return { commentId }
 }
 
 export function validateNewsletterPayload(payload: unknown) {

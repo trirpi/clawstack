@@ -76,7 +76,7 @@ export async function POST(request: NextRequest) {
 }
 
 async function handleCheckoutComplete(
-  stripeClient: Stripe,
+  _stripeClient: Stripe,
   session: Stripe.Checkout.Session
 ) {
   const publicationId = session.metadata?.publicationId
@@ -84,34 +84,23 @@ async function handleCheckoutComplete(
   const customerId = session.customer as string
   const subscriptionId = session.subscription as string
 
-  if (!publicationId || !customerId || !subscriptionId) {
+  if (!publicationId || !userIdFromMetadata || !customerId || !subscriptionId) {
     console.error('Missing required metadata in checkout session')
     return
   }
 
-  let user = userIdFromMetadata
-    ? await prisma.user.findUnique({
-        where: { id: userIdFromMetadata },
-      })
-    : null
+  const user = await prisma.user.findUnique({
+    where: { id: userIdFromMetadata },
+    select: { id: true, stripeCustomerId: true },
+  })
 
   if (!user) {
-    user = await prisma.user.findFirst({
-      where: { stripeCustomerId: customerId },
-    })
+    console.error('User not found for Stripe metadata userId:', userIdFromMetadata)
+    return
   }
 
-  if (!user) {
-    const customer = await stripeClient.customers.retrieve(customerId)
-    if (!customer.deleted && customer.email) {
-      user = await prisma.user.findUnique({
-        where: { email: customer.email },
-      })
-    }
-  }
-
-  if (!user) {
-    console.error('User not found for customer:', customerId)
+  if (user.stripeCustomerId && user.stripeCustomerId !== customerId) {
+    console.error('Stripe customer mismatch for user:', userIdFromMetadata)
     return
   }
 
