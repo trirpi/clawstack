@@ -17,4 +17,22 @@ describe('Stripe utilities', () => {
     // In production, it would be a Stripe instance
     expect(stripe === null || typeof stripe === 'object').toBe(true)
   })
+
+  it('should throw a typed configuration error when Stripe is not configured', async () => {
+    const stripeModule = await import('@/lib/stripe')
+    if (stripeModule.stripe) {
+      // Skip in environments where Stripe is configured.
+      return
+    }
+
+    await expect(
+      stripeModule.createCheckoutSession({
+        priceId: 'price_test',
+        userId: 'user_1',
+        publicationId: 'pub_1',
+        successUrl: 'http://localhost:3000/success',
+        cancelUrl: 'http://localhost:3000/cancel',
+      }),
+    ).rejects.toMatchObject({ name: 'StripeConfigurationError' })
+  })
 })

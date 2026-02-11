@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   description:
     'Publish scripts, prompts, tutorials, and technical notes with built-in subscriptions, newsletters, and moderation workflows.',
   keywords: ['Clawstack', 'technical newsletter', 'scripts', 'prompts', 'tutorials', 'creator'],
+  icons: {
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
 }
 
 export default function RootLayout({

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
-import { createCheckoutSession } from '@/lib/stripe'
+import { createCheckoutSession, isStripeConfigurationError } from '@/lib/stripe'
 import { hasSameOriginHeader } from '@/lib/validation'
 import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
 
@@ -88,6 +88,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ url: checkoutSession.url })
   } catch (error) {
     console.error('Error creating checkout session:', error)
+    if (isStripeConfigurationError(error)) {
+      return NextResponse.json({ error: error.message }, { status: 503 })
+    }
     return NextResponse.json(
       { error: 'Failed to create checkout session' },
       { status: 500 }

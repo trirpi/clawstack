@@ -5,12 +5,14 @@ const {
   getServerSessionMock,
   hasSameOriginHeaderMock,
   createCheckoutSessionMock,
+  isStripeConfigurationErrorMock,
   publicationFindUniqueMock,
   userFindUniqueMock,
 } = vi.hoisted(() => ({
   getServerSessionMock: vi.fn(),
   hasSameOriginHeaderMock: vi.fn(),
   createCheckoutSessionMock: vi.fn(),
+  isStripeConfigurationErrorMock: vi.fn(),
   publicationFindUniqueMock: vi.fn(),
   userFindUniqueMock: vi.fn(),
 }))
@@ -25,6 +27,7 @@ vi.mock('@/lib/validation', () => ({
 
 vi.mock('@/lib/stripe', () => ({
   createCheckoutSession: createCheckoutSessionMock,
+  isStripeConfigurationError: isStripeConfigurationErrorMock,
 }))
 
 vi.mock('@/lib/prisma', () => ({
@@ -77,6 +80,7 @@ describe('POST /api/stripe/checkout', () => {
     createCheckoutSessionMock.mockResolvedValue({
       url: 'https://checkout.stripe.test/session',
     })
+    isStripeConfigurationErrorMock.mockReturnValue(false)
   })
 
   it('returns 401 when user is not authenticated', async () => {
@@ -145,6 +149,17 @@ describe('POST /api/stripe/checkout', () => {
       successUrl: 'http://localhost:3000/pub-one?subscribed=true',
       cancelUrl: 'http://localhost:3000/pub-one',
     })
+  })
+
+  it('returns 503 for Stripe configuration errors', async () => {
+    createCheckoutSessionMock.mockRejectedValue(new Error('Stripe missing'))
+    isStripeConfigurationErrorMock.mockReturnValue(true)
+
+    const response = await POST(createRequest({ publicationId: 'pub_1', priceId: 'price_monthly' }))
+    const body = await response.json()
+
+    expect(response.status).toBe(503)
+    expect(body.error).toContain('Stripe')
   })
 
   afterAll(() => {

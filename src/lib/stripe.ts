@@ -6,9 +6,20 @@ export const stripe: Stripe | null = stripeKey
   ? new Stripe(stripeKey, { apiVersion: '2026-01-28.clover' })
   : null
 
+export class StripeConfigurationError extends Error {
+  constructor(message = 'Stripe is not configured. Please set STRIPE_SECRET_KEY.') {
+    super(message)
+    this.name = 'StripeConfigurationError'
+  }
+}
+
+export function isStripeConfigurationError(error: unknown): error is StripeConfigurationError {
+  return error instanceof StripeConfigurationError
+}
+
 function assertStripeConfigured(candidate: Stripe | null): asserts candidate is Stripe {
   if (!candidate) {
-    throw new Error('Stripe is not configured. Please set STRIPE_SECRET_KEY.')
+    throw new StripeConfigurationError()
   }
 }
 
