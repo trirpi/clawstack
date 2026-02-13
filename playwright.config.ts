@@ -40,7 +40,7 @@ export default defineConfig({
   outputDir: './test-results',
   
   use: {
-    baseURL: 'http://127.0.0.1:3001',
+    baseURL: 'http://127.0.0.1:3101',
     // Keep diagnostics for failures/retries without overloading CI runners.
     trace: process.env.CI ? 'retain-on-failure' : 'on-first-retry',
     screenshot: 'only-on-failure',
@@ -56,8 +56,8 @@ export default defineConfig({
   
   webServer: {
     command: 'bash scripts/playwright-webserver.sh',
-    url: 'http://127.0.0.1:3001',
-    reuseExistingServer: true,
+    url: 'http://127.0.0.1:3101',
+    reuseExistingServer: process.env.PLAYWRIGHT_REUSE_SERVER === '1',
     timeout: 120000,
   },
 })

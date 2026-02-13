@@ -5,6 +5,7 @@ import { put } from '@vercel/blob'
 import { NextRequest, NextResponse } from 'next/server'
 import { getSession } from '@/lib/auth'
 import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
+import { scanTextForPolicyViolations } from '@/lib/moderationScan'
 import { hasSameOriginHeader } from '@/lib/validation'
 
 export const runtime = 'nodejs'
@@ -103,6 +104,10 @@ export async function POST(request: NextRequest) {
 
   if (!(file instanceof File)) {
     return NextResponse.json({ error: 'Image file is required' }, { status: 400 })
+  }
+  const filenameModeration = scanTextForPolicyViolations(file.name)
+  if (filenameModeration.blocked) {
+    return NextResponse.json({ error: 'Image filename violates the Acceptable Use Policy.' }, { status: 400 })
   }
 
   if (file.size <= 0) {

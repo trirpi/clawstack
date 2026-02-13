@@ -5,6 +5,7 @@ import { Resend } from 'resend'
 import { sanitizeHtmlBasic, sanitizePlainText } from '@/lib/sanitize'
 import { hasSameOriginHeader, validateSendPostPayload } from '@/lib/validation'
 import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
+import { formatModerationSummary, scanTextForPolicyViolations } from '@/lib/moderationScan'
 
 const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
@@ -52,6 +53,17 @@ export async function POST(request: NextRequest) {
 
     if (!post) {
       return NextResponse.json({ error: 'Post not found or not published' }, { status: 404 })
+    }
+    const moderationResult = scanTextForPolicyViolations(`${post.title}\n${post.excerpt || ''}\n${post.content}`)
+    if (moderationResult.blocked) {
+      return NextResponse.json(
+        {
+          error: 'Post content violates the Acceptable Use Policy.',
+          reasons: moderationResult.findings.map((item) => item.reason),
+          details: formatModerationSummary(moderationResult.findings),
+        },
+        { status: 400 },
+      )
     }
 
     // Get all subscribers

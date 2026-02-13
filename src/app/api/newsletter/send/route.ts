@@ -5,6 +5,7 @@ import { Resend } from 'resend'
 import { sanitizeHtmlBasic, sanitizePlainText } from '@/lib/sanitize'
 import { hasSameOriginHeader, validateNewsletterPayload } from '@/lib/validation'
 import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
+import { formatModerationSummary, scanTextForPolicyViolations } from '@/lib/moderationScan'
 
 const resend = process.env.RESEND_API_KEY 
   ? new Resend(process.env.RESEND_API_KEY)
@@ -42,6 +43,17 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid newsletter payload' }, { status: 400 })
     }
     const { subject, content } = payload
+    const moderationResult = scanTextForPolicyViolations(`${subject}\n${content}`)
+    if (moderationResult.blocked) {
+      return NextResponse.json(
+        {
+          error: 'Newsletter content violates the Acceptable Use Policy.',
+          reasons: moderationResult.findings.map((item) => item.reason),
+          details: formatModerationSummary(moderationResult.findings),
+        },
+        { status: 400 },
+      )
+    }
     const safeSubject = sanitizePlainText(subject).slice(0, 180)
     const safeHtml = sanitizeHtmlBasic(content.replace(/\n/g, '<br>'))
 

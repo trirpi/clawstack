@@ -75,6 +75,11 @@ export default function TermsPage() {
               aggrieved parties to report content that violates our Acceptable Use Policy or Terms
               of Service and to request removal.
             </p>
+            <p>
+              We also use automated programmatic moderation controls, including keyword scanning on
+              newly submitted posts, comments, newsletters, and image filenames. Flagged content is
+              blocked or moved into manual review and may be automatically unpublished.
+            </p>
 
             <h2 className="text-2xl font-bold text-gray-900 mt-8">7. Repeat Violators</h2>
             <p>

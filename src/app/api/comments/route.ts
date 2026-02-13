@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { hasSameOriginHeader, validateCommentPayload } from '@/lib/validation'
 import { sanitizePlainText } from '@/lib/sanitize'
 import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
+import { formatModerationSummary, scanTextForPolicyViolations } from '@/lib/moderationScan'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -32,6 +33,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid comment payload' }, { status: 400 })
     }
     const { postId, content, parentId } = payload
+    const moderationResult = scanTextForPolicyViolations(content)
+    if (moderationResult.blocked) {
+      return NextResponse.json(
+        {
+          error: 'Comment violates the Acceptable Use Policy.',
+          reasons: moderationResult.findings.map((item) => item.reason),
+          details: formatModerationSummary(moderationResult.findings),
+        },
+        { status: 400 },
+      )
+    }
 
     // Verify the post exists and enforce visibility access.
     const post = await prisma.post.findUnique({

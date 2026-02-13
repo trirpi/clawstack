@@ -11,4 +11,4 @@ unset FORCE_COLOR
 npm run db:local:ci
 
 export DATABASE_URL="file:./dev.db"
-npm run dev -- --webpack --hostname 127.0.0.1 --port 3001
+npm run dev -- --webpack --hostname 127.0.0.1 --port "${PLAYWRIGHT_WEB_PORT:-3101}"

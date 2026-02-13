@@ -5,6 +5,7 @@ import { prisma } from '@/lib/prisma'
 import { sanitizeHtmlBasic } from '@/lib/sanitize'
 import { hasSameOriginHeader, validatePostPayload } from '@/lib/validation'
 import { consumeRateLimit, rateLimitResponse } from '@/lib/rateLimit'
+import { formatModerationSummary, scanTextForPolicyViolations } from '@/lib/moderationScan'
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -41,6 +42,17 @@ export async function POST(request: NextRequest) {
       visibility,
       published,
     } = payload
+    const moderationResult = scanTextForPolicyViolations([title, excerpt || '', content].join('\n'))
+    if (moderationResult.blocked) {
+      return NextResponse.json(
+        {
+          error: 'Post content violates the Acceptable Use Policy.',
+          reasons: moderationResult.findings.map((item) => item.reason),
+          details: formatModerationSummary(moderationResult.findings),
+        },
+        { status: 400 },
+      )
+    }
 
     // Verify the user owns this publication
     const publication = await prisma.publication.findUnique({
@@ -125,6 +137,17 @@ export async function PUT(request: NextRequest) {
       visibility,
       published,
     } = payload
+    const moderationResult = scanTextForPolicyViolations([title, excerpt || '', content].join('\n'))
+    if (moderationResult.blocked) {
+      return NextResponse.json(
+        {
+          error: 'Post content violates the Acceptable Use Policy.',
+          reasons: moderationResult.findings.map((item) => item.reason),
+          details: formatModerationSummary(moderationResult.findings),
+        },
+        { status: 400 },
+      )
+    }
 
     // Get the post and verify ownership
     const existingPost = await prisma.post.findUnique({

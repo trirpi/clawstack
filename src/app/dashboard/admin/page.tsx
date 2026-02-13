@@ -4,6 +4,7 @@ import { getSession } from '@/lib/auth'
 import { Header } from '@/components/layout/Header'
 import { DashboardNav } from '@/components/dashboard/DashboardNav'
 import { SeedDemoButton } from './SeedDemoButton'
+import { RunModerationScanButton } from './RunModerationScanButton'
 
 export const metadata = {
   title: 'Admin - Clawstack',
@@ -29,6 +30,15 @@ export default async function AdminDashboardPage() {
         <p className="mt-2 text-gray-700">
           Create demo users and content to verify subscriptions, moderation, and email flows.
         </p>
+
+        <section className="app-panel mt-6 space-y-4 p-6">
+          <h2 className="app-heading text-2xl">Moderation</h2>
+          <p className="text-sm text-gray-700">
+            Run a programmatic keyword scan on published posts. Flagged content is automatically unpublished and sent
+            to the reports queue for manual review.
+          </p>
+          <RunModerationScanButton />
+        </section>
 
         <section className="app-panel mt-6 space-y-4 p-6">
           <h2 className="app-heading text-2xl">Demo Environment</h2>
