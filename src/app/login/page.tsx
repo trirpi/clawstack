@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 
@@ -32,6 +32,9 @@ function LoginContent() {
       ? callbackUrlParam
       : '/dashboard'
   const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
+  const reviewerEnabled = process.env.NEXT_PUBLIC_REVIEWER_AUTH_ENABLED === 'true'
+  const [reviewerUsername, setReviewerUsername] = useState('')
+  const [reviewerPassword, setReviewerPassword] = useState('')
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -99,6 +102,45 @@ function LoginContent() {
               </svg>
               Continue with Google
             </Button>
+          )}
+
+          {reviewerEnabled && (
+            <form
+              className="space-y-3 rounded-lg border border-black/10 bg-white p-4"
+              onSubmit={(event) => {
+                event.preventDefault()
+                signIn('reviewer', {
+                  username: reviewerUsername.trim(),
+                  password: reviewerPassword,
+                  callbackUrl,
+                })
+              }}
+            >
+              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-600">
+                Reviewer Access
+              </div>
+              <input
+                value={reviewerUsername}
+                onChange={(event) => setReviewerUsername(event.target.value)}
+                type="text"
+                autoComplete="username"
+                placeholder="Username"
+                className="w-full rounded-md border border-black/15 px-3 py-2 text-sm focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700"
+                required
+              />
+              <input
+                value={reviewerPassword}
+                onChange={(event) => setReviewerPassword(event.target.value)}
+                type="password"
+                autoComplete="current-password"
+                placeholder="Password"
+                className="w-full rounded-md border border-black/15 px-3 py-2 text-sm focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700"
+                required
+              />
+              <Button type="submit" variant="outline" className="w-full">
+                Sign in as Reviewer
+              </Button>
+            </form>
           )}
 
           <div className="relative">

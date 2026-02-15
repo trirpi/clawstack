@@ -163,9 +163,24 @@ GOOGLE_CLIENT_ID=<optional>
 GOOGLE_CLIENT_SECRET=<optional>
 NEXT_PUBLIC_GOOGLE_AUTH_ENABLED=true
 PLATFORM_ADMIN_EMAIL=tristan.trouwen@gmail.com
+TEMP_REVIEWER_USERNAME=<optional for Stripe review>
+TEMP_REVIEWER_PASSWORD=<optional for Stripe review>
+TEMP_REVIEWER_EMAIL=stripe-reviewer@clawstack.local
+TEMP_REVIEWER_NAME="Stripe Reviewer"
+NEXT_PUBLIC_REVIEWER_AUTH_ENABLED=true
 STRIPE_SECRET_KEY=sk_live_xxx
 STRIPE_WEBHOOK_SECRET=whsec_xxx
 ```
+
+### Temporary Reviewer Login (for Stripe compliance review)
+
+If Stripe asks for a temporary admin/reviewer account:
+
+1. Set `TEMP_REVIEWER_USERNAME` and `TEMP_REVIEWER_PASSWORD` in Vercel.
+2. Set `NEXT_PUBLIC_REVIEWER_AUTH_ENABLED=true`.
+3. Redeploy.
+4. Share only that temporary username/password with Stripe.
+5. After review, remove those env vars and redeploy to disable reviewer login.
 
 ## Clawstack Integration
 
