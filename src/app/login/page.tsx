@@ -2,7 +2,7 @@
 
 import { signIn } from 'next-auth/react'
 import { useSearchParams } from 'next/navigation'
-import { Suspense, useState } from 'react'
+import { Suspense } from 'react'
 import { Button } from '@/components/ui/Button'
 import Link from 'next/link'
 
@@ -32,9 +32,6 @@ function LoginContent() {
       ? callbackUrlParam
       : '/dashboard'
   const googleEnabled = process.env.NEXT_PUBLIC_GOOGLE_AUTH_ENABLED === 'true'
-  const reviewerEnabled = process.env.NEXT_PUBLIC_REVIEWER_AUTH_ENABLED === 'true'
-  const [reviewerUsername, setReviewerUsername] = useState('')
-  const [reviewerPassword, setReviewerPassword] = useState('')
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
@@ -44,12 +41,8 @@ function LoginContent() {
             <span className="text-4xl">🦞</span>
             <span className="text-2xl font-bold text-gray-900">Clawstack</span>
           </Link>
-          <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Welcome back
-          </h2>
-          <p className="mt-2 text-gray-600">
-            Sign in to your account to continue
-          </p>
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">Welcome back</h2>
+          <p className="mt-2 text-gray-600">Sign in to your account to continue</p>
         </div>
 
         {errorMessage && (
@@ -104,56 +97,6 @@ function LoginContent() {
             </Button>
           )}
 
-          {reviewerEnabled && (
-            <form
-              className="space-y-3 rounded-lg border border-black/10 bg-white p-4"
-              onSubmit={(event) => {
-                event.preventDefault()
-                signIn('reviewer', {
-                  username: reviewerUsername.trim(),
-                  password: reviewerPassword,
-                  callbackUrl,
-                })
-              }}
-            >
-              <div className="text-xs font-semibold uppercase tracking-[0.18em] text-gray-600">
-                Reviewer Access
-              </div>
-              <input
-                value={reviewerUsername}
-                onChange={(event) => setReviewerUsername(event.target.value)}
-                type="text"
-                autoComplete="username"
-                placeholder="Username"
-                className="w-full rounded-md border border-black/15 px-3 py-2 text-sm focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700"
-                required
-              />
-              <input
-                value={reviewerPassword}
-                onChange={(event) => setReviewerPassword(event.target.value)}
-                type="password"
-                autoComplete="current-password"
-                placeholder="Password"
-                className="w-full rounded-md border border-black/15 px-3 py-2 text-sm focus:border-amber-700 focus:outline-none focus:ring-1 focus:ring-amber-700"
-                required
-              />
-              <Button type="submit" variant="outline" className="w-full">
-                Sign in as Reviewer
-              </Button>
-            </form>
-          )}
-
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-gray-300" />
-            </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-2 bg-gray-50 text-gray-500">
-                Popular with developers
-              </span>
-            </div>
-          </div>
-
           <p className="text-center text-sm text-gray-600">
             By signing in, you agree to our{' '}
             <Link href="/terms" className="text-amber-700 hover:underline">
@@ -172,11 +115,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-pulse text-gray-400">Loading...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-pulse text-gray-400">Loading...</div>
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   )

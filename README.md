@@ -179,7 +179,7 @@ If Stripe asks for a temporary admin/reviewer account:
 1. Set `TEMP_REVIEWER_USERNAME` and `TEMP_REVIEWER_PASSWORD` in Vercel.
 2. Set `NEXT_PUBLIC_REVIEWER_AUTH_ENABLED=true` (reviewer password login is disabled by default unless this is explicitly enabled).
 3. Redeploy.
-4. Share only that temporary username/password with Stripe.
+4. Share only that temporary username/password with Stripe and the URL `/reviewer-login` (for example `https://your-app.vercel.app/reviewer-login`).
 5. After review, remove those env vars and redeploy to disable reviewer login.
 
 ## Clawstack Integration
