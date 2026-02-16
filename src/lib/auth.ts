@@ -28,6 +28,10 @@ function getTemporaryReviewerConfig() {
   }
 }
 
+function isTemporaryReviewerAuthEnabled() {
+  return process.env.NEXT_PUBLIC_REVIEWER_AUTH_ENABLED === 'true'
+}
+
 function getPlatformAdminEmails() {
   const emails = new Set<string>()
   const platformAdminEmail = normalizeEmail(process.env.PLATFORM_ADMIN_EMAIL)
@@ -35,7 +39,7 @@ function getPlatformAdminEmails() {
     emails.add(platformAdminEmail)
   }
 
-  const reviewer = getTemporaryReviewerConfig()
+  const reviewer = isTemporaryReviewerAuthEnabled() ? getTemporaryReviewerConfig() : null
   if (reviewer?.email) {
     emails.add(reviewer.email)
   }
@@ -62,7 +66,7 @@ export const authOptions: NextAuthOptions = {
       )
     }
 
-    const reviewer = getTemporaryReviewerConfig()
+    const reviewer = isTemporaryReviewerAuthEnabled() ? getTemporaryReviewerConfig() : null
     if (reviewer) {
       providers.push(
         CredentialsProvider({
