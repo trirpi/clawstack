@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import { ReviewerLoginForm } from './reviewer-login-form'
@@ -23,5 +24,15 @@ export default function ReviewerLoginPage() {
     notFound()
   }
 
-  return <ReviewerLoginForm />
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center bg-gray-50">
+          <div className="animate-pulse text-gray-400">Loading reviewer login...</div>
+        </div>
+      }
+    >
+      <ReviewerLoginForm />
+    </Suspense>
+  )
 }
