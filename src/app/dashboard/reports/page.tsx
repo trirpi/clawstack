@@ -24,8 +24,9 @@ type ReportStatusFilter = ReportStatus | 'ALL'
 type ReportReasonFilter = ReportReason | 'ALL'
 
 function normalizeFilter(value: string | undefined): ReportStatusFilter {
-  if (!value) return 'ALL'
-  return (REPORT_STATUS_VALUES as readonly string[]).includes(value) ? (value as ReportStatus) : 'ALL'
+  if (!value) return 'OPEN'
+  if (value === 'ALL') return 'ALL'
+  return (REPORT_STATUS_VALUES as readonly string[]).includes(value) ? (value as ReportStatus) : 'OPEN'
 }
 
 function normalizeReasonFilter(value: string | undefined): ReportReasonFilter {
@@ -231,7 +232,7 @@ export default async function ReportsPage({ searchParams }: Props) {
 
   function buildFilterHref(nextStatus: ReportStatusFilter, nextReason: ReportReasonFilter) {
     const params = new URLSearchParams()
-    if (nextStatus !== 'ALL') params.set('status', nextStatus)
+    if (nextStatus !== 'OPEN') params.set('status', nextStatus)
     if (nextReason !== 'ALL') params.set('reason', nextReason)
     const query = params.toString()
     return query ? `/dashboard/reports?${query}` : '/dashboard/reports'
